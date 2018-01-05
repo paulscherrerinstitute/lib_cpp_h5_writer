@@ -51,7 +51,6 @@ class HDF5ChunkedWriter
     void create_file(const MessageMetadata& metadata, hsize_t frame_chunk=0);
 
     public:
-        HDF5ChunkedWriter();
         HDF5ChunkedWriter(const std::string filename, const std::string dataset_name, hsize_t frames_per_file=0, hsize_t initial_dataset_size=config::initial_dataset_size);
         void close_file();
         void write_data(const MessageMetadata& metadata, char* data);
