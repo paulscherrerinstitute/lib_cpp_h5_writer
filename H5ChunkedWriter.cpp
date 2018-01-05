@@ -90,16 +90,16 @@ void HDF5ChunkedWriter::close_file()
     max_frame_index = 0;
 }
 
-void HDF5ChunkedWriter::write_data(const MessageMetadata& metadata, char* data)
+void HDF5ChunkedWriter::write_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data)
 {
     // Define the ofset of the currently received image in the file.
-    hsize_t relative_frame_index = prepare_storage_for_frame(metadata);
+    hsize_t relative_frame_index = prepare_storage_for_frame(frame_index, frame_shape);
 
     // Define where to write values in the dataset.
     const hsize_t offset[] = {relative_frame_index, 0, 0};
     uint32_t filters = 0;
     
-    if( H5DOwrite_chunk(dataset.getId(), H5P_DEFAULT, filters, offset, metadata.size, data) )
+    if( H5DOwrite_chunk(dataset.getId(), H5P_DEFAULT, filters, offset, data_bytes_size, data) )
     {
         std::stringstream error_message;
         error_message << "Error while writing chunk to file at offset " << relative_frame_index << "." << std::endl;
@@ -108,7 +108,7 @@ void HDF5ChunkedWriter::write_data(const MessageMetadata& metadata, char* data)
     }
 }
 
-void HDF5ChunkedWriter::create_file(const MessageMetadata& metadata, hsize_t frame_chunk) {
+void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk) {
 
     if (file.getId() != -1) {
         close_file();
@@ -141,8 +141,8 @@ void HDF5ChunkedWriter::create_file(const MessageMetadata& metadata, hsize_t fra
     data_type.setOrder( config::dataset_byte_order );
 
     hsize_t dataset_rank = 3;
-    const hsize_t dataset_dimension[] = {initial_dataset_size, metadata.frame_shape[0], metadata.frame_shape[1]};
-    const hsize_t max_dataset_dimension[] = {H5S_UNLIMITED, metadata.frame_shape[0], metadata.frame_shape[1]};
+    const hsize_t dataset_dimension[] = {initial_dataset_size, frame_shape[0], frame_shape[1]};
+    const hsize_t max_dataset_dimension[] = {H5S_UNLIMITED, frame_shape[0], frame_shape[1]};
     H5::DataSpace dataspace(dataset_rank, dataset_dimension, max_dataset_dimension);
 
     #ifdef DEBUG
@@ -155,7 +155,7 @@ void HDF5ChunkedWriter::create_file(const MessageMetadata& metadata, hsize_t fra
 
     // Set chunking to single image.
     H5::DSetCreatPropList dataset_properties;
-    const hsize_t dataset_chunking[] = {1, metadata.frame_shape[0], metadata.frame_shape[1]};
+    const hsize_t dataset_chunking[] = {1, frame_shape[0], frame_shape[1]};
     dataset_properties.setChunk(dataset_rank, dataset_chunking);
 
     // Take into account initial size, set chunking.
@@ -167,9 +167,9 @@ void HDF5ChunkedWriter::create_file(const MessageMetadata& metadata, hsize_t fra
 
 }
 
-hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(const MessageMetadata& metadata) {
+hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t* frame_shape) {
 
-    auto frame_index = metadata.frame_index;
+    hsize_t relative_frame_index = frame_index;
 
     // Check if we have to create a new file.
     if (frames_per_file) {
@@ -177,33 +177,33 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(const MessageMetadata& meta
 
         // This frames does not go into this file.
         if (frame_chunk != current_frame_chunk) {
-            create_file(metadata, frame_chunk);
+            create_file(frame_shape, frame_chunk);
         }
 
         // Make the frame_index relative to this chunk (file).
-        frame_index = frame_index - ((frame_chunk - 1) * frames_per_file);
+        relative_frame_index = frame_index - ((frame_chunk - 1) * frames_per_file);
     }
 
     #ifdef DEBUG
-        std::cout << "Received frame index " << metadata.frame_index << " and processed as relative frame index " << frame_index << std::endl;
+        std::cout << "Received frame index " << frame_index << " and processed as relative frame index " << relative_frame_index << std::endl;
     #endif
 
     // Open the file if needed.
     if (file.getId() == -1) {
-        create_file(metadata);
+        create_file(frame_shape);
     }
 
     // Expand the dataset if needed.
-    if (frame_index > current_dataset_size) {
-        current_dataset_size = expand_dataset(dataset, frame_index, dataset_increase_step);
+    if (relative_frame_index > current_dataset_size) {
+        current_dataset_size = expand_dataset(dataset, relative_frame_index, dataset_increase_step);
     }
 
     // Keep track of the max index in this file - needed for shrinking the dataset at the end.
-    if (frame_index > max_frame_index) {
-        max_frame_index = frame_index;
+    if (relative_frame_index > max_frame_index) {
+        max_frame_index = relative_frame_index;
     }
 
-    return frame_index;
+    return relative_frame_index;
 }
 
 int main (int argc, char *argv[])
@@ -211,26 +211,20 @@ int main (int argc, char *argv[])
 
     HDF5ChunkedWriter writer("juhu-%d.h5", "data", 4, 2);
 
-    MessageMetadata metadata;
-    metadata.frame_index = 0;
-    metadata.frame_shape[0] = 5;
-    metadata.frame_shape[1] = 10;
-    metadata.size = metadata.frame_shape[0] * metadata.frame_shape[1];
-    metadata.dtype = "bytes";
-
-    char data[metadata.size];
+    char data[100];
+    size_t frame_shape[]={10, 10};
+    // Frame size is in bytes.
+    size_t data_bytes_size = frame_shape[0] * frame_shape[1] * 1;
     
 
-    for( int x=0; x<10; ++x )
-    {
-        metadata.frame_index = x;
-        
-        for( uint32_t y=0; y<metadata.size; ++y )
+    for( size_t frame_index=0; frame_index<10; ++frame_index )
+    {    
+        for( uint32_t y=0; y<data_bytes_size; ++y )
         {
-            data[y] = x;
+            data[y] = frame_index;
         }
         
-        writer.write_data(metadata, data);
+        writer.write_data(frame_index, frame_shape, data_bytes_size, data);
     }
 
     writer.close_file();
