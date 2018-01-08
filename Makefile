@@ -14,6 +14,9 @@ OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
 all: build_dirs h5_zmq_writer
 
+debug: CPPFLAGS += -DDEBUG -g
+debug: all
+
 h5_zmq_writer: $(OBJS)
 	$(CPP) $(LDFLAGS) -o $(BIN_DIR)/h5_zmq_writer $(OBJS) $(LDLIBS)
 
