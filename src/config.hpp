@@ -1,7 +1,7 @@
 #include <H5Cpp.h>
 
-#ifndef CONFIG
-#define CONFIG
+#ifndef CONFIG_H
+#define CONFIG_H
 
 namespace config
 {
