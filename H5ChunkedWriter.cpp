@@ -64,7 +64,7 @@ void HDF5ChunkedWriter::close_file()
         #ifdef DEBUG
             std::cout << "Trying to close an already closed file." << std::endl;
         #endif
-        
+
         return;
     }
 
@@ -221,30 +221,4 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t*
     }
 
     return relative_frame_index;
-}
-
-int main (int argc, char *argv[])
-{
-
-    HDF5ChunkedWriter writer("juhu-%d.h5", "data", 4, 2);
-
-    char data[100];
-    size_t frame_shape[]={10, 10};
-    // Frame size is in bytes.
-    size_t data_bytes_size = frame_shape[0] * frame_shape[1] * 1;
-    
-
-    for( size_t frame_index=0; frame_index<10; ++frame_index )
-    {    
-        for( uint32_t y=0; y<data_bytes_size; ++y )
-        {
-            data[y] = frame_index;
-        }
-        
-        writer.write_data(frame_index, frame_shape, data_bytes_size, data);
-    }
-
-    writer.close_file();
-
-    return 0;
 }
