@@ -53,8 +53,25 @@ HDF5ChunkedWriter::HDF5ChunkedWriter(const std::string filename, const std::stri
     this->initial_dataset_size = initial_dataset_size;
 }
 
+HDF5ChunkedWriter::~HDF5ChunkedWriter()
+{
+    close_file();
+}
+
 void HDF5ChunkedWriter::close_file()
 {
+    if (file.getId() == -1) {
+        #ifdef DEBUG
+            std::cout << "Trying to close an already closed file." << std::endl;
+        #endif
+        
+        return;
+    }
+
+    #ifdef DEBUG
+        std::cout << "Closing file." << std::endl;
+    #endif
+
     compact_dataset(dataset, max_frame_index);
     
     hsize_t min_frame_in_dataset = 0;
