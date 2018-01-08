@@ -5,14 +5,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <iostream>
-
-namespace config
-{
-    auto dataset_type = H5::PredType::NATIVE_UINT8;
-    auto dataset_byte_order = H5T_ORDER_LE;
-    hsize_t dataset_increase_step = 1000;
-    hsize_t initial_dataset_size = 1000;
-}
+#include "config.hpp"
 
 hsize_t expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
 

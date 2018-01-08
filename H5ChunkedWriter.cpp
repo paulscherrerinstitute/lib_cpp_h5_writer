@@ -212,7 +212,7 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t*
 
     // Expand the dataset if needed.
     if (relative_frame_index > current_dataset_size) {
-        current_dataset_size = expand_dataset(dataset, relative_frame_index, dataset_increase_step);
+        current_dataset_size = expand_dataset(dataset, relative_frame_index, config::dataset_increase_step);
     }
 
     // Keep track of the max index in this file - needed for shrinking the dataset at the end.
