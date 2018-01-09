@@ -69,7 +69,7 @@ void HDF5ChunkedWriter::close_file()
     }
 
     #ifdef DEBUG
-        std::cout << "Closing file." << std::endl;
+        std::cout << "[H5ChunkedWriter] Closing file." << std::endl;
     #endif
 
     compact_dataset(dataset, max_frame_index);
