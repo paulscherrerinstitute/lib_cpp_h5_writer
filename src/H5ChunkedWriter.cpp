@@ -14,7 +14,7 @@ hsize_t expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t 
     dataset_dimension[0] = frame_index + dataset_increase_step;
 
     #ifdef DEBUG
-        std::cout << "[H5ChunkedWriter] Expanding dataspace to size (";
+        std::cout << "[expand_dataset] Expanding dataspace to size (";
         for (hsize_t i=0; i<dataset_rank; ++i) {
             std::cout << dataset_dimension[i] << ",";
         }
@@ -35,7 +35,7 @@ void compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index)
     dataset_dimension[0] = max_frame_index + 1;
 
     #ifdef DEBUG
-        std::cout << "[H5ChunkedWriter] Compacting dataspace to size (";
+        std::cout << "[compact_dataset] Compacting dataspace to size (";
         for (hsize_t i=0; i<dataset_rank; ++i) {
             std::cout << dataset_dimension[i] << ",";
         }
@@ -62,14 +62,14 @@ void HDF5ChunkedWriter::close_file()
 {
     if (file.getId() == -1) {
         #ifdef DEBUG
-            std::cout << "[H5ChunkedWriter] Trying to close an already closed file." << std::endl;
+            std::cout << "[HDF5ChunkedWriter::close_file] Trying to close an already closed file." << std::endl;
         #endif
 
         return;
     }
 
     #ifdef DEBUG
-        std::cout << "[H5ChunkedWriter] Closing file." << std::endl;
+        std::cout << "[HDF5ChunkedWriter::close_file] Closing file." << std::endl;
     #endif
 
     compact_dataset(dataset, max_frame_index);
@@ -87,7 +87,7 @@ void HDF5ChunkedWriter::close_file()
     auto image_nr_high = max_frame_in_dataset + 1;
 
     #ifdef DEBUG
-        std::cout << "[H5ChunkedWriter] Setting dataset attribute image_nr_low=" << image_nr_low << " and image_nr_high=" << image_nr_high << std::endl;
+        std::cout << "[HDF5ChunkedWriter::close_file] Setting dataset attribute image_nr_low=" << image_nr_low << " and image_nr_high=" << image_nr_high << std::endl;
     #endif
 
     // H5::IntType int_type(H5::PredType::NATIVE_UINT32);
@@ -136,7 +136,7 @@ void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk) {
     // In case frames_per_file is > 0, the filename variable is a template for the filename.
     if (frames_per_file) {
         #ifdef DEBUG
-            std::cout << "[H5ChunkedWriter] Frames per file is defined. Format " << filename << " with frame_chunk " << frame_chunk << std::endl;
+            std::cout << "[HDF5ChunkedWriter::create_file] Frames per file is defined. Format " << filename << " with frame_chunk " << frame_chunk << std::endl;
         #endif
 
         // Space for 10 digits should be enough.
@@ -147,7 +147,7 @@ void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk) {
     }
 
     #ifdef DEBUG
-        std::cout << "[H5ChunkedWriter] Creating filename " << target_filename << std::endl;
+        std::cout << "[HDF5ChunkedWriter::create_file] Creating filename " << target_filename << std::endl;
     #endif
 
     // TODO: Create folder if it does not exist.
@@ -163,7 +163,7 @@ void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk) {
     H5::DataSpace dataspace(dataset_rank, dataset_dimension, max_dataset_dimension);
 
     #ifdef DEBUG
-        std::cout << "[H5ChunkedWriter] Creating dataspace of size (";
+        std::cout << "[HDF5ChunkedWriter::create_file] Creating dataspace of size (";
         for (hsize_t i=0; i<dataset_rank; ++i) {
             std::cout << dataset_dimension[i] << ",";
         }
@@ -202,7 +202,7 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t*
     }
 
     #ifdef DEBUG
-        std::cout << "[H5ChunkedWriter] Received frame index " << frame_index << " and processed as relative frame index " << relative_frame_index << std::endl;
+        std::cout << "[HDF5ChunkedWriter::prepare_storage_for_frame] Received frame index " << frame_index << " and processed as relative frame index " << relative_frame_index << std::endl;
     #endif
 
     // Open the file if needed.
