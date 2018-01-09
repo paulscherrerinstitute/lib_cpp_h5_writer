@@ -14,13 +14,13 @@
 
 struct FrameMetadata
 {
+    // Needed for the buffer.
     size_t buffer_slot_index = 0;
-
     size_t frame_bytes_size = 0;
+
+    // Part of the message header.
     size_t frame_index = 0;
     size_t frame_shape[2];
-
-    std::string frame_header;
 };
 
 class RingBuffer
