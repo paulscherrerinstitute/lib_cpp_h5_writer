@@ -2,7 +2,7 @@
 
 RingBuffer::RingBuffer(size_t n_slots) : n_slots(n_slots), ringbuffer_slots(n_slots, 0){
     #ifdef DEBUG
-        std::cout << "Creating ring buffer with n_slots " << n_slots << std::endl;
+        std::cout << "[RingBuffer] Creating ring buffer with n_slots " << n_slots << std::endl;
     #endif
 }
 
@@ -25,7 +25,7 @@ void RingBuffer::initialize(size_t slot_size)
     }
 
     #ifdef DEBUG
-        std::cout << "Initializing ring buffer with slot_size " << slot_size << std::endl;
+        std::cout << "[RingBuffer] Initializing ring buffer with slot_size " << slot_size << std::endl;
     #endif
     
     this->write_index = 0;
@@ -55,7 +55,7 @@ void RingBuffer::write(FrameMetadata &metadata, char* data)
         metadata.buffer_slot_index = write_index;
 
         #ifdef DEBUG
-            std::cout << "Ring buffer slot " << metadata.buffer_slot_index << " reserved for frame_index " << metadata.frame_index << std::endl;
+            std::cout << "[RingBuffer] Ring buffer slot " << metadata.buffer_slot_index << " reserved for frame_index " << metadata.frame_index << std::endl;
         #endif
 
         // Increase and wrap the write index around if needed.
@@ -75,7 +75,7 @@ void RingBuffer::write(FrameMetadata &metadata, char* data)
     std::memcpy(slot_memory_address, data, metadata.frame_bytes_size);
 
     #ifdef DEBUG
-        std::cout << "Copied " << metadata.frame_bytes_size << " frame bytes to buffer_slot_index " << metadata.buffer_slot_index << std::endl;
+        std::cout << "[RingBuffer] Copied " << metadata.frame_bytes_size << " frame bytes to buffer_slot_index " << metadata.buffer_slot_index << std::endl;
     #endif
     
     frame_metadata_queue_mutex.lock();
@@ -86,7 +86,7 @@ void RingBuffer::write(FrameMetadata &metadata, char* data)
     frame_metadata_queue_mutex.unlock();
 
     #ifdef DEBUG
-        std::cout << "Metadata for frame_index " << metadata.frame_index << " added to metadata queue." << std::endl;
+        std::cout << "[RingBuffer] Metadata for frame_index " << metadata.frame_index << " added to metadata queue." << std::endl;
     #endif
 }
 
@@ -102,7 +102,7 @@ char* RingBuffer::get_buffer_slot_address(size_t buffer_slot_index) {
     }
 
     #ifdef DEBUG
-        std::cout << "For buffer_slot_index " << buffer_slot_index << " the calculated memory address is " << long(slot_memory_address) << std::endl;
+        std::cout << "[RingBuffer] For buffer_slot_index " << buffer_slot_index << " the calculated memory address is " << long(slot_memory_address) << std::endl;
     #endif
 
     return slot_memory_address;
@@ -127,7 +127,7 @@ std::pair<FrameMetadata, char*> RingBuffer::read()
             frame_metadata_queue_mutex.unlock();
 
              #ifdef DEBUG
-                std::cout << "Received metadata for frame_index " << frame_metadata.frame_index << std::endl;
+                std::cout << "[RingBuffer] Received metadata for frame_index " << frame_metadata.frame_index << std::endl;
             #endif
         }
 
