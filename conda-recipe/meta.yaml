@@ -1,0 +1,32 @@
+package:
+    name: zmq_h5_writer 
+    version: 0.0.1
+
+build:
+  number: 0
+
+source:
+    path: ..
+
+requirements:
+    build:
+        - make
+        - gcc
+        - cppzmq
+        - hdf5
+        - rapidjson
+
+    run:
+        - cmake
+        - gcc
+        - cppzmq
+        - hdf5
+        - rapidjson
+
+    test:
+        - gtest
+
+
+about:
+    summary: "C++ implementation of a ZMQ to H5 writer."
+
