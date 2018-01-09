@@ -34,6 +34,7 @@ class RingBuffer
     size_t buffer_size = 0;
     char* frame_data_buffer = NULL;
     size_t write_index = 0;
+    size_t buffer_used_slots;
 
     std::list<FrameMetadata> frame_metadata_queue;
     std::mutex frame_metadata_queue_mutex;
@@ -48,6 +49,8 @@ class RingBuffer
         void write(FrameMetadata &metadata, char* data);
         std::pair<FrameMetadata, char*>  read();
         void release(size_t buffer_slot_index);
+        bool is_empty();
+        
 };
 
 #endif
