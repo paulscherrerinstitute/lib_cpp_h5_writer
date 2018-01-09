@@ -1,4 +1,11 @@
 #include "RingBuffer.hpp"
+#include <stdexcept>
+#include <chrono>
+#include <thread>
+#include <sstream>
+#include <cstring>
+#include <iostream>
+#include <cstddef>
 
 RingBuffer::RingBuffer(size_t n_slots) : n_slots(n_slots), ringbuffer_slots(n_slots, 0){
     #ifdef DEBUG
@@ -33,6 +40,7 @@ void RingBuffer::initialize(size_t slot_size)
     this->buffer_size = slot_size * n_slots;
     this->frame_data_buffer = new char[buffer_size];
     this->buffer_used_slots = 0;
+    this->ring_buffer_initialized = true;
 
     #ifdef DEBUG
         std::cout << "[RingBuffer::initialize] Total buffer_size " << buffer_size << std::endl;
@@ -41,6 +49,11 @@ void RingBuffer::initialize(size_t slot_size)
 
 void RingBuffer::write(FrameMetadata &metadata, char* data)
 {
+    // Initialize the buffer on the first write.
+    if (!ring_buffer_initialized) {
+        initialize(metadata.frame_bytes_size);
+    }
+
     // All images must fit in the ring buffer.
     if (metadata.frame_bytes_size > slot_size) {
         std::stringstream error_message;
@@ -126,6 +139,7 @@ std::pair<FrameMetadata, char*> RingBuffer::read()
 
         if (frame_metadata_queue.empty()) {
             frame_metadata_queue_mutex.unlock();
+
             continue;
 
         } else {

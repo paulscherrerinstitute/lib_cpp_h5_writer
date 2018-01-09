@@ -1,16 +1,11 @@
 #ifndef RINGBUFFER_H
 #define RINGBUFFER_H
 
-#include <cstddef>
 #include <list>
-#include <thread>
 #include <vector>
 #include <map>
-#include <stdexcept>
 #include <mutex>
-#include <sstream>
-#include <cstring>
-#include <iostream>
+
 
 struct FrameMetadata
 {
@@ -35,6 +30,7 @@ class RingBuffer
     char* frame_data_buffer = NULL;
     size_t write_index = 0;
     size_t buffer_used_slots;
+    bool ring_buffer_initialized = false;
 
     std::list<FrameMetadata> frame_metadata_queue;
     std::mutex frame_metadata_queue_mutex;
@@ -47,7 +43,7 @@ class RingBuffer
         ~RingBuffer();
         void initialize(size_t slot_size);
         void write(FrameMetadata &metadata, char* data);
-        std::pair<FrameMetadata, char*>  read();
+        std::pair<FrameMetadata, char*> read();
         void release(size_t buffer_slot_index);
         bool is_empty();
         
