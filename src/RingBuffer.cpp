@@ -33,6 +33,10 @@ void RingBuffer::initialize(size_t slot_size)
     this->buffer_size = slot_size * n_slots;
     this->frame_data_buffer = new char[buffer_size];
     this->buffer_used_slots = 0;
+
+    #ifdef DEBUG
+        std::cout << "[RingBuffer::initialize] Total buffer_size " << buffer_size << std::endl;
+    #endif
 }
 
 void RingBuffer::write(FrameMetadata &metadata, char* data)
