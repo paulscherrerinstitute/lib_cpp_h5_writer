@@ -79,7 +79,7 @@ void run_writer(string connect_address, string output_file, uint64_t n_images){
     WriterManager manager(n_images);
     RingBuffer ring_buffer(n_slots);
 
-    #ifdef DEBUG
+    #ifdef DEBUG_OUTPUT
         cout << "[h5_zmq_writer::run_writer] Running writer"; 
         cout << " with connect_address " << connect_address << " ";
         cout << " and output_file " << output_file << " ";
@@ -96,7 +96,7 @@ void run_writer(string connect_address, string output_file, uint64_t n_images){
     receiver_thread.join();
     writer_thread.join();
 
-    #ifdef DEBUG
+    #ifdef DEBUG_OUTPUT
         cout << "[h5_zmq_writer::run_writer] Writer properly stopped." << endl;
     #endif
 }

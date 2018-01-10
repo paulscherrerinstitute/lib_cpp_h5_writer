@@ -12,9 +12,9 @@ HEADERS = $(wildcard $(SRC_DIR)/*.hpp)
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-all: build_dirs h5_zmq_writer rest_api
+all: build_dirs h5_zmq_writer
 
-debug: CPPFLAGS += -DDEBUG -g
+debug: CPPFLAGS += -DDEBUG_OUTPUT -g
 debug: all
 
 h5_zmq_writer: $(OBJS)
