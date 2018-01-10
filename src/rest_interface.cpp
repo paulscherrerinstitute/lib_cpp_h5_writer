@@ -4,6 +4,8 @@
 #include "rest_interface.hpp"
 #include "crow_all.h"
 
+using namespace std;
+
 void start_rest_api(WriterManager& writer_manager, uint16_t port)
 {
     crow::SimpleApp app;
@@ -62,8 +64,8 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port)
             auto request_parameters = crow::json::load(req.body);
 
             // TODO: Fix this.
-            
-            // const std::map<std::string, std::string> parameters_to_set;
+
+            // const map<string, string> parameters_to_set;
 
             // for (const auto& item : request_parameters) {
             //     parameters_to_set[item.first] = item.second;
