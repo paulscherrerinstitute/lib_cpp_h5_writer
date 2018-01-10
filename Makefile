@@ -4,15 +4,15 @@ BIN_DIR = ./bin
 MKDIR = mkdir -p
 
 CPP = g++
-CPPFLAGS = -Wall -std=c++1y -I. -I${CONDA_PREFIX}/include
-LDLIBS = -L${CONDA_PREFIX}/lib -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
+CPPFLAGS = -Wall -std=c++1y -I./include -I${CONDA_PREFIX}/include
+LDLIBS = -L${CONDA_PREFIX}/lib -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex
 LDFLAGS = -g
 
 HEADERS = $(wildcard $(SRC_DIR)/*.hpp)
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-all: build_dirs h5_zmq_writer
+all: build_dirs h5_zmq_writer rest_api
 
 debug: CPPFLAGS += -DDEBUG -g
 debug: all
