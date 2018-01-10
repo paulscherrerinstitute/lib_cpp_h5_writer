@@ -1,3 +1,8 @@
+#include <H5Cpp.h>
+#include <sstream>
+#include <stdexcept>
+#include <iostream>
+
 #include "H5ChunkedWriter.hpp"
 
 extern "C"

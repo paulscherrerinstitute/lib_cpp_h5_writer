@@ -1,10 +1,6 @@
 #ifndef H5CHUNKEDWRITER_H
 #define H5CHUNKEDWRITER_H
 
-#include <H5Cpp.h>
-#include <sstream>
-#include <stdexcept>
-#include <iostream>
 #include "config.hpp"
 
 hsize_t expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
