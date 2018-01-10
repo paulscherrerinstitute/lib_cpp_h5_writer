@@ -9,6 +9,10 @@ namespace config
     extern H5T_order_t dataset_byte_order;
     extern hsize_t dataset_increase_step;
     extern hsize_t initial_dataset_size;
+
+    extern uint16_t rest_port;
+    extern int n_io_threads;
+    extern size_t n_slots;
 }
 
 #endif
