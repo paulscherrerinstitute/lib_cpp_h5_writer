@@ -4,6 +4,7 @@ obj/
 
 # Project directories
 .vscode/
+.DS_store
 
 # Any test H5 files
 *.h5
