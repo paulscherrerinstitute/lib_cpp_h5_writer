@@ -13,6 +13,10 @@ WriterManager::WriterManager(uint64_t n_images):
 
 void WriterManager::stop()
 {
+    #ifdef DEBUG_OUTPUT
+        cout << "[WriterManager::stop] Stopping the writer manager." << endl;
+    #endif
+
     running_flag = false;
 }
 
@@ -20,7 +24,7 @@ string WriterManager::get_status()
 {
     if (running_flag) {
         return "receiving";
-    } else if (n_received_frames == n_written_frames) {
+    } else if (n_received_frames > n_written_frames) {
         return "writing";
     } else {
         return "finished";
@@ -30,8 +34,8 @@ string WriterManager::get_status()
 map<string, uint64_t> WriterManager::get_statistics()
 {
     map<string, uint64_t> result = {{"n_received_frames", n_received_frames.load()},
-                                              {"n_written_frames", n_written_frames.load()},
-                                              {"total_expected_frames", n_images}};
+                                    {"n_written_frames", n_written_frames.load()},
+                                    {"total_expected_frames", n_images}};
 
     return result;
 }
@@ -51,7 +55,7 @@ void WriterManager::set_parameters(map<string, string>& new_parameters)
 bool WriterManager::is_running()
 {
     // Take into account n_images only if it is <> 0.
-    if (n_images && n_received_frames.load() > n_images) {
+    if (n_images && n_received_frames.load() >= n_images) {
         running_flag = false;
     }
 
