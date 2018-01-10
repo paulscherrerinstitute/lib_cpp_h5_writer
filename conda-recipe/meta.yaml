@@ -15,16 +15,13 @@ requirements:
         - cppzmq
         - hdf5
         - rapidjson
+        - boost
 
     run:
-        - cmake
-        - gcc
         - cppzmq
         - hdf5
         - rapidjson
-
-    test:
-        - gtest
+        - boost
 
 
 about:
