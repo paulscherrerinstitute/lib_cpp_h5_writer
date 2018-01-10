@@ -1,7 +1,5 @@
 #include "RingBuffer.hpp"
 #include <stdexcept>
-#include <chrono>
-#include <thread>
 #include <sstream>
 #include <cstring>
 #include <iostream>
@@ -135,43 +133,39 @@ pair<FrameMetadata, char*> RingBuffer::read()
 {
     FrameMetadata frame_metadata;
 
-    while (1) {
+    frame_metadata_queue_mutex.lock();
 
-        frame_metadata_queue_mutex.lock();
+    if (frame_metadata_queue.empty()) {
+        frame_metadata_queue_mutex.unlock();
 
-        if (frame_metadata_queue.empty()) {
-            frame_metadata_queue_mutex.unlock();
+        return {frame_metadata, NULL};
+    }
 
-            continue;
+    frame_metadata = frame_metadata_queue.front();
+    frame_metadata_queue.pop_front();
 
-        } else {
-            frame_metadata = frame_metadata_queue.front();
-            frame_metadata_queue.pop_front();
+    frame_metadata_queue_mutex.unlock();
 
-            frame_metadata_queue_mutex.unlock();
+    #ifdef DEBUG_OUTPUT
+        cout << "[RingBuffer::read] Received metadata for frame_index " << frame_metadata.frame_index << endl;
+    #endif
 
-             #ifdef DEBUG_OUTPUT
-                cout << "[RingBuffer::read] Received metadata for frame_index " << frame_metadata.frame_index << endl;
-            #endif
-        }
+    // Check if the references ring buffer slot is valid.
+    ringbuffer_slots_mutex.lock();
 
-        // Check if the references ring buffer slot is valid.
-        ringbuffer_slots_mutex.lock();
+    if (!ringbuffer_slots[frame_metadata.buffer_slot_index]) {
+        stringstream error_message;
+        error_message << "Ring buffer slot referenced in message header " << frame_metadata.buffer_slot_index << " is empty." << endl;
 
-        if (!ringbuffer_slots[frame_metadata.buffer_slot_index]) {
-            stringstream error_message;
-            error_message << "Ring buffer slot referenced in message header " << frame_metadata.buffer_slot_index << " is empty." << endl;
+        throw runtime_error(error_message.str());
+    }
 
-            throw runtime_error(error_message.str());
-        }
+    ringbuffer_slots_mutex.unlock();
 
-        ringbuffer_slots_mutex.unlock();
-
-        // Memory address of frame in buffer.
-        char* slot_memory_address = get_buffer_slot_address(frame_metadata.buffer_slot_index);
-                
-        return {frame_metadata, slot_memory_address};
-    };
+    // Memory address of frame in buffer.
+    char* slot_memory_address = get_buffer_slot_address(frame_metadata.buffer_slot_index);
+            
+    return {frame_metadata, slot_memory_address};
 }
 
 void RingBuffer::release(size_t buffer_slot_index) {

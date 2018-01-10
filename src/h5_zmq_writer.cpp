@@ -2,6 +2,8 @@
 #include <zmq.hpp>
 #include <cstdlib>
 #include <thread>
+#include <chrono>
+#include <thread>
 #include "rapidjson/document.h"
 
 #include "config.hpp"
@@ -18,6 +20,12 @@ void write(WriterManager *manager, RingBuffer *ring_buffer, string output_file)
 
     // Run until the running flag is set or the ring_buffer is empty.  
     while(manager->is_running() || !ring_buffer->is_empty()) {
+        
+        if (ring_buffer->is_empty()) {
+            this_thread::sleep_for(std::chrono::milliseconds(config::ring_buffer_read_retry_interval));
+            continue;
+        }
+
         pair<FrameMetadata, char*> received_data = ring_buffer->read();
 
         writer.write_data(received_data.first.frame_index, 
@@ -37,10 +45,11 @@ void write(WriterManager *manager, RingBuffer *ring_buffer, string output_file)
     #endif
 }
 
-void receive(WriterManager *manager, RingBuffer *ring_buffer, string connect_address, int n_io_threads=1)
+void receive(WriterManager *manager, RingBuffer *ring_buffer, string connect_address, int n_io_threads=1, int receive_timeout=-1)
 {
     zmq::context_t context(n_io_threads);
     zmq::socket_t receiver(context, ZMQ_PULL);
+    receiver.setsockopt(ZMQ_RCVTIMEO, receive_timeout);
     receiver.connect(connect_address);
     
     zmq::message_t message_data;
@@ -50,7 +59,9 @@ void receive(WriterManager *manager, RingBuffer *ring_buffer, string connect_add
 
     while (manager->is_running()) {
         // Get the message header.
-        receiver.recv(&message_data);
+        if (!receiver.recv(&message_data)){
+            continue;
+        }
 
         // Parse JSON header.
         char* header = static_cast<char*>(message_data.data());
@@ -80,8 +91,9 @@ void receive(WriterManager *manager, RingBuffer *ring_buffer, string connect_add
 
 void run_writer(string connect_address, string output_file, uint64_t n_images, uint16_t rest_port){
 
-    size_t n_slots = config::n_slots;
-    int n_io_threads = config::n_io_threads;
+    size_t n_slots = config::ring_buffer_n_slots;
+    int n_io_threads = config::zmq_n_io_threads;
+    int receive_timeout = config::zmq_receive_timeout;
 
     WriterManager manager(n_images);
     RingBuffer ring_buffer(n_slots);
@@ -92,13 +104,18 @@ void run_writer(string connect_address, string output_file, uint64_t n_images, u
         cout << " and output_file " << output_file;
         cout << " and n_slots " << n_slots;
         cout << " and n_io_threads " << n_io_threads;
+        cout << " and receive_timeout " << receive_timeout;
         cout << endl;
     #endif
 
-    thread receiver_thread(receive, &manager, &ring_buffer, connect_address, n_io_threads);
+    thread receiver_thread(receive, &manager, &ring_buffer, connect_address, n_io_threads, receive_timeout);
     thread writer_thread(write, &manager, &ring_buffer, output_file);
 
     start_rest_api(manager, rest_port);
+
+    #ifdef DEBUG_OUTPUT
+        cout << "[h5_zmq_writer::run_writer] Rest API stopped." << endl;
+    #endif
 
     receiver_thread.join();
     writer_thread.join();

@@ -6,7 +6,8 @@
 
 namespace config
 {
-    extern int n_io_threads;
+    extern int zmq_n_io_threads;
+    extern int zmq_receive_timeout;
 
     extern size_t ring_buffer_n_slots;
     extern uint32_t ring_buffer_read_retry_interval;

@@ -2,7 +2,8 @@
 
 namespace config {
     // Receiver config.
-    int n_io_threads = 1;
+    int zmq_n_io_threads = 1;
+    int zmq_receive_timeout = 100;
 
     // Ring buffer config.
     size_t ring_buffer_n_slots = 100;
