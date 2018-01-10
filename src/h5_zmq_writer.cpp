@@ -80,11 +80,12 @@ void run_writer(string connect_address, string output_file, uint64_t n_images){
     RingBuffer ring_buffer(n_slots);
 
     #ifdef DEBUG
-        cout << "[h5_zmq_writer::run_writer] Running writer with "; 
-        cout << "connect_address " << connect_address << " " << std::endl;
-        cout << "output_file " << output_file << " " << std::endl;
-        cout << "n_slots " << n_slots << " " << std::endl;
-        cout << "n_io_threads " << n_io_threads << " " << std::endl;
+        cout << "[h5_zmq_writer::run_writer] Running writer"; 
+        cout << " with connect_address " << connect_address << " ";
+        cout << " and output_file " << output_file << " ";
+        cout << " and n_slots " << n_slots << " ";
+        cout << " and n_io_threads " << n_io_threads << " ";
+        cout << endl;
     #endif
 
     thread receiver_thread(receive, &manager, &ring_buffer, connect_address, n_io_threads);
