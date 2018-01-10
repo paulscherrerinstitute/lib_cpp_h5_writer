@@ -1,4 +1,5 @@
 #include <H5Cpp.h>
+#include <string>
 
 #ifndef CONFIG_H
 #define CONFIG_H
@@ -13,6 +14,8 @@ namespace config
     extern uint16_t rest_port;
     extern int n_io_threads;
     extern size_t n_slots;
+
+    extern string dataset_name;
 }
 
 #endif

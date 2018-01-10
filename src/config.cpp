@@ -10,4 +10,6 @@ namespace config {
     int n_io_threads = 1;
     size_t n_slots = 100;
 
+    string dataset_name = "data";
+
 }
