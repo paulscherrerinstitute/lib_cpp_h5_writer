@@ -15,7 +15,7 @@ namespace config
     extern int n_io_threads;
     extern size_t n_slots;
 
-    extern string dataset_name;
+    extern std::string dataset_name;
 }
 
 #endif
