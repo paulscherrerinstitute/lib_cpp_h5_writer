@@ -133,7 +133,7 @@ int main (int argc, char *argv[])
         cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\toutput_file: Name of the output file." << endl;
         cout << "\tn_images: Number of images to acquire. 0 for infinity (untill /stop is called)." << endl;
-        cout << "\rest_port: Port to start the REST Api on." << endl;
+        cout << "\trest_port: Port to start the REST Api on." << endl;
         cout << endl;
 
         exit(-1);
