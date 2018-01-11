@@ -48,9 +48,11 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port)
     CROW_ROUTE (app, "/statistics") ([&](){
         crow::json::wvalue result;
 
-        // for (const auto& item : writer_manager.get_statistics()) {
-        //     result[item.first] = item.second;
-        // }
+        for (const auto& item : writer_manager.get_statistics()) {
+            result[item.first] = item.second;
+        }
+
+        result["status"] = writer_manager.get_status();
 
         return result;
     });
