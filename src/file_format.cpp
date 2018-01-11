@@ -722,9 +722,4 @@ h5_group get_format(){
     });
 
     return format;
-        
-}
-
-int main (int argc, char *argv[])
-{
 }
