@@ -3,8 +3,10 @@
 
 #include <string>
 #include <list>
-
+#include <boost/any.hpp>
 #include <H5Cpp.h>
+
+typedef boost::any h5_value;
 
 enum DATA_TYPE {
     NX_FLOAT,
@@ -46,25 +48,14 @@ struct h5_dataset : public h5_base, public h5_parent, public h5_data_base{
         : h5_base(name), h5_parent(items), h5_data_base(data_type, REFERENCE) {};
 };
 
-struct h5_attribute : public h5_base, public h5_data_base {
-    h5_attribute(std::string name, DATA_TYPE data_type): h5_base(name), h5_data_base(data_type, IMMEDIATE){};
-    h5_attribute(std::string name, std::string value_alias, DATA_TYPE data_types): h5_base(name), h5_data_base(data_types, REFERENCE){};
-};
-
-template<DATA_TYPE T> struct h5_attribute_val: public h5_base, public h5_data_base {};
-
-template<> struct h5_attribute_val<NX_CHAR>: public h5_attribute {
-    h5_attribute_val(std::string name, std::string value) : h5_attribute(name, NX_CHAR), value(value) {};
-    std::string value;
-};
-
-template<> struct h5_attribute_val<NX_INT>: public h5_attribute {
-    h5_attribute_val(std::string name, int value) : h5_attribute(name, NX_CHAR), value(value) {};
-    int value;
+struct h5_attr : public h5_base, public h5_data_base {
+    h5_attr(std::string name, h5_value value, DATA_TYPE data_types, DATA_LOCATION data_location=IMMEDIATE)
+        : h5_base(name), h5_data_base(data_types, data_location), value(value){};
+    h5_value value;
 };
 
 namespace h5_utils{
-    void set_attributes(H5::H5Object& target, std::list<h5_attribute>& attributes);
+    void write_attribute(H5::H5Object& target, h5_attr& attribute);
     void write_attribute(H5::H5Object& target, std::string name, std::string value);
     void write_attribute(H5::H5Object& target, std::string name, int value);
 }

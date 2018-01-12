@@ -23,18 +23,39 @@ void h5_utils::write_attribute(H5::H5Object& target, string name, int32_t value)
     h5_attribute.write(int_type, &value);
 }
 
-void h5_utils::set_attributes(H5::H5Object& target, std::list<h5_attribute>& attributes) {
-    for (auto& attribute : attributes) {
+void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute) {
 
-        string name = attribute.name;
-        
-        if (attribute.data_type == NX_CHAR) {
-            auto attribute_ptr = reinterpret_cast<h5_attribute_val<NX_CHAR>*>(&attribute);
-            h5_utils::write_attribute(target, name, attribute_ptr->value);
+    cout<< attribute.name << endl;
 
-        } else if (attribute.data_type == NX_INT) {
-            auto attribute_ptr = reinterpret_cast<h5_attribute_val<NX_INT>*>(&attribute);
-            h5_utils::write_attribute(target, name, attribute_ptr->value);
-        }
+    string name = attribute.name;
+    boost::any value;
+
+    if (attribute.data_location == IMMEDIATE){
+        value = attribute.value;
+    } else {
+        // TODO: Implement value.
+    }
+    
+    if (attribute.data_type == NX_CHAR) {
+        // Attempt to convert to const char * (string "literals" cause that).
+        try {
+            h5_utils::write_attribute(target, name, string(boost::any_cast<const char*>(value)));
+            return;
+        } catch (const boost::bad_any_cast& exception) {}
+
+        // Atempt to convert to string.
+        try {
+            h5_utils::write_attribute(target, name, boost::any_cast<string>(value));
+            return;
+        } catch (const boost::bad_any_cast& exception) {}
+
+        // We cannot really convert this attribute.
+        stringstream error_message;
+        error_message << "Cannot convert attribute " << name << "to string or const char*." << endl;
+
+        throw runtime_error(error_message.str());
+
+    } else if (attribute.data_type == NX_INT) {
+        h5_utils::write_attribute(target, name, boost::any_cast<int32_t>(value));
     }
 }
