@@ -3,12 +3,15 @@
 
 using namespace std;
 
-WriterManager::WriterManager(uint64_t n_images):
+WriterManager::WriterManager(uint64_t n_images, std::string dataset_name):
     n_images(n_images), running_flag(true), n_received_frames(0), n_written_frames(0)
 {
     #ifdef DEBUG_OUTPUT
         cout << "[WriterManager::WriterManager] Writer manager for n_images " << n_images << endl;
+        cout << "[WriterManager::WriterManager] Using dataset_name " << dataset_name << endl;
     #endif
+
+    parameters.insert({"dataset_name", dataset_name});
 }
 
 void WriterManager::stop()
@@ -40,11 +43,9 @@ map<string, uint64_t> WriterManager::get_statistics()
     return result;
 }
 
-map<string, string>& WriterManager::get_parameters()
+map<string, string> WriterManager::get_parameters()
 {
-    // TODO: Implement this.
-    map<string, string> result = {};
-    return result;
+    return parameters;
 }
 
 void WriterManager::set_parameters(map<string, string>& new_parameters)
