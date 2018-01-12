@@ -29,7 +29,7 @@ class RingBuffer
     size_t buffer_size = 0;
     char* frame_data_buffer = NULL;
     size_t write_index = 0;
-    size_t buffer_used_slots;
+    size_t buffer_used_slots = 0;
     bool ring_buffer_initialized = false;
 
     std::list<FrameMetadata> frame_metadata_queue;
