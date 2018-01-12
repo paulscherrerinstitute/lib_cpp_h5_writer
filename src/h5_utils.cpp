@@ -51,7 +51,7 @@ void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute) {
 
         // We cannot really convert this attribute.
         stringstream error_message;
-        error_message << "Cannot convert attribute " << name << "to string or const char*." << endl;
+        error_message << "Cannot convert attribute " << name << " to string or const char*." << endl;
 
         throw runtime_error(error_message.str());
 
