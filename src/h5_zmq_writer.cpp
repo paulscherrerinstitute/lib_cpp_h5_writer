@@ -16,7 +16,7 @@ using namespace std;
 
 void write(WriterManager *manager, RingBuffer *ring_buffer, string output_file) 
 {
-    HDF5ChunkedWriter writer(output_file, config::dataset_name);
+    HDF5ChunkedWriter writer(output_file, manager->get_parameters()["dataset_name"]);
 
     // Run until the running flag is set or the ring_buffer is empty.  
     while(manager->is_running() || !ring_buffer->is_empty()) {
@@ -116,6 +116,9 @@ void run_writer(string connect_address, string output_file, uint64_t n_images, u
     #ifdef DEBUG_OUTPUT
         cout << "[h5_zmq_writer::run_writer] Rest API stopped." << endl;
     #endif
+
+    // In case SIGINT stopped the rest_api.
+    manager.stop();
 
     receiver_thread.join();
     writer_thread.join();
