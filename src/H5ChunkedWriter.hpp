@@ -1,11 +1,16 @@
 #ifndef H5CHUNKEDWRITER_H
 #define H5CHUNKEDWRITER_H
 
+#include <map>
 #include "config.hpp"
+#include "h5_file_format.hpp"
+#include <boost/any.hpp>
 
 hsize_t expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
 
 void compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index);
+
+typedef boost::any h5_value;
 
 class HDF5ChunkedWriter
 {
@@ -34,6 +39,7 @@ class HDF5ChunkedWriter
         ~HDF5ChunkedWriter();
         void close_file();
         void write_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data);
+        void write_format(h5_base& format_root, std::map<std::string, h5_value>& values);
 };
 
 #endif

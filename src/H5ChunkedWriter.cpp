@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "H5ChunkedWriter.hpp"
+#include "h5_file_format.hpp"
 
 extern "C"
 {
@@ -102,15 +103,8 @@ void HDF5ChunkedWriter::close_file()
         cout << "[HDF5ChunkedWriter::close_file] Setting dataset attribute image_nr_low=" << image_nr_low << " and image_nr_high=" << image_nr_high << endl;
     #endif
 
-    // H5::IntType int_type(H5::PredType::NATIVE_UINT32);
-    // H5::DataSpace att_space(H5S_SCALAR);
-    // auto low_index_attribute = dataset.createAttribute("image_nr_low", int_type, att_space);
-
-    // H5::IntType int_type(H5::PredType::NATIVE_UINT32);
-    // H5::DataSpace att_space(H5S_SCALAR);
-    // auto high_index_attribute = dataset.createAttribute("image_nr_high", int_type, att_space);
-
-    // TODO: Populate additional h5 attributes.
+    h5_utils::write_attribute(dataset, "image_nr_low", image_nr_low);
+    h5_utils::write_attribute(dataset, "image_nr_high", image_nr_high);
 
     // Cleanup.
     file.close();
@@ -233,4 +227,7 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t*
     }
 
     return relative_frame_index;
+}
+
+void HDF5ChunkedWriter::write_format(h5_base& format_root, std::map<std::string, h5_value>& values) {
 }
