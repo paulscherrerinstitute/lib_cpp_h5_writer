@@ -14,7 +14,7 @@
 
 using namespace std;
 
-void write(WriterManager *manager, RingBuffer *ring_buffer, string output_file) 
+void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_file) 
 {
     HDF5ChunkedWriter writer(output_file, manager->get_parameters()["dataset_name"]);
 
@@ -22,7 +22,7 @@ void write(WriterManager *manager, RingBuffer *ring_buffer, string output_file)
     while(manager->is_running() || !ring_buffer->is_empty()) {
         
         if (ring_buffer->is_empty()) {
-            this_thread::sleep_for(std::chrono::milliseconds(config::ring_buffer_read_retry_interval));
+            this_thread::sleep_for(chrono::milliseconds(config::ring_buffer_read_retry_interval));
             continue;
         }
 
@@ -45,7 +45,7 @@ void write(WriterManager *manager, RingBuffer *ring_buffer, string output_file)
     #endif
 }
 
-void receive(WriterManager *manager, RingBuffer *ring_buffer, string connect_address, int n_io_threads=1, int receive_timeout=-1)
+void receive_zmq(WriterManager *manager, RingBuffer *ring_buffer, string connect_address, int n_io_threads=1, int receive_timeout=-1)
 {
     zmq::context_t context(n_io_threads);
     zmq::socket_t receiver(context, ZMQ_PULL);
@@ -108,8 +108,8 @@ void run_writer(string connect_address, string output_file, uint64_t n_images, u
         cout << endl;
     #endif
 
-    thread receiver_thread(receive, &manager, &ring_buffer, connect_address, n_io_threads, receive_timeout);
-    thread writer_thread(write, &manager, &ring_buffer, output_file);
+    thread receiver_thread(receive_zmq, &manager, &ring_buffer, connect_address, n_io_threads, receive_timeout);
+    thread writer_thread(write_h5, &manager, &ring_buffer, output_file);
 
     start_rest_api(manager, rest_port);
 
