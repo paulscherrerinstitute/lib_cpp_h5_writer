@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include <iostream>
 #include "H5ChunkedWriter.hpp"
-#include "h5_file_format.hpp"
 
 extern "C"
 {
