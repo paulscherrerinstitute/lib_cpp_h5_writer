@@ -4,13 +4,10 @@
 #include <map>
 #include "config.hpp"
 #include "h5_file_format.hpp"
-#include <boost/any.hpp>
 
 hsize_t expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
 
 void compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index);
-
-typedef boost::any h5_value;
 
 class HDF5ChunkedWriter
 {
