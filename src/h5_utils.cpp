@@ -7,26 +7,64 @@
 
 using namespace std;
 
-void h5_utils::write_attribute(H5::H5Object& target, string name, string value){
-    H5::StrType str_type(0, H5T_VARIABLE);
-    H5::DataSpace att_space(H5S_SCALAR);
-
-    H5::Attribute h5_attribute = target.createAttribute(name, str_type, att_space);
-    h5_attribute.write(str_type, value);
+H5::Group h5_utils::create_group(H5::CommonFG& target, std::string name)
+{
+    return target.createGroup(name);
 }
 
-void h5_utils::write_attribute(H5::H5Object& target, string name, int32_t value){
-    H5::IntType int_type(H5::PredType::NATIVE_INT32);
+H5::DataSet h5_utils::write_dataset(H5::Group& target, string name, double value)
+{
     H5::DataSpace att_space(H5S_SCALAR);
+    auto data_type = H5::PredType::NATIVE_DOUBLE;
 
-    H5::Attribute h5_attribute = target.createAttribute(name, int_type, att_space);
-    h5_attribute.write(int_type, &value);
+    H5::DataSet dataset = target.createDataSet(name, data_type , att_space);
+    dataset.write(&value, data_type);
+
+    return dataset;
 }
 
-void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute) {
+H5::DataSet h5_utils::write_dataset(H5::Group& target, string name, int value)
+{
+    H5::DataSpace att_space(H5S_SCALAR);
+    auto data_type = H5::PredType::NATIVE_INT;
 
-    cout<< attribute.name << endl;
+    H5::DataSet dataset = target.createDataSet(name, data_type, att_space);
+    dataset.write(&value, data_type);
 
+    return dataset;
+}
+
+H5::DataSet h5_utils::write_dataset(H5::Group& target, string name, string value)
+{
+    H5::DataSpace att_space(H5S_SCALAR);
+    H5::DataType data_type = H5::StrType(0, H5T_VARIABLE);
+
+    H5::DataSet dataset = target.createDataSet(name, data_type ,att_space);
+    dataset.write(&value, data_type);
+
+    return dataset;
+}
+
+void h5_utils::write_attribute(H5::H5Object& target, string name, string value)
+{
+    H5::DataSpace att_space(H5S_SCALAR);
+    H5::DataType data_type = H5::StrType(0, H5T_VARIABLE);
+
+    auto h5_attribute = target.createAttribute(name, data_type, att_space);
+    h5_attribute.write(data_type, value);
+}
+
+void h5_utils::write_attribute(H5::H5Object& target, string name, int value)
+{
+    H5::DataSpace att_space(H5S_SCALAR);
+    auto data_type = H5::PredType::NATIVE_INT;
+
+    auto h5_attribute = target.createAttribute(name, data_type, att_space);
+    h5_attribute.write(data_type, &value);
+}
+
+void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute) 
+{
     string name = attribute.name;
     boost::any value;
 
@@ -56,6 +94,15 @@ void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute) {
         throw runtime_error(error_message.str());
 
     } else if (attribute.data_type == NX_INT) {
-        h5_utils::write_attribute(target, name, boost::any_cast<int32_t>(value));
+        try {
+            h5_utils::write_attribute(target, name, boost::any_cast<int32_t>(value));
+            return;
+        } catch (const boost::bad_any_cast& exception) {}
+
+        // We cannot really convert this attribute.
+        stringstream error_message;
+        error_message << "Cannot convert attribute " << name << " to INT." << endl;
+
+        throw runtime_error(error_message.str());
     }
 }

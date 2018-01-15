@@ -44,8 +44,10 @@ struct h5_group : public h5_base, public h5_parent {
 };
 
 struct h5_dataset : public h5_base, public h5_parent, public h5_data_base{
-    h5_dataset(std::string name, std::string value_alias, DATA_TYPE data_type, std::list<h5_base> items={})
-        : h5_base(name), h5_parent(items), h5_data_base(data_type, REFERENCE) {};
+    h5_dataset(std::string name, std::string value, DATA_TYPE data_type, std::list<h5_base> items={})
+        : h5_base(name), h5_parent(items), h5_data_base(data_type, REFERENCE), value(value) {};
+    
+    std::string value;
 };
 
 struct h5_attr : public h5_base, public h5_data_base {
@@ -55,9 +57,19 @@ struct h5_attr : public h5_base, public h5_data_base {
 };
 
 namespace h5_utils{
+    H5::Group create_group(H5::CommonFG& target, std::string name);
+
+    H5::DataSet write_dataset(H5::Group& target, h5_dataset& dataset);
+
+    H5::DataSet write_dataset(H5::Group& target, std::string name, double value);
+    H5::DataSet write_dataset(H5::Group& target, std::string name, int value);
+    H5::DataSet write_dataset(H5::Group& target, std::string name, std::string value);
+
     void write_attribute(H5::H5Object& target, h5_attr& attribute);
     void write_attribute(H5::H5Object& target, std::string name, std::string value);
     void write_attribute(H5::H5Object& target, std::string name, int value);
+
+    
 }
 
 #endif
