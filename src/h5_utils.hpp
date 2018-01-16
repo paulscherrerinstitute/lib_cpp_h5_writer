@@ -8,6 +8,12 @@
 
 typedef boost::any h5_value;
 
+enum NODE_TYPE {
+    ATTRIBUTE,
+    DATASET,
+    GROUP
+};
+
 enum DATA_TYPE {
     NX_FLOAT,
     NX_CHAR,
@@ -24,8 +30,10 @@ enum DATA_LOCATION {
 
 
 struct h5_base {
-    h5_base(std::string name) : name(name){};
+    h5_base(std::string name, NODE_TYPE node_type) : name(name), node_type(node_type){};
+    virtual ~h5_base(){};
     std::string name;
+    NODE_TYPE node_type;
 };
 
 struct h5_data_base{
@@ -34,25 +42,25 @@ struct h5_data_base{
     DATA_LOCATION data_location;
 };
 
-struct h5_parent{
-    h5_parent(std::list<h5_base> items) : items(items) {};
+struct h5_parent: public h5_base{
+    h5_parent(std::string name, NODE_TYPE node_type, std::list<h5_base> items) : h5_base(name, node_type), items(items) {};
     std::list<h5_base> items;
 };
 
-struct h5_group : public h5_base, public h5_parent {
-    h5_group(std::string name, std::list<h5_base> items) : h5_base(name), h5_parent(items) {};
+struct h5_group : public h5_parent {
+    h5_group(std::string name, std::list<h5_base> items) : h5_parent(name, GROUP, items) {};
 };
 
-struct h5_dataset : public h5_base, public h5_parent, public h5_data_base{
+struct h5_dataset : public h5_parent, public h5_data_base{
     h5_dataset(std::string name, std::string value, DATA_TYPE data_type, std::list<h5_base> items={})
-        : h5_base(name), h5_parent(items), h5_data_base(data_type, REFERENCE), value(value) {};
+        : h5_parent(name, DATASET, items), h5_data_base(data_type, REFERENCE), value(value) {};
     
     std::string value;
 };
 
 struct h5_attr : public h5_base, public h5_data_base {
     h5_attr(std::string name, h5_value value, DATA_TYPE data_types, DATA_LOCATION data_location=IMMEDIATE)
-        : h5_base(name), h5_data_base(data_types, data_location), value(value){};
+        : h5_base(name, ATTRIBUTE), h5_data_base(data_types, data_location), value(value){};
     h5_value value;
 };
 
