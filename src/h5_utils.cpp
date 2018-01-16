@@ -225,3 +225,38 @@ void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute, map<str
         throw runtime_error(error_message.str());
     }
 }
+
+void h5_utils::write_format_data(H5::CommonFG& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values){
+    auto node_group = h5_utils::create_group(file_node, format_node.name);
+
+    for (auto item : format_node.items) {
+
+        if (item->node_type == GROUP) {
+            auto sub_group = dynamic_cast<h5_group*>(item); 
+
+            write_format_data(node_group, *sub_group, values);
+        } else if (item->node_type == ATTRIBUTE) {
+            auto sub_attribute = dynamic_cast<h5_attr*>(item);
+
+            h5_utils::write_attribute(node_group, *sub_attribute, values);
+        } else if (item->node_type == DATASET) {
+            auto sub_dataset = dynamic_cast<h5_dataset*>(item);
+
+            auto current_dataset = h5_utils::write_dataset(node_group, *sub_dataset, values);
+
+            for (auto dataset_attr : sub_dataset->items) {
+                // You can specify only attributes inside a dataset.
+                if (dataset_attr->node_type != ATTRIBUTE) {
+                    stringstream error_message;
+                    error_message << "Invalid element " << dataset_attr->name << " on dataset " << sub_dataset->name << ". Only attributes allowd.";
+
+                    throw invalid_argument( error_message.str() );
+                }
+
+                auto sub_attribute = dynamic_cast<h5_attr*>(item);
+
+                h5_utils::write_attribute(current_dataset, *sub_attribute, values);
+            }
+        }
+    }
+}

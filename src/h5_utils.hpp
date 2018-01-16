@@ -3,9 +3,10 @@
 
 #include <string>
 #include <list>
+#include <map>
+
 #include <boost/any.hpp>
 #include <H5Cpp.h>
-#include <map>
 
 typedef boost::any h5_value;
 
@@ -81,6 +82,8 @@ namespace h5_utils{
     void write_attribute(H5::H5Object& target, std::string name, int value);
 
     boost::any get_value_from_reference(std::string& dataset_name, boost::any value_reference, std::map<std::string, boost::any>& values);
+
+    void write_format_data(H5::CommonFG& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values);
 }
 
 #endif

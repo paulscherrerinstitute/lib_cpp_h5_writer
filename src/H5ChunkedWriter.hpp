@@ -31,8 +31,6 @@ class HDF5ChunkedWriter
     hsize_t prepare_storage_for_frame(size_t frame_index, size_t* frame_shape);
     void create_file(size_t* frame_shape, hsize_t frame_chunk=0);
 
-    void write_format_data(H5::CommonFG& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values);
-
     public:
         HDF5ChunkedWriter(const std::string filename, const std::string dataset_name, hsize_t frames_per_file=0, hsize_t initial_dataset_size=config::initial_dataset_size);
         ~HDF5ChunkedWriter();
