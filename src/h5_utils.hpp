@@ -66,6 +66,9 @@ struct h5_attr : public h5_base, public h5_data_base {
 };
 
 namespace h5_utils{
+    hsize_t expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
+    void compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index);
+
     H5::Group create_group(H5::CommonFG& target, std::string name);
 
     H5::DataSet write_dataset(H5::Group& target, h5_dataset& dataset, std::map<std::string, boost::any>& values);

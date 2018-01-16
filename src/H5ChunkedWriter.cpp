@@ -1,4 +1,4 @@
-#include <H5Cpp.h>
+#include "h5_utils.hpp"
 #include <sstream>
 #include <stdexcept>
 #include <iostream>
@@ -10,46 +10,6 @@ extern "C"
 }
 
 using namespace std;
-
-hsize_t expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step)
-{
-    hsize_t dataset_rank = 3;
-    hsize_t dataset_dimension[dataset_rank];
-
-    dataset.getSpace().getSimpleExtentDims(dataset_dimension);
-    dataset_dimension[0] = frame_index + dataset_increase_step;
-
-    #ifdef DEBUG_OUTPUT
-        cout << "[expand_dataset] Expanding dataspace to size (";
-        for (hsize_t i=0; i<dataset_rank; ++i) {
-            cout << dataset_dimension[i] << ",";
-        }
-        cout << ")" << endl;
-    #endif
-
-    dataset.extend(dataset_dimension);
-
-    return dataset_dimension[0];
-}
-
-void compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index)
-{
-    hsize_t dataset_rank = 3;
-    hsize_t dataset_dimension[dataset_rank];
-
-    dataset.getSpace().getSimpleExtentDims(dataset_dimension);
-    dataset_dimension[0] = max_frame_index + 1;
-
-    #ifdef DEBUG_OUTPUT
-        cout << "[compact_dataset] Compacting dataspace to size (";
-        for (hsize_t i=0; i<dataset_rank; ++i) {
-            cout << dataset_dimension[i] << ",";
-        }
-        cout << ")" << endl;
-    #endif
-
-    dataset.extend(dataset_dimension);
-}
 
 HDF5ChunkedWriter::HDF5ChunkedWriter(const string filename, const string dataset_name, hsize_t frames_per_file, hsize_t initial_dataset_size) :
     filename(filename), dataset_name(dataset_name), frames_per_file(frames_per_file), initial_dataset_size(initial_dataset_size)
@@ -83,7 +43,7 @@ void HDF5ChunkedWriter::close_file()
         cout << "[HDF5ChunkedWriter::close_file] Closing file." << endl;
     #endif
 
-    compact_dataset(dataset, max_frame_index);
+    h5_utils::compact_dataset(dataset, max_frame_index);
     
     hsize_t min_frame_in_dataset = 0;
     if (frames_per_file) {
@@ -216,7 +176,7 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t*
 
     // Expand the dataset if needed.
     if (relative_frame_index > current_dataset_size) {
-        current_dataset_size = expand_dataset(dataset, relative_frame_index, config::dataset_increase_step);
+        current_dataset_size = h5_utils::expand_dataset(dataset, relative_frame_index, config::dataset_increase_step);
     }
 
     // Keep track of the max index in this file - needed for shrinking the dataset at the end.

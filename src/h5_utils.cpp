@@ -7,6 +7,46 @@
 
 using namespace std;
 
+hsize_t h5_utils::expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step)
+{
+    hsize_t dataset_rank = 3;
+    hsize_t dataset_dimension[dataset_rank];
+
+    dataset.getSpace().getSimpleExtentDims(dataset_dimension);
+    dataset_dimension[0] = frame_index + dataset_increase_step;
+
+    #ifdef DEBUG_OUTPUT
+        cout << "[expand_dataset] Expanding dataspace to size (";
+        for (hsize_t i=0; i<dataset_rank; ++i) {
+            cout << dataset_dimension[i] << ",";
+        }
+        cout << ")" << endl;
+    #endif
+
+    dataset.extend(dataset_dimension);
+
+    return dataset_dimension[0];
+}
+
+void h5_utils::compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index)
+{
+    hsize_t dataset_rank = 3;
+    hsize_t dataset_dimension[dataset_rank];
+
+    dataset.getSpace().getSimpleExtentDims(dataset_dimension);
+    dataset_dimension[0] = max_frame_index + 1;
+
+    #ifdef DEBUG_OUTPUT
+        cout << "[compact_dataset] Compacting dataspace to size (";
+        for (hsize_t i=0; i<dataset_rank; ++i) {
+            cout << dataset_dimension[i] << ",";
+        }
+        cout << ")" << endl;
+    #endif
+
+    dataset.extend(dataset_dimension);
+}
+
 H5::Group h5_utils::create_group(H5::CommonFG& target, std::string name)
 {
     return target.createGroup(name);
