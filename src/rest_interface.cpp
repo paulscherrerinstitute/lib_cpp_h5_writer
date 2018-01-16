@@ -62,8 +62,8 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port)
 
         if (req.method == "GET"_method) {
 
-            for (const auto& item : writer_manager.get_parameters()) {
-                result[item.first] = item.second;
+            for (auto item : writer_manager.get_parameters()) {
+                // result[item.first] = item.second;
             }
 
             return result;
