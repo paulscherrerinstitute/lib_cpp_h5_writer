@@ -921,7 +921,7 @@ void add_input_values(map<string, boost::any>& values, map<string, boost::any>& 
         {"sample_description", {"sample/description"}},
         {"bpm5z", {"XBPM5_skew/data"}},
         {"moth1", {"/entry/instrument/monochromator/crystal_1/bragg_angle", "/entry/instrument/monochromator/crystal_2/bragg_angle"}},
-        {"sec", {"/entry/instrument/XBPM4/XBPM4/count_time", "/entry/instrument/XBPM5/XBPM5/count_time', '/entry/instrument/XBPM6/XBPM6/count_time"}},
+        {"sec", {"/entry/instrument/XBPM4/XBPM4/count_time", "/entry/instrument/XBPM5/XBPM5/count_time", "/entry/instrument/XBPM6/XBPM6/count_time"}},
         {"sl3cv", {"slit_3/height"}},
         {"bs1x", {"beam_stop_1/x"}},
         {"bpm6_saturation_value", {"XBPM6_sum/saturation_value"}},
