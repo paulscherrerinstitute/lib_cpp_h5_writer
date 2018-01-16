@@ -4,11 +4,12 @@
 #include <map>
 #include <string>
 #include <atomic>
+#include <boost/any.hpp>
 #include "config.hpp"
 
 class WriterManager
 {
-    std::map<std::string, std::string> parameters = {};
+    std::map<std::string, boost::any> parameters = {};
 
     // Initialize in constructor.
     size_t n_images;
@@ -21,7 +22,7 @@ class WriterManager
         void stop();
         std::string get_status();
         std::map<std::string, uint64_t> get_statistics();
-        std::map<std::string, std::string> get_parameters();
+        std::map<std::string, boost::any>& get_parameters();
         void set_parameters(std::map<std::string, std::string> &new_parameters);
         bool is_running();
         void received_frame(size_t frame_index);

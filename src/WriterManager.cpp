@@ -43,8 +43,7 @@ map<string, uint64_t> WriterManager::get_statistics()
     return result;
 }
 
-map<string, string> WriterManager::get_parameters()
-{
+std::map<std::string, boost::any>& WriterManager::get_parameters(){
     return parameters;
 }
 
