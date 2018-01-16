@@ -871,3 +871,80 @@ void add_calculated_values(map<string, boost::any>& values){
         }
     }
 }
+
+void add_input_values(map<string, boost::any>& values, map<string, boost::any>& input_values) {
+    map<string, list<string>> input_mapping = {
+        {"sl2wv", {"slit_2/y_gap"}},
+        {"sl0ch", {"slit_0/x_translation"}},
+        {"sl2wh", {"slit_2/x_gap"}},
+        {"temp_mono_cryst_1", {"crystal_1/temperature"}},
+        {"harmonic", {"insertion_device/harmonic"}},
+        {"mokev", {"monochromator/energy"}},
+        {"sl2cv", {"slit_2/height"}},
+        {"bpm4_gain_setting", {"XBPM4/gain_setting"}},
+        {"mirror_coating", {"mirror/coating_material"}},
+        {"samx", {"sample/x_translation"}},
+        {"sample_name", {"sample/name"}},
+        {"bpm5y", {"XBPM5_y/data"}},
+        {"sl2ch", {"slit_2/x_translation"}},
+        {"curr", {"source/current"}},
+        {"bs2_status", {"beam_stop_2/status"}},
+        {"bs2y", {"beam_stop_2/y"}},
+        {"diode", {"beam_stop_2/data"}},
+        {"samy", {"sample/y_translation"}},
+        {"sl4ch", {"slit_4/x_translation"}},
+        {"sl4wh", {"slit_4/x_gap"}},
+        {"temp_mono_cryst_2", {"crystal_2/temperature"}},
+        {"sl3wh", {"slit_3/x_gap"}},
+        {"mith", {"mirror/incident_angle"}},
+        {"bs1_status", {"beam_stop_1/status"}},
+        {"bpm4s", {"XBPM4_sum/data", "control/integral"}},
+        {"sl0wh", {"slit_0/x_gap"}},
+        {"bpm6z", {"XBPM6_skew/data"}},
+        {"bs1y", {"beam_stop_1/y"}},
+        {"scan", {"entry/title"}},
+        {"bpm5_gain_setting", {"XBPM5/gain_setting"}},
+        {"bpm4z", {"XBPM4_skew/data"}},
+        {"bpm4x", {"XBPM4_x/data"}},
+        {"date", {"entry/start_time"}},
+        {"mibd", {"mirror/bend_y"}},
+        {"temp", {"sample/temperature_log"}},
+        {"idgap", {"insertion_device/gap"}},
+        {"sl4cv", {"slit_4/height"}},
+        {"sl1wv", {"slit_1/y_gap"}},
+        {"sl3wv", {"slit_3/y_gap"}},
+        {"sl1ch", {"slit_1/x_translation"}},
+        {"bs2x", {"beam_stop_2/x"}},
+        {"bpm6_gain_setting", {"XBPM6/gain_setting"}},
+        {"bpm4y", {"XBPM4_y/data"}},
+        {"bpm6s", {"XBPM6_sum/data"}},
+        {"sample_description", {"sample/description"}},
+        {"bpm5z", {"XBPM5_skew/data"}},
+        {"moth1", {"/entry/instrument/monochromator/crystal_1/bragg_angle", "/entry/instrument/monochromator/crystal_2/bragg_angle"}},
+        {"sec", {"/entry/instrument/XBPM4/XBPM4/count_time", "/entry/instrument/XBPM5/XBPM5/count_time', '/entry/instrument/XBPM6/XBPM6/count_time"}},
+        {"sl3cv", {"slit_3/height"}},
+        {"bs1x", {"beam_stop_1/x"}},
+        {"bpm6_saturation_value", {"XBPM6_sum/saturation_value"}},
+        {"bpm5s", {"XBPM5_sum/data"}},
+        {"mobd", {"crystal_2/bend_x"}},
+        {"sl1wh", {"slit_1/x_gap"}},
+        {"sl4wv", {"slit_4/y_gap"}},
+        {"bs2_det_dist", {"beam_stop_2/distance_to_detector"}},
+        {"bpm5_saturation_value", {"XBPM5_sum/saturation_value"}},
+        {"fil_comb_description", {"filter_set/type"}},
+        {"bpm5x", {"XBPM5_x/data"}},
+        {"bpm4_saturation_value", {"XBPM4_sum/saturation_value"}},
+        {"bs1_det_dist", {"beam_stop_1/distance_to_detector"}},
+        {"sl3ch", {"slit_3/x_translation"}},
+        {"bpm6y", {"XBPM6_y/data"}},
+        {"sl1cv", {"slit_1/height"}},
+        {"bpm6x", {"XBPM6_x/data"}},
+    };
+
+    for (auto input : input_mapping) {
+        for (auto destination_name : input.second) {
+            values[destination_name] = input_values[input.first];
+        }
+    }
+
+}
