@@ -71,10 +71,10 @@ void HDF5ChunkedWriter::close_file()
     max_frame_index = 0;
 }
 
-void HDF5ChunkedWriter::write_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data)
+void HDF5ChunkedWriter::write_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data, string data_type, string endianness)
 {
     // Define the ofset of the currently received image in the file.
-    hsize_t relative_frame_index = prepare_storage_for_frame(frame_index, frame_shape);
+    hsize_t relative_frame_index = prepare_storage_for_frame(frame_index, frame_shape, data_type, endianness);
 
     // Define where to write values in the dataset.
     const hsize_t offset[] = {relative_frame_index, 0, 0};
@@ -89,7 +89,7 @@ void HDF5ChunkedWriter::write_data(size_t frame_index, size_t* frame_shape, size
     }
 }
 
-void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk) {
+void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk, string& type, string& endianness) {
 
     if (file.getId() != -1) {
         close_file();
@@ -118,9 +118,6 @@ void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk) {
 
     file = H5::H5File( target_filename.c_str(), H5F_ACC_TRUNC );
     
-    H5::IntType data_type( config::dataset_type );
-    data_type.setOrder( config::dataset_byte_order );
-
     hsize_t dataset_rank = 3;
     const hsize_t dataset_dimension[] = {initial_dataset_size, frame_shape[0], frame_shape[1]};
     const hsize_t max_dataset_dimension[] = {H5S_UNLIMITED, frame_shape[0], frame_shape[1]};
@@ -138,6 +135,14 @@ void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk) {
     H5::DSetCreatPropList dataset_properties;
     const hsize_t dataset_chunking[] = {1, frame_shape[0], frame_shape[1]};
     dataset_properties.setChunk(dataset_rank, dataset_chunking);
+    
+    H5::AtomType data_type(h5_utils::get_dataset_data_type(type));
+
+    if (endianness == "big") {
+        data_type.setOrder(H5T_ORDER_BE);
+    } else {
+        data_type.setOrder(H5T_ORDER_LE);
+    }
 
     // Take into account initial size, set chunking.
     dataset = file.createDataSet(dataset_name.c_str(), data_type, dataspace, dataset_properties);
@@ -148,7 +153,7 @@ void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk) {
 
 }
 
-hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t* frame_shape) {
+hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t* frame_shape, string& data_type, string& endianness) {
 
     hsize_t relative_frame_index = frame_index;
 
@@ -158,7 +163,7 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t*
 
         // This frames does not go into this file.
         if (frame_chunk != current_frame_chunk) {
-            create_file(frame_shape, frame_chunk);
+            create_file(frame_shape, frame_chunk, data_type, endianness);
         }
 
         // Make the frame_index relative to this chunk (file).
@@ -171,7 +176,7 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t*
 
     // Open the file if needed.
     if (file.getId() == -1) {
-        create_file(frame_shape);
+        create_file(frame_shape, 0, data_type, endianness);
     }
 
     // Expand the dataset if needed.
