@@ -3,10 +3,11 @@
 
 #include "rest_interface.hpp"
 #include "crow_all.h"
+#include "h5_utils.hpp"
 
 using namespace std;
 
-void start_rest_api(WriterManager& writer_manager, uint16_t port)
+void start_rest_api(WriterManager& writer_manager, uint16_t port, std::map<std::string, DATA_TYPE>* input_value_type)
 {
 
     #ifdef DEBUG_OUTPUT
@@ -63,22 +64,76 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port)
         if (req.method == "GET"_method) {
 
             for (auto item : writer_manager.get_parameters()) {
-                // result[item.first] = item.second;
+                auto parameter_name = item.first;
+                auto parameter_value = item.second;
+
+                try {
+                    auto parameter_type = input_value_type->at(parameter_name);
+
+                    if (parameter_type == NX_FLOAT) {
+                        result[parameter_name] = *(boost::any_cast<double*>(parameter_value));
+
+                    } else if (parameter_type == NX_CHAR) {
+                        result[parameter_name] = *(boost::any_cast<string*>(parameter_value));
+
+                    } else if (parameter_type == NX_DATE_TIME) {
+                        result[parameter_name] = *(boost::any_cast<string*>(parameter_value));
+
+                    } else if (parameter_type == NX_INT) {
+                        result[parameter_name] = *(boost::any_cast<int*>(parameter_value));
+
+                    }
+                } catch (const boost::bad_any_cast& exception) {
+                    stringstream error_message;
+                    error_message << "Cannot cast parameter " << parameter_name << " into specified type." << endl;
+
+                    throw runtime_error(error_message.str());
+
+                } catch (const out_of_range& exception){
+                    stringstream error_message;
+                    error_message << "No type mapping for parameter " << parameter_name << " in file format."<< endl;
+                    
+                    throw runtime_error(error_message.str());
+                }
             }
 
             return result;
         } else {
             auto request_parameters = crow::json::load(req.body);
+            std::map<std::string, boost::any> new_parameters;
 
-            // TODO: Fix this.
+            for (auto item : request_parameters) {
+                string parameter_name = item.key();
+                
+                try{
+                    auto parameter_type = input_value_type->at(parameter_name);
 
-            // const map<string, string> parameters_to_set;
+                    if (parameter_type == NX_FLOAT) {
+                        new_parameters[parameter_name] = item.d();
+                    } else if (parameter_type == NX_INT) {
+                        new_parameters[parameter_name] = item.i();
+                    } else if (parameter_type == NX_CHAR) {
+                        new_parameters[parameter_name] = item.s();
+                    } else if (parameter_type == NX_DATE_TIME) {
+                        new_parameters[parameter_name] = item.s();
+                    }
+                    
+                } catch (const out_of_range& exception){
+                    stringstream error_message;
+                    error_message << "No type mapping for received parameter " << parameter_name << " in file format."<< endl;
+                    
+                    throw runtime_error(error_message.str());
 
-            // for (const auto& item : request_parameters) {
-            //     parameters_to_set[item.first] = item.second;
-            // }
+                } catch (const boost::bad_any_cast& exception) {
+                    stringstream error_message;
+                    error_message << "Cannot cast parameter " << parameter_name << " into specified type." << endl;
+
+                    throw runtime_error(error_message.str());
+
+                }
+            }
             
-            // writer_manager.set_parameters(parameters_to_set);
+            writer_manager.set_parameters(new_parameters);
 
             result["message"] = "Parameters set.";
             return result;
