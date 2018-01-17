@@ -84,7 +84,7 @@ H5::DataSet h5_utils::write_dataset(H5::Group& target, h5_dataset& dataset, map<
         value = h5_utils::get_value_from_reference(name, dataset.value, values);
     }
     
-    if (dataset.data_type == NX_CHAR || dataset.data_type == NX_DATE_TIME) {
+    if (dataset.data_type == NX_CHAR || dataset.data_type == NX_DATE_TIME || dataset.data_type == NXnote) {
         // Attempt to convert to const char * (string "literals" cause that).
         try {
             return h5_utils::write_dataset(target, name, string(boost::any_cast<const char*>(value)));
@@ -108,17 +108,17 @@ H5::DataSet h5_utils::write_dataset(H5::Group& target, h5_dataset& dataset, map<
 
         // We cannot really convert this attribute.
         stringstream error_message;
-        error_message << "Cannot convert dataset " << name << " to INT." << endl;
+        error_message << "Cannot convert dataset " << name << " to NX_INT." << endl;
 
         throw runtime_error(error_message.str());
-    } else if (dataset.data_type == NX_FLOAT) {
+    } else if (dataset.data_type == NX_FLOAT || dataset.data_type == NX_NUMBER) {
         try {
             return h5_utils::write_dataset(target, name, boost::any_cast<double>(value));
         } catch (const boost::bad_any_cast& exception) {}
 
         // We cannot really convert this attribute.
         stringstream error_message;
-        error_message << "Cannot convert dataset " << name << " to INT." << endl;
+        error_message << "Cannot convert dataset " << name << " to NX_FLOAT." << endl;
 
         throw runtime_error(error_message.str());
     } else {
@@ -241,10 +241,10 @@ void h5_utils::write_format_data(H5::CommonFG& file_node, h5_parent& format_node
             h5_utils::write_attribute(node_group, *sub_attribute, values);
         } else if (item->node_type == DATASET) {
             auto sub_dataset = dynamic_cast<h5_dataset*>(item);
-
             auto current_dataset = h5_utils::write_dataset(node_group, *sub_dataset, values);
 
             for (auto dataset_attr : sub_dataset->items) {
+
                 // You can specify only attributes inside a dataset.
                 if (dataset_attr->node_type != ATTRIBUTE) {
                     stringstream error_message;
@@ -253,7 +253,7 @@ void h5_utils::write_format_data(H5::CommonFG& file_node, h5_parent& format_node
                     throw invalid_argument( error_message.str() );
                 }
 
-                auto sub_attribute = dynamic_cast<h5_attr*>(item);
+                auto sub_attribute = dynamic_cast<h5_attr*>(dataset_attr);
 
                 h5_utils::write_attribute(current_dataset, *sub_attribute, values);
             }
@@ -262,11 +262,12 @@ void h5_utils::write_format_data(H5::CommonFG& file_node, h5_parent& format_node
 }
 
 void h5_utils::write_format(H5::H5File& file, std::map<std::string, h5_value>& input_values){
+    
     auto format = get_format_definition();
     auto values = get_default_values();
-
+    
     add_input_values(*values, input_values);
     add_calculated_values(*values);
-
+    
     write_format_data(file, *format, *values);
 }
