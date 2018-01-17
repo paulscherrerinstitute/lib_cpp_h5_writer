@@ -21,7 +21,7 @@ struct FrameMetadata
 class RingBuffer
 {
     // Initialized in constructor.
-    size_t n_slots;
+    size_t n_slots = 0;
     std::vector<bool> ringbuffer_slots;    
 
     // Set in initialize().
