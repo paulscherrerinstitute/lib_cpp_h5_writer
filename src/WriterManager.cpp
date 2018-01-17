@@ -11,7 +11,7 @@ WriterManager::WriterManager(uint64_t n_images, std::string dataset_name):
         cout << "[WriterManager::WriterManager] Using dataset_name " << dataset_name << endl;
     #endif
 
-    parameters.insert({"dataset_name", dataset_name});
+    // parameters.insert({"dataset_name", dataset_name});
 }
 
 void WriterManager::stop()
@@ -47,9 +47,14 @@ std::map<std::string, boost::any>& WriterManager::get_parameters(){
     return parameters;
 }
 
-void WriterManager::set_parameters(map<string, string>& new_parameters)
+void WriterManager::set_parameters(map<string, boost::any>& new_parameters)
 {
-    // TODO: Implement this.
+    for (auto parameter : new_parameters) {
+        string parameter_name = parameter.first;
+        auto parameter_value = parameter.second;
+
+        parameters[parameter_name] = parameter_value;
+    }
 }
 
 bool WriterManager::is_running()
