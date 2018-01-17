@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "h5_utils.hpp"
+#include "config.hpp"
 
 using namespace std;
 
@@ -16,7 +17,7 @@ hsize_t h5_utils::expand_dataset(const H5::DataSet& dataset, hsize_t frame_index
     dataset_dimension[0] = frame_index + dataset_increase_step;
 
     #ifdef DEBUG_OUTPUT
-        cout << "[expand_dataset] Expanding dataspace to size (";
+        cout << "[h5_utils::expand_dataset] Expanding dataspace to size (";
         for (hsize_t i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
         }
@@ -37,7 +38,7 @@ void h5_utils::compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_ind
     dataset_dimension[0] = max_frame_index + 1;
 
     #ifdef DEBUG_OUTPUT
-        cout << "[compact_dataset] Compacting dataspace to size (";
+        cout << "[h5_utils::compact_dataset] Compacting dataspace to size (";
         for (hsize_t i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
         }
@@ -67,6 +68,39 @@ boost::any h5_utils::get_value_from_reference(string& dataset_name, boost::any v
     } catch (const out_of_range& exception){
         stringstream error_message;
         error_message << "Dataset " << dataset_name << " value reference " << boost::any_cast<string>(value_reference) << " not present in values map." << endl;
+
+        throw runtime_error(error_message.str());
+    }
+}
+
+H5::PredType h5_utils::get_dataset_data_type(string& type){
+
+    #ifdef DEBUG_OUTPUT
+        cout << "[h5_utils::get_dataset_data_type] Getting dataset type for received frame type " << type << endl;
+    #endif
+
+    if (type == "uint8") {
+        return H5::PredType::NATIVE_UINT8;
+
+    } else if (type == "uint16") {
+        return H5::PredType::NATIVE_UINT16;
+
+    } else if (type == "uint32") {
+        return H5::PredType::NATIVE_UINT32;
+
+    }if (type == "int8") {
+        return H5::PredType::NATIVE_INT8;
+        
+    } else if (type == "int16") {
+        return H5::PredType::NATIVE_INT16;
+
+    } else if (type == "int32") {
+        return H5::PredType::NATIVE_INT32;
+
+    } else {
+        // We cannot really convert this attribute.
+        stringstream error_message;
+        error_message << "Unsupported array data_type " << type << endl;
 
         throw runtime_error(error_message.str());
     }

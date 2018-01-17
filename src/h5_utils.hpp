@@ -72,6 +72,7 @@ namespace h5_utils{
     void compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index);
 
     H5::Group create_group(H5::CommonFG& target, std::string name);
+    H5::PredType get_dataset_data_type(std::string& type);
 
     H5::DataSet write_dataset(H5::Group& target, h5_dataset& dataset, std::map<std::string, boost::any>& values);
     H5::DataSet write_dataset(H5::Group& target, std::string name, double value);
