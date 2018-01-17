@@ -187,6 +187,6 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t*
     return relative_frame_index;
 }
 
-void HDF5ChunkedWriter::write_format(h5_group& format_root, std::map<std::string, h5_value>& values) {
-    h5_utils::write_format_data(file, format_root, values);
+H5::H5File& HDF5ChunkedWriter::get_h5_file() {
+    return file;
 }

@@ -36,7 +36,7 @@ class HDF5ChunkedWriter
         ~HDF5ChunkedWriter();
         void close_file();
         void write_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data);
-        void write_format(h5_group& format_root, std::map<std::string, h5_value>& values);
+        H5::H5File& get_h5_file();
 };
 
 #endif
