@@ -73,15 +73,15 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port, std::map<std::
                     if (parameter_type == NX_FLOAT) {
                         result[parameter_name] = boost::any_cast<double>(parameter_value);
                     } else if (parameter_type == NX_CHAR) {
-                        result[parameter_name] = boost::any_cast<string*>(parameter_value);
+                        result[parameter_name] = boost::any_cast<string>(parameter_value);
 
                     } else if (parameter_type == NX_DATE_TIME) {
-                        result[parameter_name] = boost::any_cast<string*>(parameter_value);
+                        result[parameter_name] = boost::any_cast<string>(parameter_value);
 
                     } else if (parameter_type == NX_INT) {
-                        result[parameter_name] = boost::any_cast<int*>(parameter_value);
+                        result[parameter_name] = boost::any_cast<int>(parameter_value);
                     }
-                    
+
                 } catch (const boost::bad_any_cast& exception) {
                     stringstream error_message;
                     error_message << "Cannot cast parameter " << parameter_name << " into specified type." << endl;
