@@ -226,7 +226,7 @@ void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute, map<str
     }
 }
 
-void h5_utils::write_format_data(H5::CommonFG& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values){
+void h5_utils::write_format_data(H5::CommonFG& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values) {
     auto node_group = h5_utils::create_group(file_node, format_node.name);
 
     for (auto item : format_node.items) {
@@ -259,4 +259,14 @@ void h5_utils::write_format_data(H5::CommonFG& file_node, h5_parent& format_node
             }
         }
     }
+}
+
+void h5_utils::write_format(H5::H5File& file, std::map<std::string, h5_value>& input_values){
+    auto format = get_format_definition();
+    auto values = get_default_values();
+
+    add_input_values(*values, input_values);
+    add_calculated_values(*values);
+
+    write_format_data(file, *format, *values);
 }
