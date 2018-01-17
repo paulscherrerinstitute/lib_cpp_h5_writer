@@ -84,7 +84,7 @@ H5::DataSet h5_utils::write_dataset(H5::Group& target, h5_dataset& dataset, map<
         value = h5_utils::get_value_from_reference(name, dataset.value, values);
     }
     
-    if (dataset.data_type == NX_CHAR) {
+    if (dataset.data_type == NX_CHAR || dataset.data_type == NX_DATE_TIME) {
         // Attempt to convert to const char * (string "literals" cause that).
         try {
             return h5_utils::write_dataset(target, name, string(boost::any_cast<const char*>(value)));
