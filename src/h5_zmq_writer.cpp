@@ -49,6 +49,8 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
     #ifdef DEBUG_OUTPUT
         cout << "[h5_zmq_writer::write] Writer thread stopped." << endl;
     #endif
+
+    exit(0);
 }
 
 void receive_zmq(WriterManager *manager, RingBuffer *ring_buffer, string connect_address, int n_io_threads=1, int receive_timeout=-1)
@@ -87,7 +89,7 @@ void receive_zmq(WriterManager *manager, RingBuffer *ring_buffer, string connect
         }
 
         frame_metadata.type = header_parser["type"].GetString();
-        
+
         // Get the message data.
         receiver.recv(&message_data);
         frame_metadata.frame_bytes_size = message_data.size();
