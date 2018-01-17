@@ -6,7 +6,7 @@
 
 using namespace std;
 
-h5_group* get_nxsas_format(){
+h5_group* get_format_definition(){
 
     auto format = 
     new h5_group("entry", {
