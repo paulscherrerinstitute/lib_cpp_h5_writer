@@ -214,7 +214,7 @@ void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute, map<str
 
     } else if (attribute.data_type == NX_INT) {
         try {
-            h5_utils::write_attribute(target, name, boost::any_cast<int32_t>(value));
+            h5_utils::write_attribute(target, name, boost::any_cast<int>(value));
             return;
         } catch (const boost::bad_any_cast& exception) {}
 
