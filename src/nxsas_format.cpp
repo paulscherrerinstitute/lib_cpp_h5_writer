@@ -254,7 +254,7 @@ h5_group* get_format_definition(){
                     new h5_attr("NX_class", "NX_FLOAT", NX_CHAR),
                     new h5_attr("NX_LENGTH", "mm", NX_CHAR)
                 }),
-                new h5_dataset("data", "beam_stop_2/data", NX_CHAR, {
+                new h5_dataset("data", "beam_stop_2/data", NX_FLOAT, {
                     new h5_attr("NX_class", "NX_CHAR", NX_CHAR)
                 }),
                 new h5_dataset("description", "beam_stop_2/description", NX_CHAR, {
@@ -783,7 +783,7 @@ map<string, boost::any>* get_default_values(){
             {"source/sigma_y", 0.018},
             {"XBPM5/description", "Four quadrant x-ray beam position monitor"},
             {"slit_2/material", "Ag"},
-            {"XBPM4/distance", nan},
+            {"XBPM4/distance", 0.0},
             {"beam_stop_1/size", 3.0},
             {"XBPM5_x/description", "Normalized difference of counts between left and right quadrants"},
             {"XBPM5/calibration_date", "???"},
@@ -795,8 +795,8 @@ map<string, boost::any>* get_default_values(){
             {"slit_4/description", "Slit 4, experimental hutch, exposure box"},
             {"control/mode", "Value from bpm4s"},
             {"XBPM4/description", "Four quadrant x-ray beam position monitor"},
-            {"XBPM5/distance", nan},
-            {"XBPM6/distance", nan},
+            {"XBPM5/distance", 0.0},
+            {"XBPM6/distance", 0.0},
             {"source/probe", "x-ray"},
             {"slit_1/description", "Slit 1, optics hutch"},
             {"instrument/name", "cSAXS beamline"},
@@ -804,7 +804,13 @@ map<string, boost::any>* get_default_values(){
             {"mirror/description", "Grazing incidence mirror to reject high-harmonic wavelengths from the monochromator. There are three coating options available that are used depending on the X-ray energy, no coating (SiO2), rhodium (Rh) or platinum (Pt)."},
             {"slit_0/material", "OFHC Cu"},
             {"beam_stop_2/description", "rectangular"},
-            {"source/type", "Synchrotron X-ray Source"}
+            {"source/type", "Synchrotron X-ray Source"},
+            // TODO: This are temp for dataset arrays. Implement size based on type.
+            {"crystal_1/reflection", 1},
+            {"crystal_2/reflection", 1},
+            {"XBPM4/group_parent", 1},
+            {"XBPM5/group_parent", 1},
+            {"XBPM6/group_parent", 1},
         }
     );
 
@@ -828,17 +834,17 @@ void add_calculated_values(map<string, boost::any>& values){
     };
     
     map<string, function<double(double)>> functions = {
-        {"source/distance", [](double x) { return -33800 - x;}},
-        {"slit_0/distance", [](double x) { return -33800 + 12100 - x;}},
-        {"slit_1/distance", [](double x) { return -33800 + 26000 - x;}},
-        {"monochromator/distance", [](double x) { return -33800 - x;}},
-        {"mirror/distance", [](double x) { return -33800 + 29430 - x;}},
-        {"slit_2/distance", [](double x) { return -33800 + 30660 - x;}},
-        {"slit_3/distance", [](double x) { return 0 - x;}},
-        {"filter_set/distance", [](double x) { return 0 - x;}},
-        {"slit_4/distance", [](double x) { return 0 - x;}},
-        {"monochromator/wavelength", [](double x) { return 12.3984193 / x;}},
-        {"filter_set/attenuator_transmission", [](double x) { return pow(10.0, x);}},
+        {"source/distance", [](double x) -> double { return -33800 - x;}},
+        {"slit_0/distance", [](double x) -> double { return -33800 + 12100 - x;}},
+        {"slit_1/distance", [](double x) -> double { return -33800 + 26000 - x;}},
+        {"monochromator/distance", [](double x) -> double { return -33800 - x;}},
+        {"mirror/distance", [](double x) -> double { return -33800 + 29430 - x;}},
+        {"slit_2/distance", [](double x) -> double { return -33800 + 30660 - x;}},
+        {"slit_3/distance", [](double x) -> double { return 0 - x;}},
+        {"filter_set/distance", [](double x) -> double { return 0 - x;}},
+        {"slit_4/distance", [](double x) -> double { return 0 - x;}},
+        {"monochromator/wavelength", [](double x) -> double { return 12.3984193 / x;}},
+        {"filter_set/attenuator_transmission", [](double x) -> double { return pow(10.0, x);}},
     };
 
     for (auto pair : functions) {
@@ -920,8 +926,8 @@ void add_input_values(map<string, boost::any>& values, map<string, boost::any>& 
         {"bpm6s", {"XBPM6_sum/data"}},
         {"sample_description", {"sample/description"}},
         {"bpm5z", {"XBPM5_skew/data"}},
-        {"moth1", {"/entry/instrument/monochromator/crystal_1/bragg_angle", "/entry/instrument/monochromator/crystal_2/bragg_angle"}},
-        {"sec", {"/entry/instrument/XBPM4/XBPM4/count_time", "/entry/instrument/XBPM5/XBPM5/count_time", "/entry/instrument/XBPM6/XBPM6/count_time"}},
+        {"moth1", {"crystal_1/bragg_angle", "crystal_2/bragg_angle"}},
+        {"sec", {"XBPM4/count_time", "XBPM5/count_time", "XBPM6/count_time"}},
         {"sl3cv", {"slit_3/height"}},
         {"bs1x", {"beam_stop_1/x"}},
         {"bpm6_saturation_value", {"XBPM6_sum/saturation_value"}},
