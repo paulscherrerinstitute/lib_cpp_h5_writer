@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <mutex>
+#include <string>
 
 
 struct FrameMetadata
@@ -14,8 +15,10 @@ struct FrameMetadata
     size_t frame_bytes_size = 0;
 
     // Part of the message header.
-    size_t frame_index = 0;
+    uint64_t frame_index = 0;
     size_t frame_shape[2];
+    std::string endianness = "little";
+    std::string type;
 };
 
 class RingBuffer

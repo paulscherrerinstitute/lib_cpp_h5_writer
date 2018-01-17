@@ -33,7 +33,9 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
         writer.write_data(received_data.first.frame_index, 
                           received_data.first.frame_shape, 
                           received_data.first.frame_bytes_size, 
-                          received_data.second);
+                          received_data.second,
+                          received_data.first.type,
+                          received_data.first.endianness);
 
         ring_buffer->release(received_data.first.buffer_slot_index);
 
@@ -71,12 +73,20 @@ void receive_zmq(WriterManager *manager, RingBuffer *ring_buffer, string connect
         char* header = static_cast<char*>(message_data.data());
         header_parser.Parse(header);
 
-        // Extract frame_index and frame_shape from the message header.
+        // Extract data from message header.
         frame_metadata.frame_index = header_parser["frame"].GetUint64();
 
         auto header_shape = header_parser["shape"].GetArray();
         frame_metadata.frame_shape[0] = header_shape[0].GetUint64();
         frame_metadata.frame_shape[1] = header_shape[1].GetUint64();
+
+        if (header_parser.HasMember("endianness")) {
+            if (string("big") == header_parser["endianness"].GetString()) {
+                frame_metadata.endianness = "big";
+            }
+        }
+
+        frame_metadata.type = header_parser["type"].GetString();
         
         // Get the message data.
         receiver.recv(&message_data);
