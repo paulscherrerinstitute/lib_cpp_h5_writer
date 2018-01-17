@@ -12,11 +12,8 @@ namespace config
     extern size_t ring_buffer_n_slots;
     extern uint32_t ring_buffer_read_retry_interval;
 
-    extern std::string dataset_name;
     extern hsize_t dataset_increase_step;
     extern hsize_t initial_dataset_size;
-    extern H5::PredType dataset_type;
-    extern H5T_order_t dataset_byte_order;
 }
 
 #endif
