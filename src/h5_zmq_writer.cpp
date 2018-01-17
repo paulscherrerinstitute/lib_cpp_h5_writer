@@ -5,18 +5,20 @@
 #include <chrono>
 #include <thread>
 #include "rapidjson/document.h"
+#include <vector>
 
 #include "config.hpp"
 #include "WriterManager.hpp"
 #include "H5ChunkedWriter.hpp"
 #include "RingBuffer.hpp"
 #include "rest_interface.hpp"
+#include "h5_utils.hpp"
 
 using namespace std;
 
 void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_file) 
 {
-    HDF5ChunkedWriter writer(output_file, manager->get_parameters()["dataset_name"]);
+    HDF5ChunkedWriter writer(output_file, "data");
 
     // Run until the running flag is set or the ring_buffer is empty.  
     while(manager->is_running() || !ring_buffer->is_empty()) {
@@ -37,6 +39,8 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
 
         manager->written_frame(received_data.first.frame_index);
     }
+
+    h5_utils::write_format(writer.get_h5_file(), manager->get_parameters());
 
     writer.close_file();
 
@@ -111,7 +115,7 @@ void run_writer(string connect_address, string output_file, uint64_t n_images, u
     thread receiver_thread(receive_zmq, &manager, &ring_buffer, connect_address, n_io_threads, receive_timeout);
     thread writer_thread(write_h5, &manager, &ring_buffer, output_file);
 
-    start_rest_api(manager, rest_port);
+    start_rest_api(manager, rest_port, get_input_value_type());
 
     #ifdef DEBUG_OUTPUT
         cout << "[h5_zmq_writer::run_writer] Rest API stopped." << endl;
