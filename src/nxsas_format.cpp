@@ -939,6 +939,8 @@ void add_input_values(map<string, boost::any>& values, map<string, boost::any>& 
         {"bpm6y", {"XBPM6_y/data"}},
         {"sl1cv", {"slit_1/height"}},
         {"bpm6x", {"XBPM6_x/data"}},
+        {"ftrans", {"input/ftrans"}},
+        {"samz", {"input/samz"}},
     };
 
     for (auto input : input_mapping) {
@@ -1015,6 +1017,8 @@ std::map<string, DATA_TYPE>* get_input_value_type() {
         {"bpm6y", NX_FLOAT},
         {"sl1cv", NX_FLOAT},
         {"bpm6x", NX_FLOAT},
+        {"ftrans", NX_FLOAT},
+        {"samz", NX_FLOAT},
     });
 
     return input_value_types;
