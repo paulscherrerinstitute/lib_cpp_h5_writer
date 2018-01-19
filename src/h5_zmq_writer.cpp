@@ -1,11 +1,11 @@
 #include <iostream>
+#include <sstream>
 #include <zmq.hpp>
 #include <cstdlib>
 #include <thread>
 #include <chrono>
-#include <thread>
-#include "rapidjson/document.h"
-#include <vector>
+#include <boost/property_tree/json_parser.hpp>
+ 
 
 #include "config.hpp"
 #include "WriterManager.hpp"
@@ -14,7 +14,10 @@
 #include "rest_interface.hpp"
 #include "h5_utils.hpp"
 
+
+
 using namespace std;
+namespace pt = boost::property_tree;
 
 void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_file) 
 {
@@ -60,35 +63,38 @@ void receive_zmq(WriterManager *manager, RingBuffer *ring_buffer, string connect
     receiver.setsockopt(ZMQ_RCVTIMEO, receive_timeout);
     receiver.connect(connect_address);
     
-    zmq::message_t message_data;
+    zmq::message_t message_header(config::zmq_buffer_size_header);
+    zmq::message_t message_data(config::zmq_buffer_size_data);
+
     FrameMetadata frame_metadata;
 
-    rapidjson::Document header_parser;
+    pt::ptree json_header;
 
     while (manager->is_running()) {
         // Get the message header.
-        if (!receiver.recv(&message_data)){
+        if (!receiver.recv(&message_header)){
             continue;
         }
 
         // Parse JSON header.
-        char* header = static_cast<char*>(message_data.data());
-        header_parser.Parse(header);
+        string header_string(static_cast<char*>(message_header.data()), message_header.size());
+        stringstream header_stream;
+        header_stream << header_string << endl;
+        pt::read_json(header_stream, json_header);
 
         // Extract data from message header.
-        frame_metadata.frame_index = header_parser["frame"].GetUint64();
+        frame_metadata.frame_index = json_header.get<uint64_t>("frame");
 
-        auto header_shape = header_parser["shape"].GetArray();
-        frame_metadata.frame_shape[0] = header_shape[0].GetUint64();
-        frame_metadata.frame_shape[1] = header_shape[1].GetUint64();
-
-        if (header_parser.HasMember("endianness")) {
-            if (string("big") == header_parser["endianness"].GetString()) {
-                frame_metadata.endianness = "big";
-            }
+        uint8_t index = 0;
+        for (auto item : json_header.get_child("shape")) {
+            frame_metadata.frame_shape[index] = item.second.get_value<size_t>();
+            index++;
         }
+        
+        // Array 1.0 specified little endian as the default encoding.
+        frame_metadata.endianness = json_header.get("endianness", "little");
 
-        frame_metadata.type = header_parser["type"].GetString();
+        frame_metadata.type = json_header.get<string>("type");
 
         // Get the message data.
         receiver.recv(&message_data);

@@ -14,13 +14,11 @@ requirements:
         - gcc
         - cppzmq
         - hdf5
-        - rapidjson
         - boost
 
     run:
         - cppzmq
         - hdf5
-        - rapidjson
         - boost
 
 

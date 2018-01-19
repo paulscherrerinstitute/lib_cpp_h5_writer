@@ -4,6 +4,8 @@ namespace config {
     // Receiver config.
     int zmq_n_io_threads = 1;
     int zmq_receive_timeout = 100;
+    int zmq_buffer_size_header = 1024 * 1024 * 0.2;
+    int zmq_buffer_size_data = 1024 * 1024 * 10;
 
     // Ring buffer config.
     size_t ring_buffer_n_slots = 100;
