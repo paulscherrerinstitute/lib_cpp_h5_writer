@@ -31,7 +31,7 @@ HDF5ChunkedWriter::~HDF5ChunkedWriter()
 
 void HDF5ChunkedWriter::close_file()
 {
-    if (file.getId() == -1) {
+    if (!is_file_open()) {
         #ifdef DEBUG_OUTPUT
             cout << "[HDF5ChunkedWriter::close_file] Trying to close an already closed file." << endl;
         #endif
@@ -153,6 +153,10 @@ void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk, st
 
 }
 
+bool HDF5ChunkedWriter::is_file_open() {
+    return (file.getId() != -1);
+}
+
 hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t* frame_shape, string& data_type, string& endianness) {
 
     hsize_t relative_frame_index = frame_index;
@@ -175,7 +179,7 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t*
     #endif
 
     // Open the file if needed.
-    if (file.getId() == -1) {
+    if (!is_file_open()) {
         create_file(frame_shape, 0, data_type, endianness);
     }
 

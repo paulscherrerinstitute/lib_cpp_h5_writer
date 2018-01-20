@@ -30,6 +30,7 @@ class HDF5ChunkedWriter
     public:
         HDF5ChunkedWriter(const std::string filename, const std::string dataset_name, hsize_t frames_per_file=0, hsize_t initial_dataset_size=config::initial_dataset_size);
         ~HDF5ChunkedWriter();
+        bool is_file_open();
         void close_file();
         void write_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data, std::string data_type, std::string endianness);
         H5::H5File& get_h5_file();
