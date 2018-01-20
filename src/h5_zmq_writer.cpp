@@ -45,12 +45,14 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
         manager->written_frame(received_data.first.frame_index);
     }
 
-    #ifdef DEBUG_OUTPUT
-        cout << "[h5_zmq_writer::write] Writing file format." << endl;
-    #endif
+    if (writer.is_file_open()) {
+        #ifdef DEBUG_OUTPUT
+            cout << "[h5_zmq_writer::write] Writing file format." << endl;
+        #endif
 
-    h5_utils::write_format(writer.get_h5_file(), manager->get_parameters());
-
+        h5_utils::write_format(writer.get_h5_file(), manager->get_parameters());
+    }
+    
     #ifdef DEBUG_OUTPUT
         cout << "[h5_zmq_writer::write] Closing file." << endl;
     #endif
