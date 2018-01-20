@@ -47,18 +47,18 @@ void RingBuffer::initialize(size_t slot_size)
     #endif
 }
 
-void RingBuffer::write(FrameMetadata &metadata, char* data)
+void RingBuffer::write(FrameMetadata &frame_metadata, char* data)
 {
     // Initialize the buffer on the first write.
     if (!ring_buffer_initialized) {
-        initialize(metadata.frame_bytes_size);
+        initialize(frame_metadata.frame_bytes_size);
     }
 
     // All images must fit in the ring buffer.
-    if (metadata.frame_bytes_size > slot_size) {
+    if (frame_metadata.frame_bytes_size > slot_size) {
         stringstream error_message;
-        error_message << "Received frame index "<< metadata.frame_index <<" that is too large for ring buffer slot." << endl;
-        error_message << "RingBuffer slot size " << slot_size << ", but frame bytes size " << metadata.frame_bytes_size << endl;
+        error_message << "Received frame index "<< frame_metadata.frame_index <<" that is too large for ring buffer slot." << endl;
+        error_message << "RingBuffer slot size " << slot_size << ", but frame bytes size " << frame_metadata.frame_bytes_size << endl;
 
         throw runtime_error(error_message.str());
     }
@@ -70,10 +70,10 @@ void RingBuffer::write(FrameMetadata &metadata, char* data)
         ringbuffer_slots[write_index] = 1;
         
         // Set the write index in the FrameMetadata object.
-        metadata.buffer_slot_index = write_index;
+        frame_metadata.buffer_slot_index = write_index;
 
         #ifdef DEBUG_OUTPUT
-            cout << "[RingBuffer::write] Ring buffer slot " << metadata.buffer_slot_index << " reserved for frame_index " << metadata.frame_index << endl;
+            cout << "[RingBuffer::write] Ring buffer slot " << frame_metadata.buffer_slot_index << " reserved for frame_index " << frame_metadata.frame_index << endl;
         #endif
 
         // Increase and wrap the write index around if needed.
@@ -92,22 +92,24 @@ void RingBuffer::write(FrameMetadata &metadata, char* data)
     ringbuffer_slots_mutex.unlock();
 
     // Write to the buffer. The slot is already reserved.
-    char* slot_memory_address = get_buffer_slot_address(metadata.buffer_slot_index);
-    memcpy(slot_memory_address, data, metadata.frame_bytes_size);
+    char* slot_memory_address = get_buffer_slot_address(frame_metadata.buffer_slot_index);
+    memcpy(slot_memory_address, data, frame_metadata.frame_bytes_size);
 
     #ifdef DEBUG_OUTPUT
-        cout << "[RingBuffer::write] Copied " << metadata.frame_bytes_size << " frame bytes to buffer_slot_index " << metadata.buffer_slot_index << endl;
+        cout << "[RingBuffer::write] Copied " << frame_metadata.frame_bytes_size << " frame bytes to buffer_slot_index " << frame_metadata.buffer_slot_index << endl;
     #endif
     
     frame_metadata_queue_mutex.lock();
 
+    cout << "push back metadata " << frame_metadata.frame_shape[0] << endl;
+
     // Send the metadata header to writing process.
-    frame_metadata_queue.push_back(metadata);
+    frame_metadata_queue.push_back(frame_metadata);
 
     frame_metadata_queue_mutex.unlock();
 
     #ifdef DEBUG_OUTPUT
-        cout << "[RingBuffer] Metadata for frame_index " << metadata.frame_index << " added to metadata queue." << endl;
+        cout << "[RingBuffer] Metadata for frame_index " << frame_metadata.frame_index << " added to metadata queue." << endl;
     #endif
 }
 
