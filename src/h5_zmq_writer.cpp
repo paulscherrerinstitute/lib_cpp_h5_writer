@@ -33,6 +33,11 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
 
         pair<FrameMetadata, char*> received_data = ring_buffer->read();
         
+        // NULL pointer means that the ringbuffer->read() timeouted. Faster than rising an exception.
+        if(!received_data.second) {
+            continue;
+        }
+
         writer.write_data(received_data.first.frame_index, 
                           received_data.first.frame_shape,
                           received_data.first.frame_bytes_size, 
@@ -54,7 +59,7 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
     }
     
     #ifdef DEBUG_OUTPUT
-        cout << "[h5_zmq_writer::write] Closing file." << endl;
+        cout << "[h5_zmq_writer::write] Closing file " << output_file << endl;
     #endif
     
     writer.close_file();
@@ -121,7 +126,7 @@ void receive_zmq(WriterManager *manager, RingBuffer *ring_buffer, string connect
         #endif
 
         // Commit the frame to the buffer.
-        // ring_buffer->write(frame_metadata, static_cast<char*>(message_data.data()));
+        ring_buffer->write(frame_metadata, static_cast<char*>(message_data.data()));
 
         manager->received_frame(frame_metadata.frame_index);
    }
