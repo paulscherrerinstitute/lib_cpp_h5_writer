@@ -32,9 +32,9 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
         }
 
         pair<FrameMetadata, char*> received_data = ring_buffer->read();
-
+        
         writer.write_data(received_data.first.frame_index, 
-                          received_data.first.frame_shape, 
+                          received_data.first.frame_shape,
                           received_data.first.frame_bytes_size, 
                           received_data.second,
                           received_data.first.type,
@@ -45,8 +45,16 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
         manager->written_frame(received_data.first.frame_index);
     }
 
+    #ifdef DEBUG_OUTPUT
+        cout << "[h5_zmq_writer::write] Writing file format." << endl;
+    #endif
+
     h5_utils::write_format(writer.get_h5_file(), manager->get_parameters());
 
+    #ifdef DEBUG_OUTPUT
+        cout << "[h5_zmq_writer::write] Closing file." << endl;
+    #endif
+    
     writer.close_file();
 
     #ifdef DEBUG_OUTPUT
@@ -90,7 +98,7 @@ void receive_zmq(WriterManager *manager, RingBuffer *ring_buffer, string connect
             frame_metadata.frame_shape[index] = item.second.get_value<size_t>();
             index++;
         }
-        
+
         // Array 1.0 specified little endian as the default encoding.
         frame_metadata.endianness = json_header.get("endianness", "little");
 
@@ -100,14 +108,24 @@ void receive_zmq(WriterManager *manager, RingBuffer *ring_buffer, string connect
         receiver.recv(&message_data);
         frame_metadata.frame_bytes_size = message_data.size();
 
+        #ifdef DEBUG_OUTPUT
+            cout << "[h5_zmq_writer::receive_zmq] Processing FrameMetadata"; 
+            cout << " with frame_index " << frame_metadata.frame_index;
+            cout << " and frame_shape [" << frame_metadata.frame_shape[0] << ", " << frame_metadata.frame_shape[1] << "]";
+            cout << " and endianness " << frame_metadata.endianness;
+            cout << " and type " << frame_metadata.type;
+            cout << " and frame_bytes_size " << frame_metadata.frame_bytes_size;
+            cout << "." << endl;
+        #endif
+
         // Commit the frame to the buffer.
-        ring_buffer->write(frame_metadata, static_cast<char*>(message_data.data()));
+        // ring_buffer->write(frame_metadata, static_cast<char*>(message_data.data()));
 
         manager->received_frame(frame_metadata.frame_index);
    }
 
     #ifdef DEBUG_OUTPUT
-        cout << "[h5_zmq_writer::receive] Receiver thread stopped." << endl;
+        cout << "[h5_zmq_writer::receive_zmq] Receiver thread stopped." << endl;
     #endif
 }
 
