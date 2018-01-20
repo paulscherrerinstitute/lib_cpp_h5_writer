@@ -10,15 +10,24 @@
 
 struct FrameMetadata
 {
-    // Needed for the buffer.
+    FrameMetadata(){}
+
+    FrameMetadata(const FrameMetadata& other) : 
+        buffer_slot_index(other.buffer_slot_index), frame_bytes_size(other.frame_bytes_size), frame_index(other.frame_index), 
+        endianness(other.endianness), type(other.type) {
+        frame_shape[0] = other.frame_shape[0];
+        frame_shape[1] = other.frame_shape[1];
+    }
+
+    // Ring buffer needed data.
     size_t buffer_slot_index = 0;
     size_t frame_bytes_size = 0;
-
-    // Part of the message header.
+    
+    // Image header data.
     uint64_t frame_index = 0;
-    size_t frame_shape[2];
     std::string endianness = "little";
     std::string type;
+    size_t frame_shape[2];
 };
 
 class RingBuffer
