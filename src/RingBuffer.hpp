@@ -20,12 +20,12 @@ struct FrameMetadata
     }
 
     // Ring buffer needed data.
-    size_t buffer_slot_index = 0;
+    size_t buffer_slot_index = -1;
     size_t frame_bytes_size = 0;
     
     // Image header data.
-    uint64_t frame_index = 0;
-    std::string endianness = "little";
+    uint64_t frame_index = -1;
+    std::string endianness = "";
     std::string type;
     size_t frame_shape[2];
 };
