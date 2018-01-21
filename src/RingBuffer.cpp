@@ -1,9 +1,10 @@
-#include "RingBuffer.hpp"
 #include <stdexcept>
 #include <sstream>
 #include <cstring>
 #include <iostream>
 #include <cstddef>
+
+#include "RingBuffer.hpp"
 
 using namespace std;
 
@@ -24,9 +25,9 @@ RingBuffer::~RingBuffer() {
 void RingBuffer::initialize(size_t slot_size)
 {
     // Check if the ring buffer is already initialized.
-    if (frame_data_buffer != NULL) {
+    if (frame_data_buffer) {
         stringstream error_message;
-        error_message << "Ring buffer already initialized." << endl;
+        error_message << "[RingBuffer::initialize] Ring buffer already initialized." << endl;
 
         throw runtime_error(error_message.str());
     }
@@ -57,8 +58,9 @@ void RingBuffer::write(FrameMetadata &frame_metadata, char* data)
     // All images must fit in the ring buffer.
     if (frame_metadata.frame_bytes_size > slot_size) {
         stringstream error_message;
-        error_message << "Received frame index "<< frame_metadata.frame_index <<" that is too large for ring buffer slot." << endl;
-        error_message << "RingBuffer slot size " << slot_size << ", but frame bytes size " << frame_metadata.frame_bytes_size << endl;
+        error_message << "[RingBuffer::write] Received frame index "<< frame_metadata.frame_index;
+        error_message << " that is too large for ring buffer slot. ";
+        error_message << "Slot size " << slot_size << ", but frame bytes size " << frame_metadata.frame_bytes_size << endl;
 
         throw runtime_error(error_message.str());
     }
@@ -73,7 +75,8 @@ void RingBuffer::write(FrameMetadata &frame_metadata, char* data)
         frame_metadata.buffer_slot_index = write_index;
 
         #ifdef DEBUG_OUTPUT
-            cout << "[RingBuffer::write] Ring buffer slot " << frame_metadata.buffer_slot_index << " reserved for frame_index " << frame_metadata.frame_index << endl;
+            cout << "[RingBuffer::write] Ring buffer slot " << frame_metadata.buffer_slot_index << " reserved for frame_index ";
+            cout << frame_metadata.frame_index << endl;
         #endif
 
         // Increase and wrap the write index around if needed.
@@ -84,7 +87,7 @@ void RingBuffer::write(FrameMetadata &frame_metadata, char* data)
 
     } else {
         stringstream error_message;
-        error_message << "Ring buffer is full. Collision at write_index = " << write_index << endl;
+        error_message << "[RingBuffer::write] Ring buffer is full. Collision at write_index = " << write_index << endl;
 
         throw runtime_error(error_message.str());
     }
@@ -96,12 +99,11 @@ void RingBuffer::write(FrameMetadata &frame_metadata, char* data)
     memcpy(slot_memory_address, data, frame_metadata.frame_bytes_size);
 
     #ifdef DEBUG_OUTPUT
-        cout << "[RingBuffer::write] Copied " << frame_metadata.frame_bytes_size << " frame bytes to buffer_slot_index " << frame_metadata.buffer_slot_index << endl;
+        cout << "[RingBuffer::write] Copied " << frame_metadata.frame_bytes_size << " frame bytes to buffer_slot_index ";
+        cout << frame_metadata.buffer_slot_index << endl;
     #endif
     
     frame_metadata_queue_mutex.lock();
-
-    cout << "push back metadata " << frame_metadata.frame_shape[0] << endl;
 
     // Send the metadata header to writing process.
     frame_metadata_queue.push_back(frame_metadata);
@@ -109,7 +111,7 @@ void RingBuffer::write(FrameMetadata &frame_metadata, char* data)
     frame_metadata_queue_mutex.unlock();
 
     #ifdef DEBUG_OUTPUT
-        cout << "[RingBuffer] Metadata for frame_index " << frame_metadata.frame_index << " added to metadata queue." << endl;
+        cout << "[RingBuffer::write] Metadata for frame_index " << frame_metadata.frame_index << " added to metadata queue." << endl;
     #endif
 }
 
@@ -119,13 +121,15 @@ char* RingBuffer::get_buffer_slot_address(size_t buffer_slot_index) {
     // Check if the memory address is valid.
     if (slot_memory_address > frame_data_buffer + buffer_size) {
         stringstream error_message;
-        error_message << "Calculated ring buffer address is out of bound for buffer_slot_index " << buffer_slot_index << endl;
+        error_message << "[RingBuffer::get_buffer_slot_address] Calculated ring buffer address is out of bound for buffer_slot_index ";
+        error_message << buffer_slot_index << endl;
 
         throw runtime_error(error_message.str());
     }
 
     #ifdef DEBUG_OUTPUT
-        cout << "[RingBuffer::get_buffer_slot_address] For buffer_slot_index " << buffer_slot_index << " the calculated memory address is " << long(slot_memory_address) << endl;
+        cout << "[RingBuffer::get_buffer_slot_address] For buffer_slot_index " << buffer_slot_index;
+        cout << " the calculated memory address is " << long(slot_memory_address) << endl;
     #endif
 
     return slot_memory_address;
@@ -157,7 +161,8 @@ pair<FrameMetadata, char*> RingBuffer::read()
 
     if (!ringbuffer_slots[frame_metadata.buffer_slot_index]) {
         stringstream error_message;
-        error_message << "Ring buffer slot referenced in message header " << frame_metadata.buffer_slot_index << " is empty." << endl;
+        error_message << "[RingBuffer::read] Ring buffer slot referenced in message header ";
+        error_message << frame_metadata.buffer_slot_index << " is empty." << endl;
 
         throw runtime_error(error_message.str());
     }
@@ -174,7 +179,8 @@ void RingBuffer::release(size_t buffer_slot_index) {
     // Cannot release a slot index that is out of range.
     if (buffer_slot_index >= n_slots) {
         stringstream error_message;
-        error_message << "Slot index to release " << buffer_slot_index << " is out of range. Ring buffer n_slots = " << n_slots << endl;
+        error_message << "[RingBuffer::release] Slot index to release " << buffer_slot_index;
+        error_message << " is out of range. Ring buffer n_slots = " << n_slots << endl;
 
         throw runtime_error(error_message.str());
     }
@@ -190,7 +196,7 @@ void RingBuffer::release(size_t buffer_slot_index) {
 
     } else {
         stringstream error_message;
-        error_message << "Cannot release empty ring buffer slot " << buffer_slot_index << endl;
+        error_message << "[RingBuffer::release] Cannot release empty ring buffer slot " << buffer_slot_index << endl;
 
         throw runtime_error(error_message.str());
     }

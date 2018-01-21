@@ -52,8 +52,9 @@ class RingBuffer
 
     public:
         RingBuffer(size_t n_slots);
-        ~RingBuffer();
+        virtual ~RingBuffer();
         void initialize(size_t slot_size);
+        
         void write(FrameMetadata &metadata, char* data);
         std::pair<FrameMetadata, char*> read();
         void release(size_t buffer_slot_index);
