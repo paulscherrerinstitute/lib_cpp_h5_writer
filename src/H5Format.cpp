@@ -3,12 +3,11 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "h5_utils.hpp"
-#include "config.hpp"
+#include "H5Format.hpp"
 
 using namespace std;
 
-hsize_t h5_utils::expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step)
+hsize_t H5Format::expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step)
 {
     hsize_t dataset_rank = 3;
     hsize_t dataset_dimension[dataset_rank];
@@ -17,7 +16,7 @@ hsize_t h5_utils::expand_dataset(const H5::DataSet& dataset, hsize_t frame_index
     dataset_dimension[0] = frame_index + dataset_increase_step;
 
     #ifdef DEBUG_OUTPUT
-        cout << "[h5_utils::expand_dataset] Expanding dataspace to size (";
+        cout << "[H5Format::expand_dataset] Expanding dataspace to size (";
         for (hsize_t i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
         }
@@ -29,7 +28,7 @@ hsize_t h5_utils::expand_dataset(const H5::DataSet& dataset, hsize_t frame_index
     return dataset_dimension[0];
 }
 
-void h5_utils::compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index)
+void H5Format::compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index)
 {
     hsize_t dataset_rank = 3;
     hsize_t dataset_dimension[dataset_rank];
@@ -38,7 +37,7 @@ void h5_utils::compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_ind
     dataset_dimension[0] = max_frame_index + 1;
 
     #ifdef DEBUG_OUTPUT
-        cout << "[h5_utils::compact_dataset] Compacting dataspace to size (";
+        cout << "[H5Format::compact_dataset] Compacting dataspace to size (";
         for (hsize_t i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
         }
@@ -48,12 +47,12 @@ void h5_utils::compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_ind
     dataset.extend(dataset_dimension);
 }
 
-H5::Group h5_utils::create_group(H5::CommonFG& target, std::string name)
+H5::Group H5Format::create_group(H5::CommonFG& target, std::string name)
 {
     return target.createGroup(name);
 }
 
-boost::any h5_utils::get_value_from_reference(string& dataset_name, boost::any value_reference, map<string, boost::any>& values)
+boost::any H5Format::get_value_from_reference(string& dataset_name, boost::any value_reference, map<string, boost::any>& values)
 {
     try {
         auto reference_string = boost::any_cast<string>(value_reference);
@@ -73,10 +72,10 @@ boost::any h5_utils::get_value_from_reference(string& dataset_name, boost::any v
     }
 }
 
-H5::PredType h5_utils::get_dataset_data_type(string& type){
+H5::PredType H5Format::get_dataset_data_type(string& type){
 
     #ifdef DEBUG_OUTPUT
-        cout << "[h5_utils::get_dataset_data_type] Getting dataset type for received frame type " << type << endl;
+        cout << "[H5Format::get_dataset_data_type] Getting dataset type for received frame type " << type << endl;
     #endif
 
     if (type == "uint8") {
@@ -106,7 +105,7 @@ H5::PredType h5_utils::get_dataset_data_type(string& type){
     }
 }
 
-H5::DataSet h5_utils::write_dataset(H5::Group& target, h5_dataset& dataset, map<string, boost::any>& values){
+H5::DataSet H5Format::write_dataset(H5::Group& target, h5_dataset& dataset, map<string, boost::any>& values){
     string name = dataset.name;
     boost::any value;
 
@@ -115,18 +114,18 @@ H5::DataSet h5_utils::write_dataset(H5::Group& target, h5_dataset& dataset, map<
         value = dataset.value;
     // Value in struct is just a string reference to into the values map.
     } else {
-        value = h5_utils::get_value_from_reference(name, dataset.value, values);
+        value = H5Format::get_value_from_reference(name, dataset.value, values);
     }
     
     if (dataset.data_type == NX_CHAR || dataset.data_type == NX_DATE_TIME || dataset.data_type == NXnote) {
         // Attempt to convert to const char * (string "literals" cause that).
         try {
-            return h5_utils::write_dataset(target, name, string(boost::any_cast<const char*>(value)));
+            return H5Format::write_dataset(target, name, string(boost::any_cast<const char*>(value)));
         } catch (const boost::bad_any_cast& exception) {}
 
         // Atempt to convert to string.
         try {
-            return h5_utils::write_dataset(target, name, boost::any_cast<string>(value));
+            return H5Format::write_dataset(target, name, boost::any_cast<string>(value));
         } catch (const boost::bad_any_cast& exception) {}
 
         // We cannot really convert this attribute.
@@ -137,7 +136,7 @@ H5::DataSet h5_utils::write_dataset(H5::Group& target, h5_dataset& dataset, map<
 
     } else if (dataset.data_type == NX_INT) {
         try {
-            return h5_utils::write_dataset(target, name, boost::any_cast<int>(value));
+            return H5Format::write_dataset(target, name, boost::any_cast<int>(value));
         } catch (const boost::bad_any_cast& exception) {}
 
         // We cannot really convert this attribute.
@@ -147,7 +146,7 @@ H5::DataSet h5_utils::write_dataset(H5::Group& target, h5_dataset& dataset, map<
         throw runtime_error(error_message.str());
     } else if (dataset.data_type == NX_FLOAT || dataset.data_type == NX_NUMBER) {
         try {
-            return h5_utils::write_dataset(target, name, boost::any_cast<double>(value));
+            return H5Format::write_dataset(target, name, boost::any_cast<double>(value));
         } catch (const boost::bad_any_cast& exception) {}
 
         // We cannot really convert this attribute.
@@ -163,7 +162,7 @@ H5::DataSet h5_utils::write_dataset(H5::Group& target, h5_dataset& dataset, map<
     }
 }
 
-H5::DataSet h5_utils::write_dataset(H5::Group& target, string name, double value)
+H5::DataSet H5Format::write_dataset(H5::Group& target, string name, double value)
 {
     H5::DataSpace att_space(H5S_SCALAR);
     auto data_type = H5::PredType::NATIVE_DOUBLE;
@@ -174,7 +173,7 @@ H5::DataSet h5_utils::write_dataset(H5::Group& target, string name, double value
     return dataset;
 }
 
-H5::DataSet h5_utils::write_dataset(H5::Group& target, string name, int value)
+H5::DataSet H5Format::write_dataset(H5::Group& target, string name, int value)
 {
     H5::DataSpace att_space(H5S_SCALAR);
     auto data_type = H5::PredType::NATIVE_INT;
@@ -185,7 +184,7 @@ H5::DataSet h5_utils::write_dataset(H5::Group& target, string name, int value)
     return dataset;
 }
 
-H5::DataSet h5_utils::write_dataset(H5::Group& target, string name, string value)
+H5::DataSet H5Format::write_dataset(H5::Group& target, string name, string value)
 {
     H5::DataSpace att_space(H5S_SCALAR);
     H5::DataType data_type = H5::StrType(0, H5T_VARIABLE);
@@ -196,7 +195,7 @@ H5::DataSet h5_utils::write_dataset(H5::Group& target, string name, string value
     return dataset;
 }
 
-void h5_utils::write_attribute(H5::H5Object& target, string name, string value)
+void H5Format::write_attribute(H5::H5Object& target, string name, string value)
 {
     H5::DataSpace att_space(H5S_SCALAR);
     H5::DataType data_type = H5::StrType(0, H5T_VARIABLE);
@@ -205,7 +204,7 @@ void h5_utils::write_attribute(H5::H5Object& target, string name, string value)
     h5_attribute.write(data_type, value);
 }
 
-void h5_utils::write_attribute(H5::H5Object& target, string name, int value)
+void H5Format::write_attribute(H5::H5Object& target, string name, int value)
 {
     H5::DataSpace att_space(H5S_SCALAR);
     auto data_type = H5::PredType::NATIVE_INT;
@@ -214,7 +213,7 @@ void h5_utils::write_attribute(H5::H5Object& target, string name, int value)
     h5_attribute.write(data_type, &value);
 }
 
-void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute, map<string, boost::any>& values) 
+void H5Format::write_attribute(H5::H5Object& target, h5_attr& attribute, map<string, boost::any>& values) 
 {
     string name = attribute.name;
     boost::any value;
@@ -224,19 +223,19 @@ void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute, map<str
         value = attribute.value;
     // Value in struct is just a string reference to into the values map.
     } else {
-        value = h5_utils::get_value_from_reference(name, attribute.value, values);
+        value = H5Format::get_value_from_reference(name, attribute.value, values);
     }
     
     if (attribute.data_type == NX_CHAR) {
         // Attempt to convert to const char * (string "literals" cause that).
         try {
-            h5_utils::write_attribute(target, name, string(boost::any_cast<const char*>(value)));
+            H5Format::write_attribute(target, name, string(boost::any_cast<const char*>(value)));
             return;
         } catch (const boost::bad_any_cast& exception) {}
 
         // Atempt to convert to string.
         try {
-            h5_utils::write_attribute(target, name, boost::any_cast<string>(value));
+            H5Format::write_attribute(target, name, boost::any_cast<string>(value));
             return;
         } catch (const boost::bad_any_cast& exception) {}
 
@@ -248,7 +247,7 @@ void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute, map<str
 
     } else if (attribute.data_type == NX_INT) {
         try {
-            h5_utils::write_attribute(target, name, boost::any_cast<int>(value));
+            H5Format::write_attribute(target, name, boost::any_cast<int>(value));
             return;
         } catch (const boost::bad_any_cast& exception) {}
 
@@ -260,8 +259,8 @@ void h5_utils::write_attribute(H5::H5Object& target, h5_attr& attribute, map<str
     }
 }
 
-void h5_utils::write_format_data(H5::CommonFG& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values) {
-    auto node_group = h5_utils::create_group(file_node, format_node.name);
+void H5Format::write_format_data(H5::CommonFG& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values) {
+    auto node_group = H5Format::create_group(file_node, format_node.name);
 
     for (auto item : format_node.items) {
 
@@ -272,10 +271,10 @@ void h5_utils::write_format_data(H5::CommonFG& file_node, h5_parent& format_node
         } else if (item->node_type == ATTRIBUTE) {
             auto sub_attribute = dynamic_cast<h5_attr*>(item);
 
-            h5_utils::write_attribute(node_group, *sub_attribute, values);
+            H5Format::write_attribute(node_group, *sub_attribute, values);
         } else if (item->node_type == DATASET) {
             auto sub_dataset = dynamic_cast<h5_dataset*>(item);
-            auto current_dataset = h5_utils::write_dataset(node_group, *sub_dataset, values);
+            auto current_dataset = H5Format::write_dataset(node_group, *sub_dataset, values);
 
             for (auto dataset_attr : sub_dataset->items) {
 
@@ -289,13 +288,13 @@ void h5_utils::write_format_data(H5::CommonFG& file_node, h5_parent& format_node
 
                 auto sub_attribute = dynamic_cast<h5_attr*>(dataset_attr);
 
-                h5_utils::write_attribute(current_dataset, *sub_attribute, values);
+                H5Format::write_attribute(current_dataset, *sub_attribute, values);
             }
         }
     }
 }
 
-void h5_utils::write_format(H5::H5File& file, std::map<std::string, h5_value>& input_values){
+void H5Format::write_format(H5::H5File& file, std::map<std::string, h5_value>& input_values){
     
     auto format = get_format_definition();
     auto values = get_default_values();

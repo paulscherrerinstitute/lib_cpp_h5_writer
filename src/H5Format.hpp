@@ -4,9 +4,8 @@
 #include <string>
 #include <list>
 #include <map>
-
-#include <boost/any.hpp>
 #include <H5Cpp.h>
+#include <boost/any.hpp>
 
 
 typedef boost::any h5_value;
@@ -67,7 +66,7 @@ struct h5_attr : public h5_base, public h5_data_base {
     h5_value value;
 };
 
-namespace h5_utils{
+namespace H5Format {
     hsize_t expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
     void compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index);
 
@@ -89,12 +88,12 @@ namespace h5_utils{
     void write_format(H5::H5File& file, std::map<std::string, h5_value>& input_values);
 };
 
+// Move this somewhere else.
 std::map<std::string, DATA_TYPE>* get_input_value_type();
 std::map<std::string, boost::any>* get_default_values();
 h5_group* get_format_definition();
 void add_calculated_values(std::map<std::string, boost::any>& values);
 void add_input_values(std::map<std::string, boost::any>& values, std::map<std::string, boost::any>& input_values);
-
 
 
 #endif

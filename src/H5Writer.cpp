@@ -1,8 +1,9 @@
-#include "h5_utils.hpp"
 #include <sstream>
 #include <stdexcept>
 #include <iostream>
+
 #include "H5Writer.hpp"
+#include "H5Format.hpp"
 
 extern "C"
 {
@@ -45,7 +46,7 @@ void H5Writer::close_file()
         cout << "[H5Writer::close_file] Closing file." << endl;
     #endif
 
-    h5_utils::compact_dataset(dataset, max_frame_index);
+    H5Format::compact_dataset(dataset, max_frame_index);
     
     hsize_t min_frame_in_dataset = 0;
     if (frames_per_file) {
@@ -63,8 +64,8 @@ void H5Writer::close_file()
         cout << "[H5Writer::close_file] Setting dataset attribute image_nr_low=" << image_nr_low << " and image_nr_high=" << image_nr_high << endl;
     #endif
 
-    h5_utils::write_attribute(dataset, "image_nr_low", image_nr_low);
-    h5_utils::write_attribute(dataset, "image_nr_high", image_nr_high);
+    H5Format::write_attribute(dataset, "image_nr_low", image_nr_low);
+    H5Format::write_attribute(dataset, "image_nr_high", image_nr_high);
 
     // Cleanup.
     file.close();
@@ -139,7 +140,7 @@ void H5Writer::create_file(size_t* frame_shape, hsize_t frame_chunk, string& typ
     const hsize_t dataset_chunking[] = {1, frame_shape[0], frame_shape[1]};
     dataset_properties.setChunk(dataset_rank, dataset_chunking);
     
-    H5::AtomType data_type(h5_utils::get_dataset_data_type(type));
+    H5::AtomType data_type(H5Format::get_dataset_data_type(type));
 
     if (endianness == "big") {
         data_type.setOrder(H5T_ORDER_BE);
@@ -190,7 +191,7 @@ hsize_t H5Writer::prepare_storage_for_frame(size_t frame_index, size_t* frame_sh
 
     // Expand the dataset if needed.
     if (relative_frame_index > current_dataset_size) {
-        current_dataset_size = h5_utils::expand_dataset(dataset, relative_frame_index, dataset_increase_step);
+        current_dataset_size = H5Format::expand_dataset(dataset, relative_frame_index, dataset_increase_step);
     }
 
     // Keep track of the max index in this file - needed for shrinking the dataset at the end.

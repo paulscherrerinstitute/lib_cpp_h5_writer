@@ -11,7 +11,7 @@
 #include "H5Writer.hpp"
 #include "RingBuffer.hpp"
 #include "rest_interface.hpp"
-#include "h5_utils.hpp"
+#include "H5Format.hpp"
 
 using namespace std;
 namespace pt = boost::property_tree;
@@ -52,7 +52,7 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
             cout << "[h5_zmq_writer::write] Writing file format." << endl;
         #endif
 
-        h5_utils::write_format(writer.get_h5_file(), manager->get_parameters());
+        H5Format::write_format(writer.get_h5_file(), manager->get_parameters());
     }
     
     #ifdef DEBUG_OUTPUT
