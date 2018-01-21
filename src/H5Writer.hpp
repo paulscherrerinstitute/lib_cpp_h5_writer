@@ -32,7 +32,7 @@ class H5Writer
         ~H5Writer();
         bool is_file_open();
         void close_file();
-        void write_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data, std::string data_type, std::string endianness);
+        void write_frame_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data, std::string data_type, std::string endianness);
         H5::H5File& get_h5_file();
 };
 

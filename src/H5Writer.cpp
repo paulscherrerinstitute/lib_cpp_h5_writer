@@ -71,7 +71,7 @@ void H5Writer::close_file()
     max_frame_index = 0;
 }
 
-void H5Writer::write_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data, string data_type, string endianness)
+void H5Writer::write_frame_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data, string data_type, string endianness)
 {
     // Define the ofset of the currently received image in the file.
     hsize_t relative_frame_index = prepare_storage_for_frame(frame_index, frame_shape, data_type, endianness);

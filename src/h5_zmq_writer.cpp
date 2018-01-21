@@ -5,7 +5,6 @@
 #include <thread>
 #include <chrono>
 #include <boost/property_tree/json_parser.hpp>
- 
 
 #include "config.hpp"
 #include "WriterManager.hpp"
@@ -13,8 +12,6 @@
 #include "RingBuffer.hpp"
 #include "rest_interface.hpp"
 #include "h5_utils.hpp"
-
-
 
 using namespace std;
 namespace pt = boost::property_tree;
@@ -38,12 +35,12 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
             continue;
         }
 
-        writer.write_data(received_data.first.frame_index, 
-                          received_data.first.frame_shape,
-                          received_data.first.frame_bytes_size, 
-                          received_data.second,
-                          received_data.first.type,
-                          received_data.first.endianness);
+        writer.write_frame_data(received_data.first.frame_index, 
+                                received_data.first.frame_shape,
+                                received_data.first.frame_bytes_size, 
+                                received_data.second,
+                                received_data.first.type,
+                                received_data.first.endianness);
 
         ring_buffer->release(received_data.first.buffer_slot_index);
 
