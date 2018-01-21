@@ -11,8 +11,10 @@ extern "C"
 
 using namespace std;
 
-H5Writer::H5Writer(const string filename, const string dataset_name, hsize_t frames_per_file, hsize_t initial_dataset_size) :
-    filename(filename), dataset_name(dataset_name), frames_per_file(frames_per_file), initial_dataset_size(initial_dataset_size)
+H5Writer::H5Writer(const std::string filename, const std::string dataset_name, 
+            hsize_t frames_per_file, hsize_t initial_dataset_size, hsize_t dataset_increase_step) :
+    filename(filename), dataset_name(dataset_name), frames_per_file(frames_per_file), 
+    initial_dataset_size(initial_dataset_size), dataset_increase_step(dataset_increase_step)
 {
     #ifdef DEBUG_OUTPUT
         cout << "[H5Writer::H5Writer] Creating chunked writer"; 
@@ -89,7 +91,8 @@ void H5Writer::write_frame_data(size_t frame_index, size_t* frame_shape, size_t 
     }
 }
 
-void H5Writer::create_file(size_t* frame_shape, hsize_t frame_chunk, string& type, string& endianness) {
+void H5Writer::create_file(size_t* frame_shape, hsize_t frame_chunk, string& type, string& endianness) 
+{
 
     if (file.getId() != -1) {
         close_file();
@@ -153,11 +156,13 @@ void H5Writer::create_file(size_t* frame_shape, hsize_t frame_chunk, string& typ
 
 }
 
-bool H5Writer::is_file_open() {
+bool H5Writer::is_file_open() 
+{
     return (file.getId() != -1);
 }
 
-hsize_t H5Writer::prepare_storage_for_frame(size_t frame_index, size_t* frame_shape, string& data_type, string& endianness) {
+hsize_t H5Writer::prepare_storage_for_frame(size_t frame_index, size_t* frame_shape, string& data_type, string& endianness) 
+{
 
     hsize_t relative_frame_index = frame_index;
 
@@ -185,7 +190,7 @@ hsize_t H5Writer::prepare_storage_for_frame(size_t frame_index, size_t* frame_sh
 
     // Expand the dataset if needed.
     if (relative_frame_index > current_dataset_size) {
-        current_dataset_size = h5_utils::expand_dataset(dataset, relative_frame_index, config::dataset_increase_step);
+        current_dataset_size = h5_utils::expand_dataset(dataset, relative_frame_index, dataset_increase_step);
     }
 
     // Keep track of the max index in this file - needed for shrinking the dataset at the end.
@@ -196,6 +201,7 @@ hsize_t H5Writer::prepare_storage_for_frame(size_t frame_index, size_t* frame_sh
     return relative_frame_index;
 }
 
-H5::H5File& H5Writer::get_h5_file() {
+H5::H5File& H5Writer::get_h5_file() 
+{
     return file;
 }

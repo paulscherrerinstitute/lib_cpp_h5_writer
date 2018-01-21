@@ -2,8 +2,7 @@
 #define H5WRITER_H
 
 #include <map>
-#include "config.hpp"
-#include "h5_utils.hpp"
+#include <H5Cpp.h>
 
 class H5Writer
 {
@@ -12,10 +11,8 @@ class H5Writer
     std::string dataset_name;
     hsize_t frames_per_file;
     hsize_t initial_dataset_size;
+    hsize_t dataset_increase_step = 0;
 
-    // Configuration parameters.
-    hsize_t dataset_increase_step = config::dataset_increase_step;
-    
     // State variables.
     hsize_t max_frame_index = 0;
     hsize_t current_dataset_size = 0;
@@ -28,11 +25,13 @@ class H5Writer
     void create_file(size_t* frame_shape, hsize_t frame_chunk, std::string& data_type, std::string& endianness);
 
     public:
-        H5Writer(const std::string filename, const std::string dataset_name, hsize_t frames_per_file=0, hsize_t initial_dataset_size=config::initial_dataset_size);
+        H5Writer(const std::string filename, const std::string dataset_name, 
+            hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
         ~H5Writer();
         bool is_file_open();
         void close_file();
-        void write_frame_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data, std::string data_type, std::string endianness);
+        void write_frame_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, 
+            char* data, std::string data_type, std::string endianness);
         H5::H5File& get_h5_file();
 };
 
