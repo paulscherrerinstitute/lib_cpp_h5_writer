@@ -1,11 +1,11 @@
-#ifndef H5CHUNKEDWRITER_H
-#define H5CHUNKEDWRITER_H
+#ifndef H5WRITER_H
+#define H5WRITER_H
 
 #include <map>
 #include "config.hpp"
 #include "h5_utils.hpp"
 
-class HDF5ChunkedWriter
+class H5Writer
 {
     // Initialized in constructor.
     std::string filename;
@@ -28,8 +28,8 @@ class HDF5ChunkedWriter
     void create_file(size_t* frame_shape, hsize_t frame_chunk, std::string& data_type, std::string& endianness);
 
     public:
-        HDF5ChunkedWriter(const std::string filename, const std::string dataset_name, hsize_t frames_per_file=0, hsize_t initial_dataset_size=config::initial_dataset_size);
-        ~HDF5ChunkedWriter();
+        H5Writer(const std::string filename, const std::string dataset_name, hsize_t frames_per_file=0, hsize_t initial_dataset_size=config::initial_dataset_size);
+        ~H5Writer();
         bool is_file_open();
         void close_file();
         void write_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data, std::string data_type, std::string endianness);

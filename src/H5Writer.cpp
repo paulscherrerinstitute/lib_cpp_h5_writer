@@ -2,7 +2,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <iostream>
-#include "H5ChunkedWriter.hpp"
+#include "H5Writer.hpp"
 
 extern "C"
 {
@@ -11,11 +11,11 @@ extern "C"
 
 using namespace std;
 
-HDF5ChunkedWriter::HDF5ChunkedWriter(const string filename, const string dataset_name, hsize_t frames_per_file, hsize_t initial_dataset_size) :
+H5Writer::H5Writer(const string filename, const string dataset_name, hsize_t frames_per_file, hsize_t initial_dataset_size) :
     filename(filename), dataset_name(dataset_name), frames_per_file(frames_per_file), initial_dataset_size(initial_dataset_size)
 {
     #ifdef DEBUG_OUTPUT
-        cout << "[HDF5ChunkedWriter::HDF5ChunkedWriter] Creating chunked writer"; 
+        cout << "[H5Writer::H5Writer] Creating chunked writer"; 
         cout << " with filename " << filename;
         cout << " and dataset_name " << dataset_name;
         cout << " and frames_per_file " << frames_per_file;
@@ -24,23 +24,23 @@ HDF5ChunkedWriter::HDF5ChunkedWriter(const string filename, const string dataset
     #endif
 }
 
-HDF5ChunkedWriter::~HDF5ChunkedWriter()
+H5Writer::~H5Writer()
 {
     close_file();
 }
 
-void HDF5ChunkedWriter::close_file()
+void H5Writer::close_file()
 {
     if (!is_file_open()) {
         #ifdef DEBUG_OUTPUT
-            cout << "[HDF5ChunkedWriter::close_file] Trying to close an already closed file." << endl;
+            cout << "[H5Writer::close_file] Trying to close an already closed file." << endl;
         #endif
 
         return;
     }
 
     #ifdef DEBUG_OUTPUT
-        cout << "[HDF5ChunkedWriter::close_file] Closing file." << endl;
+        cout << "[H5Writer::close_file] Closing file." << endl;
     #endif
 
     h5_utils::compact_dataset(dataset, max_frame_index);
@@ -58,7 +58,7 @@ void HDF5ChunkedWriter::close_file()
     auto image_nr_high = max_frame_in_dataset + 1;
 
     #ifdef DEBUG_OUTPUT
-        cout << "[HDF5ChunkedWriter::close_file] Setting dataset attribute image_nr_low=" << image_nr_low << " and image_nr_high=" << image_nr_high << endl;
+        cout << "[H5Writer::close_file] Setting dataset attribute image_nr_low=" << image_nr_low << " and image_nr_high=" << image_nr_high << endl;
     #endif
 
     h5_utils::write_attribute(dataset, "image_nr_low", image_nr_low);
@@ -71,7 +71,7 @@ void HDF5ChunkedWriter::close_file()
     max_frame_index = 0;
 }
 
-void HDF5ChunkedWriter::write_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data, string data_type, string endianness)
+void H5Writer::write_data(size_t frame_index, size_t* frame_shape, size_t data_bytes_size, char* data, string data_type, string endianness)
 {
     // Define the ofset of the currently received image in the file.
     hsize_t relative_frame_index = prepare_storage_for_frame(frame_index, frame_shape, data_type, endianness);
@@ -89,7 +89,7 @@ void HDF5ChunkedWriter::write_data(size_t frame_index, size_t* frame_shape, size
     }
 }
 
-void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk, string& type, string& endianness) {
+void H5Writer::create_file(size_t* frame_shape, hsize_t frame_chunk, string& type, string& endianness) {
 
     if (file.getId() != -1) {
         close_file();
@@ -100,7 +100,7 @@ void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk, st
     // In case frames_per_file is > 0, the filename variable is a template for the filename.
     if (frames_per_file) {
         #ifdef DEBUG_OUTPUT
-            cout << "[HDF5ChunkedWriter::create_file] Frames per file is defined. Format " << filename << " with frame_chunk " << frame_chunk << endl;
+            cout << "[H5Writer::create_file] Frames per file is defined. Format " << filename << " with frame_chunk " << frame_chunk << endl;
         #endif
 
         // Space for 10 digits should be enough.
@@ -111,7 +111,7 @@ void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk, st
     }
 
     #ifdef DEBUG_OUTPUT
-        cout << "[HDF5ChunkedWriter::create_file] Creating filename " << target_filename << endl;
+        cout << "[H5Writer::create_file] Creating filename " << target_filename << endl;
     #endif
 
     // TODO: Create folder if it does not exist.
@@ -124,7 +124,7 @@ void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk, st
     H5::DataSpace dataspace(dataset_rank, dataset_dimension, max_dataset_dimension);
 
     #ifdef DEBUG_OUTPUT
-        cout << "[HDF5ChunkedWriter::create_file] Creating dataspace of size (";
+        cout << "[H5Writer::create_file] Creating dataspace of size (";
         for (hsize_t i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
         }
@@ -153,11 +153,11 @@ void HDF5ChunkedWriter::create_file(size_t* frame_shape, hsize_t frame_chunk, st
 
 }
 
-bool HDF5ChunkedWriter::is_file_open() {
+bool H5Writer::is_file_open() {
     return (file.getId() != -1);
 }
 
-hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t* frame_shape, string& data_type, string& endianness) {
+hsize_t H5Writer::prepare_storage_for_frame(size_t frame_index, size_t* frame_shape, string& data_type, string& endianness) {
 
     hsize_t relative_frame_index = frame_index;
 
@@ -175,7 +175,7 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t*
     }
 
     #ifdef DEBUG_OUTPUT
-        cout << "[HDF5ChunkedWriter::prepare_storage_for_frame] Received frame index " << frame_index << " and processed as relative frame index " << relative_frame_index << endl;
+        cout << "[H5Writer::prepare_storage_for_frame] Received frame index " << frame_index << " and processed as relative frame index " << relative_frame_index << endl;
     #endif
 
     // Open the file if needed.
@@ -196,6 +196,6 @@ hsize_t HDF5ChunkedWriter::prepare_storage_for_frame(size_t frame_index, size_t*
     return relative_frame_index;
 }
 
-H5::H5File& HDF5ChunkedWriter::get_h5_file() {
+H5::H5File& H5Writer::get_h5_file() {
     return file;
 }

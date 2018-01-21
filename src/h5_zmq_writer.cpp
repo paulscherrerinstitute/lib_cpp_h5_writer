@@ -9,7 +9,7 @@
 
 #include "config.hpp"
 #include "WriterManager.hpp"
-#include "H5ChunkedWriter.hpp"
+#include "H5Writer.hpp"
 #include "RingBuffer.hpp"
 #include "rest_interface.hpp"
 #include "h5_utils.hpp"
@@ -21,7 +21,7 @@ namespace pt = boost::property_tree;
 
 void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_file) 
 {
-    HDF5ChunkedWriter writer(output_file, "data");
+    H5Writer writer(output_file, "data");
 
     // Run until the running flag is set or the ring_buffer is empty.  
     while(manager->is_running() || !ring_buffer->is_empty()) {
