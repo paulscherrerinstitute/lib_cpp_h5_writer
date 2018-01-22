@@ -95,5 +95,4 @@ h5_group* get_format_definition();
 void add_calculated_values(std::map<std::string, boost::any>& values);
 void add_input_values(std::map<std::string, boost::any>& values, std::map<std::string, boost::any>& input_values);
 
-
 #endif
