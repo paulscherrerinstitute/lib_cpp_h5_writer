@@ -13,8 +13,8 @@ class WriterManager
     // Initialize in constructor.
     size_t n_images;
     std::atomic_bool running_flag;
-    std::atomic_int n_received_frames;
-    std::atomic_int n_written_frames;
+    std::atomic<uint64_t> n_received_frames;
+    std::atomic<uint64_t> n_written_frames;
 
     public:
         WriterManager(uint64_t n_images=0);
