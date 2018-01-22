@@ -12,14 +12,14 @@ requirements:
     build:
         - make
         - gcc
-        - cppzmq
-        - hdf5
-        - boost
+        - cppzmq =4.2.1
+        - hdf5 =1.8.17
+        - boost =1.61.0
 
     run:
-        - cppzmq
-        - hdf5
-        - boost
+        - cppzmq =4.2.1
+        - hdf5 =1.8.17
+        - boost =1.61.0
 
 
 about:
