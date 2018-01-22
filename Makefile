@@ -5,7 +5,7 @@ MKDIR = mkdir -p
 
 CPP = g++
 CPPFLAGS = -Wall -std=c++1y -I./include -I${CONDA_PREFIX}/include
-LDLIBS = -L${CONDA_PREFIX}/lib -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex
+LDLIBS = -L${CONDA_PREFIX}/lib -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex -lboost_thread
 LDFLAGS = -g
 
 HEADERS = $(wildcard $(SRC_DIR)/*.hpp)

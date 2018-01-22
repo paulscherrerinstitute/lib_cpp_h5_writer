@@ -2,9 +2,9 @@
 #include <sstream>
 #include <zmq.hpp>
 #include <cstdlib>
-#include <thread>
 #include <chrono>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/thread.hpp>
 
 #include "config.hpp"
 #include "WriterManager.hpp"
@@ -24,7 +24,7 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
     while(manager->is_running() || !ring_buffer->is_empty()) {
         
         if (ring_buffer->is_empty()) {
-            this_thread::sleep_for(chrono::milliseconds(config::ring_buffer_read_retry_interval));
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(config::ring_buffer_read_retry_interval));
             continue;
         }
 
@@ -223,8 +223,8 @@ void run_writer(string connect_address, string output_file, uint64_t n_images, u
         cout << endl;
     #endif
 
-    thread receiver_thread(receive_zmq, &manager, &ring_buffer, connect_address, n_io_threads, receive_timeout);
-    thread writer_thread(write_h5, &manager, &ring_buffer, output_file);
+    boost::thread receiver_thread(receive_zmq, &manager, &ring_buffer, connect_address, n_io_threads, receive_timeout);
+    boost::thread writer_thread(write_h5, &manager, &ring_buffer, output_file);
 
     start_rest_api(manager, rest_port, get_input_value_type());
 
