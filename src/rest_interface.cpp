@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void start_rest_api(WriterManager& writer_manager, uint16_t port, std::map<std::string, DATA_TYPE>* input_value_type)
+void start_rest_api(WriterManager& writer_manager, uint16_t port)
 {
 
     #ifdef DEBUG_OUTPUT
@@ -59,6 +59,7 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port, std::map<std::
 
     CROW_ROUTE (app, "/parameters").methods("GET"_method, "POST"_method) ([&](const crow::request& req){
         crow::json::wvalue result;
+        auto parameters_type = writer_manager.get_parameters_type();
 
         if (req.method == "GET"_method) {
 
@@ -67,7 +68,7 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port, std::map<std::
                 auto parameter_value = item.second;
 
                 try {
-                    auto parameter_type = input_value_type->at(parameter_name);
+                    auto parameter_type = parameters_type->at(parameter_name);
 
                     if (parameter_type == NX_FLOAT) {
                         result[parameter_name] = boost::any_cast<double>(parameter_value);
@@ -104,7 +105,7 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port, std::map<std::
                 string parameter_name = item.key();
                 
                 try{
-                    auto parameter_type = input_value_type->at(parameter_name);
+                    auto parameter_type = parameters_type->at(parameter_name);
 
                     if (parameter_type == NX_FLOAT) {
                         new_parameters[parameter_name] = item.d();

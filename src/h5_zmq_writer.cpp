@@ -141,7 +141,7 @@ void run_writer(string connect_address, string output_file, uint64_t n_images, u
     int n_io_threads = config::zmq_n_io_threads;
     int receive_timeout = config::zmq_receive_timeout;
 
-    WriterManager manager(n_images);
+    WriterManager manager(get_input_value_type(), n_images);
     RingBuffer ring_buffer(n_slots);
 
     // TODO: Remove this. This is needed only for testing.
@@ -228,7 +228,7 @@ void run_writer(string connect_address, string output_file, uint64_t n_images, u
     boost::thread receiver_thread(receive_zmq, &manager, &ring_buffer, connect_address, n_io_threads, receive_timeout);
     boost::thread writer_thread(write_h5, &manager, &ring_buffer, output_file);
 
-    start_rest_api(manager, rest_port, get_input_value_type());
+    start_rest_api(manager, rest_port);
 
     #ifdef DEBUG_OUTPUT
         cout << "[h5_zmq_writer::run_writer] Rest API stopped." << endl;

@@ -4,8 +4,8 @@
 
 using namespace std;
 
-WriterManager::WriterManager(uint64_t n_images):
-    n_images(n_images), running_flag(true), n_received_frames(0), n_written_frames(0)
+WriterManager::WriterManager(map<string, DATA_TYPE>* parameters_type, uint64_t n_images):
+    parameters_type(parameters_type), n_images(n_images), running_flag(true), n_received_frames(0), n_written_frames(0)
 {
     #ifdef DEBUG_OUTPUT
         cout << "[WriterManager::WriterManager] Writer manager for n_images " << n_images << endl;
@@ -41,7 +41,7 @@ map<string, uint64_t> WriterManager::get_statistics()
     return result;
 }
 
-std::map<std::string, boost::any>& WriterManager::get_parameters(){
+map<string, boost::any>& WriterManager::get_parameters(){
     return parameters;
 }
 
@@ -53,6 +53,10 @@ void WriterManager::set_parameters(map<string, boost::any>& new_parameters)
 
         parameters[parameter_name] = parameter_value;
     }
+}
+
+map<string, DATA_TYPE>* WriterManager::get_parameters_type() {
+    return parameters_type;
 }
 
 bool WriterManager::is_running()
