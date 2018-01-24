@@ -85,7 +85,7 @@ namespace H5Format {
     boost::any get_value_from_reference(std::string& dataset_name, boost::any value_reference, std::map<std::string, boost::any>& values);
 
     void write_format_data(H5::Group& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values);
-    void write_format(H5::H5File& file, std::map<std::string, h5_value>& input_values);
+    void write_format(H5::H5File& file, std::map<std::string, h5_value>& input_values, std::string frames_dataset_name);
 };
 
 // Move this somewhere else.
@@ -94,5 +94,6 @@ std::map<std::string, boost::any>* get_default_values();
 h5_group* get_format_definition();
 void add_calculated_values(std::map<std::string, boost::any>& values);
 void add_input_values(std::map<std::string, boost::any>& values, std::map<std::string, boost::any>& input_values);
+std::string get_frames_dataset_name();
 
 #endif

@@ -294,7 +294,7 @@ void H5Format::write_format_data(H5::Group& file_node, h5_parent& format_node, s
     }
 }
 
-void H5Format::write_format(H5::H5File& file, std::map<std::string, h5_value>& input_values){
+void H5Format::write_format(H5::H5File& file, std::map<std::string, h5_value>& input_values, string frames_dataset_name){
     
     auto format = get_format_definition();
     auto values = get_default_values();
@@ -303,4 +303,6 @@ void H5Format::write_format(H5::H5File& file, std::map<std::string, h5_value>& i
     add_calculated_values(*values);
     
     write_format_data(file, *format, *values);
+
+    file.move("raw_data", frames_dataset_name.c_str());
 }

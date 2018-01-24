@@ -7,6 +7,10 @@
 
 using namespace std;
 
+string get_frames_dataset_name() {
+    return "entry/plottable_data/data";
+}
+
 h5_group* get_format_definition(){
 
     auto format = 

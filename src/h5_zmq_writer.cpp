@@ -20,7 +20,7 @@ namespace pt = boost::property_tree;
 
 void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_file) 
 {
-    H5Writer writer(output_file, "data");
+    H5Writer writer(output_file, "raw_data");
 
     // Run until the running flag is set or the ring_buffer is empty.  
     while(manager->is_running() || !ring_buffer->is_empty()) {
@@ -54,7 +54,7 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
             cout << "[h5_zmq_writer::write] Writing file format." << endl;
         #endif
 
-        H5Format::write_format(writer.get_h5_file(), manager->get_parameters());
+        H5Format::write_format(writer.get_h5_file(), manager->get_parameters(), get_frames_dataset_name());
     }
     
     #ifdef DEBUG_OUTPUT
