@@ -16,7 +16,7 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port)
     crow::SimpleApp app;
 
     CROW_ROUTE(app, "/kill")([&](){
-        writer_manager.stop();
+        writer_manager.kill();
 
         crow::json::wvalue result;
 
