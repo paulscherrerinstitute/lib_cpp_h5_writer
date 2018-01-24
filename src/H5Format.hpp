@@ -70,7 +70,7 @@ namespace H5Format {
     hsize_t expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
     void compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index);
 
-    H5::Group create_group(H5::CommonFG& target, std::string name);
+    H5::Group create_group(H5::Group& target, std::string name);
     H5::PredType get_dataset_data_type(std::string& type);
 
     H5::DataSet write_dataset(H5::Group& target, h5_dataset& dataset, std::map<std::string, boost::any>& values);
@@ -84,7 +84,7 @@ namespace H5Format {
 
     boost::any get_value_from_reference(std::string& dataset_name, boost::any value_reference, std::map<std::string, boost::any>& values);
 
-    void write_format_data(H5::CommonFG& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values);
+    void write_format_data(H5::Group& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values);
     void write_format(H5::H5File& file, std::map<std::string, h5_value>& input_values);
 };
 

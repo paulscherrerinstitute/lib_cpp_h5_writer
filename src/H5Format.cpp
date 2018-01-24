@@ -47,9 +47,9 @@ void H5Format::compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_ind
     dataset.extend(dataset_dimension);
 }
 
-H5::Group H5Format::create_group(H5::CommonFG& target, std::string name)
+H5::Group H5Format::create_group(H5::Group& target, std::string name)
 {
-    return target.createGroup(name);
+    return target.createGroup(name.c_str());
 }
 
 boost::any H5Format::get_value_from_reference(string& dataset_name, boost::any value_reference, map<string, boost::any>& values)
@@ -167,7 +167,7 @@ H5::DataSet H5Format::write_dataset(H5::Group& target, string name, double value
     H5::DataSpace att_space(H5S_SCALAR);
     auto data_type = H5::PredType::NATIVE_DOUBLE;
 
-    H5::DataSet dataset = target.createDataSet(name, data_type , att_space);
+    H5::DataSet dataset = target.createDataSet(name.c_str(), data_type , att_space);
     dataset.write(&value, data_type);
 
     return dataset;
@@ -178,7 +178,7 @@ H5::DataSet H5Format::write_dataset(H5::Group& target, string name, int value)
     H5::DataSpace att_space(H5S_SCALAR);
     auto data_type = H5::PredType::NATIVE_INT;
 
-    H5::DataSet dataset = target.createDataSet(name, data_type, att_space);
+    H5::DataSet dataset = target.createDataSet(name.c_str(), data_type, att_space);
     dataset.write(&value, data_type);
 
     return dataset;
@@ -189,7 +189,7 @@ H5::DataSet H5Format::write_dataset(H5::Group& target, string name, string value
     H5::DataSpace att_space(H5S_SCALAR);
     H5::DataType data_type = H5::StrType(0, H5T_VARIABLE);
 
-    H5::DataSet dataset = target.createDataSet(name, data_type ,att_space);
+    H5::DataSet dataset = target.createDataSet(name.c_str(), data_type ,att_space);
     dataset.write(&value, data_type);
 
     return dataset;
@@ -198,10 +198,10 @@ H5::DataSet H5Format::write_dataset(H5::Group& target, string name, string value
 void H5Format::write_attribute(H5::H5Object& target, string name, string value)
 {
     H5::DataSpace att_space(H5S_SCALAR);
-    H5::DataType data_type = H5::StrType(0, H5T_VARIABLE);
+    H5::DataType data_type = H5::StrType(H5::PredType::C_S1, H5T_VARIABLE);
 
-    auto h5_attribute = target.createAttribute(name, data_type, att_space);
-    h5_attribute.write(data_type, value);
+    auto h5_attribute = target.createAttribute(name.c_str(), data_type, att_space);
+    h5_attribute.write(data_type, &value);
 }
 
 void H5Format::write_attribute(H5::H5Object& target, string name, int value)
@@ -209,7 +209,7 @@ void H5Format::write_attribute(H5::H5Object& target, string name, int value)
     H5::DataSpace att_space(H5S_SCALAR);
     auto data_type = H5::PredType::NATIVE_INT;
 
-    auto h5_attribute = target.createAttribute(name, data_type, att_space);
+    auto h5_attribute = target.createAttribute(name.c_str(), data_type, att_space);
     h5_attribute.write(data_type, &value);
 }
 
@@ -259,7 +259,7 @@ void H5Format::write_attribute(H5::H5Object& target, h5_attr& attribute, map<str
     }
 }
 
-void H5Format::write_format_data(H5::CommonFG& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values) {
+void H5Format::write_format_data(H5::Group& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values) {
     auto node_group = H5Format::create_group(file_node, format_node.name);
 
     for (auto item : format_node.items) {
