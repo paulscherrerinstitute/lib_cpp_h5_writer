@@ -62,7 +62,13 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
         // Need to check again if we have all parameters to write down the format.
         if (manager->are_all_parameters_set()) {
             auto parameters = manager->get_parameters();
-            H5Format::write_format(writer.get_h5_file(), parameters, get_frames_dataset_name());
+            
+            // Even if we can't write the format, lets try to preserve the data.
+            try {
+                H5Format::write_format(writer.get_h5_file(), parameters, get_frames_dataset_name());
+            } catch (const runtime_error& exception) {
+                cerr << "[h5_zmq_writer::write] Error while trying to write file format: "<< ex.what() << endl
+            }
         }
     }
     
