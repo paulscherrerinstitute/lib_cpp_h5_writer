@@ -16,6 +16,8 @@ namespace config
 
     extern hsize_t dataset_increase_step;
     extern hsize_t initial_dataset_size;
+
+    extern uint32_t parameters_read_retry_interval;
 }
 
 #endif

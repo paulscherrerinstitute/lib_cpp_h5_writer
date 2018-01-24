@@ -14,4 +14,7 @@ namespace config {
     // H5 config.
     hsize_t dataset_increase_step = 1000;
     hsize_t initial_dataset_size = 1000;
+
+    // Try again to see if the parameters were passed.
+    uint32_t parameters_read_retry_interval = 100;
 }
