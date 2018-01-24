@@ -54,7 +54,16 @@ void write_h5(WriterManager *manager, RingBuffer *ring_buffer, string output_fil
             cout << "[h5_zmq_writer::write] Writing file format." << endl;
         #endif
 
-        H5Format::write_format(writer.get_h5_file(), manager->get_parameters(), get_frames_dataset_name());
+        // Wait until all parameters are set or writer is killed.
+        while (!manager->are_all_parameters_set() && !manager->is_killed()) {
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(config::parameters_read_retry_interval));
+        }
+
+        // Need to check again if we have all parameters to write down the format.
+        if (manager->are_all_parameters_set()) {
+            auto parameters = manager->get_parameters();
+            H5Format::write_format(writer.get_h5_file(), parameters, get_frames_dataset_name());
+        }
     }
     
     #ifdef DEBUG_OUTPUT
