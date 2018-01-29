@@ -107,7 +107,7 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port)
                 try{
                     auto parameter_type = parameters_type->at(parameter_name);
 
-                    if (parameter_type == NX_FLOAT) {
+                    if (parameter_type == NX_FLOAT || parameter_type == NX_NUMBER) {
                         new_parameters[parameter_name] = item.d();
                     } else if (parameter_type == NX_INT) {
                         new_parameters[parameter_name] = item.i();
@@ -115,6 +115,11 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port)
                         new_parameters[parameter_name] = item.s();
                     } else if (parameter_type == NX_DATE_TIME) {
                         new_parameters[parameter_name] = item.s();
+                    } else {
+                        stringstream error_message;
+                        error_message << "No NX type mapping for parameter " << parameter_name << endl;
+
+                        throw runtime_error(error_message.str());
                     }
                     
                 } catch (const out_of_range& exception){
