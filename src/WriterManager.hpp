@@ -17,14 +17,14 @@ class WriterManager
 
     // Initialize in constructor.
     std::map<std::string, DATA_TYPE>* parameters_type;
-    size_t n_images;
+    size_t n_frames;
     std::atomic_bool running_flag;
     std::atomic_bool killed_flag;
     std::atomic<uint64_t> n_received_frames;
     std::atomic<uint64_t> n_written_frames;
 
     public:
-        WriterManager(std::map<std::string, DATA_TYPE>* parameters_type, uint64_t n_images=0);
+        WriterManager(std::map<std::string, DATA_TYPE>* parameters_type, uint64_t n_frames=0);
         void stop();
         void kill();
         bool is_running();

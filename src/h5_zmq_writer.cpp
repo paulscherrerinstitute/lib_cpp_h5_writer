@@ -151,13 +151,13 @@ void receive_zmq(WriterManager *manager, RingBuffer *ring_buffer, string connect
     #endif
 }
 
-void run_writer(string connect_address, string output_file, uint64_t n_images, uint16_t rest_port){
+void run_writer(string connect_address, string output_file, uint64_t n_frames, uint16_t rest_port){
 
     size_t n_slots = config::ring_buffer_n_slots;
     int n_io_threads = config::zmq_n_io_threads;
     int receive_timeout = config::zmq_receive_timeout;
 
-    WriterManager manager(get_input_value_type(), n_images);
+    WriterManager manager(get_input_value_type(), n_frames);
     RingBuffer ring_buffer(n_slots);
 
     // TODO: Remove this. This is needed only for testing.
@@ -265,10 +265,10 @@ int main (int argc, char *argv[])
 {
     if (argc != 6) {
         cout << endl;
-        cout << "Usage: h5_zmq_writer [connection_address] [output_file] [n_images] [rest_port]" << endl;
+        cout << "Usage: h5_zmq_writer [connection_address] [output_file] [n_frames] [rest_port]" << endl;
         cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\toutput_file: Name of the output file." << endl;
-        cout << "\tn_images: Number of images to acquire. 0 for infinity (untill /stop is called)." << endl;
+        cout << "\n_frames: Number of images to acquire. 0 for infinity (untill /stop is called)." << endl;
         cout << "\trest_port: Port to start the REST Api on." << endl;
         cout << "\tuser_id: uid under which to run the writer. -1 to leave it as it is." << endl;
         cout << endl;

@@ -4,11 +4,11 @@
 
 using namespace std;
 
-WriterManager::WriterManager(map<string, DATA_TYPE>* parameters_type, uint64_t n_images):
-    parameters_type(parameters_type), n_images(n_images), running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0)
+WriterManager::WriterManager(map<string, DATA_TYPE>* parameters_type, uint64_t n_frames):
+    parameters_type(parameters_type), n_frames(n_frames), running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0)
 {
     #ifdef DEBUG_OUTPUT
-        cout << "[WriterManager::WriterManager] Writer manager for n_images " << n_images << endl;
+        cout << "[WriterManager::WriterManager] Writer manager for n_frames " << n_frames << endl;
     #endif
 }
 
@@ -49,7 +49,7 @@ map<string, uint64_t> WriterManager::get_statistics()
 {
     map<string, uint64_t> result = {{"n_received_frames", n_received_frames.load()},
                                     {"n_written_frames", n_written_frames.load()},
-                                    {"total_expected_frames", n_images}};
+                                    {"total_expected_frames", n_frames}};
 
     return result;
 }
@@ -76,8 +76,8 @@ map<string, DATA_TYPE>* WriterManager::get_parameters_type() {
 
 bool WriterManager::is_running()
 {
-    // Take into account n_images only if it is <> 0.
-    if (n_images && n_received_frames.load() >= n_images) {
+    // Take into account n_frames only if it is <> 0.
+    if (n_frames && n_received_frames.load() >= n_frames) {
         running_flag = false;
     }
 
