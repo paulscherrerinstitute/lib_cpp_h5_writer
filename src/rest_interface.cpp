@@ -106,13 +106,13 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port)
                     auto parameter_type = parameters_type->at(parameter_name);
 
                     if (parameter_type == NX_FLOAT || parameter_type == NX_NUMBER) {
-                        new_parameters[parameter_name] = item.d();
+                        new_parameters[parameter_name] = double(item.d());
                     } else if (parameter_type == NX_INT) {
-                        new_parameters[parameter_name] = item.i();
+                        new_parameters[parameter_name] = int(item.i());
                     } else if (parameter_type == NX_CHAR) {
-                        new_parameters[parameter_name] = item.s();
+                        new_parameters[parameter_name] = string(item.s());
                     } else if (parameter_type == NX_DATE_TIME) {
-                        new_parameters[parameter_name] = item.s();
+                        new_parameters[parameter_name] = string(item.s());
                     } else {
                         stringstream error_message;
                         error_message << "No NX type mapping for parameter " << parameter_name << endl;
