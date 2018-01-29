@@ -106,6 +106,10 @@ bool WriterManager::are_all_parameters_set() {
         auto parameter_name = parameter.first;
 
         if (parameters.count(parameter_name) == 0) {
+            #ifdef DEBUG_OUTPUT
+                cout << "[WriterManager::are_all_parameters_set] Parameter " << parameter_name << " not set." << endl;
+            #endif
+
             return false;
         }
     }
