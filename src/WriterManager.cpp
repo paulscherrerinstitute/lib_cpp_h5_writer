@@ -62,12 +62,25 @@ void WriterManager::set_parameters(map<string, boost::any>& new_parameters)
 {
     lock_guard<mutex> lock(parameters_mutex);
 
+    #ifdef DEBUG_OUTPUT
+        stringstream output_message;
+        output_message << "[WriterManager::set_parameters] Setting parameters: ";
+    #endif
+
     for (auto parameter : new_parameters) {
         string parameter_name = parameter.first;
         auto parameter_value = parameter.second;
 
         parameters[parameter_name] = parameter_value;
+
+        #ifdef DEBUG_OUTPUT
+            output_message << parameter_name << ", ";
+        #endif
     }
+
+    #ifdef DEBUG_OUTPUT
+        cout << output_message.str() << endl;
+    #endif
 }
 
 map<string, DATA_TYPE>* WriterManager::get_parameters_type() {
