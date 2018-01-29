@@ -70,12 +70,10 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port)
                 try {
                     auto parameter_type = parameters_type->at(parameter_name);
 
-                    if (parameter_type == NX_FLOAT) {
+                    if (parameter_type == NX_FLOAT || parameter_type == NX_NUMBER) {
                         result[parameter_name] = boost::any_cast<double>(parameter_value);
-                    } else if (parameter_type == NX_CHAR) {
-                        result[parameter_name] = boost::any_cast<string>(parameter_value);
 
-                    } else if (parameter_type == NX_DATE_TIME) {
+                    } else if (parameter_type == NX_CHAR || parameter_type == NXnote || parameter_type == NX_DATE_TIME) {
                         result[parameter_name] = boost::any_cast<string>(parameter_value);
 
                     } else if (parameter_type == NX_INT) {
