@@ -127,7 +127,9 @@ void receive_zmq(WriterManager *manager, RingBuffer *ring_buffer, string connect
         frame_metadata.type = json_header.get<string>("type");
 
         // Get the message data.
+        // TODO: Check if the message was received, otherwise log the exception.
         receiver.recv(&message_data);
+
         frame_metadata.frame_bytes_size = message_data.size();
 
         #ifdef DEBUG_OUTPUT
