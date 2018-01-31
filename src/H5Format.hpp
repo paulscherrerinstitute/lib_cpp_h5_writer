@@ -66,7 +66,7 @@ struct h5_attr : public h5_base, public h5_data_base {
     h5_value value;
 };
 
-namespace H5Format {
+namespace H5FormatUtils {
     hsize_t expand_dataset(H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
     void compact_dataset(H5::DataSet& dataset, hsize_t max_frame_index);
 
@@ -87,6 +87,7 @@ namespace H5Format {
     void write_format_data(H5::Group& file_node, const h5_parent& format_node, const std::map<std::string, h5_value>& values);
     void write_format(H5::H5File& file, const std::map<std::string, h5_value>& input_values, const std::string& raw_frames_dataset_name, const std::string& frames_dataset_name);
 };
+
 
 // Move this somewhere else.
 const std::map<std::string, DATA_TYPE>* get_input_value_type();
