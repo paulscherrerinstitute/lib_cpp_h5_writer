@@ -34,7 +34,7 @@ class WriterManager
 
         const std::map<std::string, DATA_TYPE>* get_parameters_type();
         std::map<std::string, boost::any> get_parameters();
-        void set_parameters(std::map<std::string, boost::any>& new_parameters);
+        void set_parameters(const std::map<std::string, boost::any>& new_parameters);
         
         std::map<std::string, uint64_t> get_statistics();
         void received_frame(size_t frame_index);

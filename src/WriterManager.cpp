@@ -37,7 +37,7 @@ string WriterManager::get_status()
 {
     if (running_flag) {
         return "receiving";
-    } else if (n_received_frames > n_written_frames) {
+    } else if (n_received_frames.load() > n_written_frames) {
         return "writing";
     } else if (!are_all_parameters_set()) {
         return "waiting for parameters";
@@ -55,11 +55,14 @@ map<string, uint64_t> WriterManager::get_statistics()
     return result;
 }
 
-map<string, boost::any> WriterManager::get_parameters(){
+map<string, boost::any> WriterManager::get_parameters()
+{
+    lock_guard<mutex> lock(parameters_mutex);
+
     return parameters;
 }
 
-void WriterManager::set_parameters(map<string, boost::any>& new_parameters)
+void WriterManager::set_parameters(const map<string, boost::any>& new_parameters)
 {
     lock_guard<mutex> lock(parameters_mutex);
 
@@ -68,9 +71,9 @@ void WriterManager::set_parameters(map<string, boost::any>& new_parameters)
         output_message << "[WriterManager::set_parameters] Setting parameters: ";
     #endif
 
-    for (auto parameter : new_parameters) {
-        string parameter_name = parameter.first;
-        auto parameter_value = parameter.second;
+    for (const auto& parameter : new_parameters) {
+        auto& parameter_name = parameter.first;
+        auto& parameter_value = parameter.second;
 
         parameters[parameter_name] = parameter_value;
 
@@ -116,8 +119,8 @@ void WriterManager::written_frame(size_t frame_index)
 bool WriterManager::are_all_parameters_set() {
     lock_guard<mutex> lock(parameters_mutex);
 
-    for (auto parameter : *parameters_type) {
-        auto parameter_name = parameter.first;
+    for (const auto& parameter : *parameters_type) {
+        const auto& parameter_name = parameter.first;
 
         if (parameters.count(parameter_name) == 0) {
             #ifdef DEBUG_OUTPUT
