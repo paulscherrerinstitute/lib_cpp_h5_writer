@@ -15,12 +15,14 @@
 #include "rest_interface.hpp"
 #include "H5Format.hpp"
 
+#include "NXmxFormat.cpp"
+
 using namespace std;
 namespace pt = boost::property_tree;
 
-void write_h5(WriterManager& manager, RingBuffer& ring_buffer, string output_file) 
+void write_h5(WriterManager& manager, H5Format& format, RingBuffer& ring_buffer, string output_file) 
 {
-    H5Writer writer(output_file, config::raw_dataset_name);
+    H5Writer writer(output_file, format.get_raw_frames_dataset_name());
 
     // Run until the running flag is set or the ring_buffer is empty.  
     while(manager.is_running() || !ring_buffer.is_empty()) {
@@ -65,7 +67,7 @@ void write_h5(WriterManager& manager, RingBuffer& ring_buffer, string output_fil
             
             // Even if we can't write the format, lets try to preserve the data.
             try {
-                H5FormatUtils::write_format(writer.get_h5_file(), parameters, config::raw_dataset_name, get_frames_dataset_name());
+                H5FormatUtils::write_format(writer.get_h5_file(), format, parameters);
             } catch (const runtime_error& ex) {
                 cerr << "[h5_zmq_writer::write] Error while trying to write file format: "<< ex.what() << endl;
             }
@@ -165,7 +167,8 @@ void run_writer(string connect_address, string output_file, uint64_t n_frames, u
     int n_io_threads = config::zmq_n_io_threads;
     int receive_timeout = config::zmq_receive_timeout;
 
-    WriterManager manager(get_input_value_type(), n_frames);
+    NXmxFormat format; 
+    WriterManager manager(format.get_input_value_type(), n_frames);
     RingBuffer ring_buffer(n_slots);
 
     #ifdef DEBUG_OUTPUT
@@ -179,7 +182,7 @@ void run_writer(string connect_address, string output_file, uint64_t n_frames, u
     #endif
 
     boost::thread receiver_thread(receive_zmq, boost::ref(manager), boost::ref(ring_buffer), connect_address, n_io_threads, receive_timeout);
-    boost::thread writer_thread(write_h5, boost::ref(manager), boost::ref(ring_buffer), output_file);
+    boost::thread writer_thread(write_h5, boost::ref(manager), boost::ref(format), boost::ref(ring_buffer), output_file);
 
     start_rest_api(manager, rest_port);
 

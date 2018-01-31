@@ -75,6 +75,21 @@ struct h5_attr : public h5_base, public h5_data_base
     h5_value value;
 };
 
+class H5Format
+{
+    public:
+        virtual ~H5Format(){};
+
+        virtual const std::map<std::string, DATA_TYPE>* get_input_value_type() const = 0;
+        virtual std::map<std::string, boost::any>* get_default_values() const = 0;
+        virtual const h5_group* get_format_definition() const = 0;
+        virtual void add_calculated_values(std::map<std::string, boost::any>& values) const = 0;
+        virtual void add_input_values(std::map<std::string, boost::any>& values, const std::map<std::string, boost::any>& input_values) const = 0;
+        
+        virtual std::string get_raw_frames_dataset_name() const = 0;
+        virtual std::string get_frames_dataset_name() const = 0;
+};
+
 namespace H5FormatUtils 
 {
     hsize_t expand_dataset(H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
@@ -95,15 +110,7 @@ namespace H5FormatUtils
     const boost::any& get_value_from_reference(const std::string& dataset_name, const boost::any& value_reference, const std::map<std::string, boost::any>& values);
 
     void write_format_data(H5::Group& file_node, const h5_parent& format_node, const std::map<std::string, h5_value>& values);
-    void write_format(H5::H5File& file, const std::map<std::string, h5_value>& input_values, const std::string& raw_frames_dataset_name, const std::string& frames_dataset_name);
+    void write_format(H5::H5File& file, const H5Format& format, const std::map<std::string, h5_value>& input_values);
 };
-
-// Move this somewhere else.
-const std::map<std::string, DATA_TYPE>* get_input_value_type();
-std::map<std::string, boost::any>* get_default_values();
-const h5_group* get_format_definition();
-void add_calculated_values(std::map<std::string, boost::any>& values);
-void add_input_values(std::map<std::string, boost::any>& values, const std::map<std::string, boost::any>& input_values);
-std::string get_frames_dataset_name();
 
 #endif

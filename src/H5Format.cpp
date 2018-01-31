@@ -296,17 +296,16 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
     }
 }
 
-void H5FormatUtils::write_format(H5::H5File& file, const std::map<std::string, h5_value>& input_values, 
-    const string& raw_frames_dataset_name, const string& frames_dataset_name)
+void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format, const std::map<std::string, h5_value>& input_values)
 {
     
-    auto format = get_format_definition();
-    auto values = get_default_values();
+    auto format_definition = format.get_format_definition();
+    auto values = format.get_default_values();
     
-    add_input_values(*values, input_values);
-    add_calculated_values(*values);
+    format.add_input_values(*values, input_values);
+    format.add_calculated_values(*values);
     
-    write_format_data(file, *format, *values);
+    write_format_data(file, *format_definition, *values);
 
-    file.move(raw_frames_dataset_name.c_str(), frames_dataset_name.c_str());
+    file.move(format.get_raw_frames_dataset_name().c_str(), format.get_frames_dataset_name().c_str());
 }
