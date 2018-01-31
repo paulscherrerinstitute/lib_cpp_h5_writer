@@ -48,7 +48,7 @@ void RingBuffer::initialize(size_t slot_size)
     #endif
 }
 
-void RingBuffer::write(FrameMetadata &frame_metadata, char* data)
+void RingBuffer::write(FrameMetadata &frame_metadata, const char* data)
 {
     // Initialize the buffer on the first write.
     if (!ring_buffer_initialized) {
