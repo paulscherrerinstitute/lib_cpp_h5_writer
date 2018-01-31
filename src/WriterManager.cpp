@@ -6,7 +6,8 @@
 using namespace std;
 
 WriterManager::WriterManager(const map<string, DATA_TYPE>* parameters_type, uint64_t n_frames):
-    parameters_type(parameters_type), n_frames(n_frames), running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0)
+    parameters_type(parameters_type), n_frames(n_frames), running_flag(true), killed_flag(false), 
+    n_received_frames(0), n_written_frames(0), n_lost_frames(0)
 {
     #ifdef DEBUG_OUTPUT
         cout << "[WriterManager::WriterManager] Writer manager for n_frames " << n_frames << endl;
@@ -50,6 +51,7 @@ map<string, uint64_t> WriterManager::get_statistics()
 {
     map<string, uint64_t> result = {{"n_received_frames", n_received_frames.load()},
                                     {"n_written_frames", n_written_frames.load()},
+                                    {"n_lost_frames", n_lost_frames.load()},
                                     {"total_expected_frames", n_frames}};
 
     return result;
@@ -87,7 +89,8 @@ void WriterManager::set_parameters(const map<string, boost::any>& new_parameters
     #endif
 }
 
-const map<string, DATA_TYPE>* WriterManager::get_parameters_type() {
+const map<string, DATA_TYPE>* WriterManager::get_parameters_type() 
+{
     return parameters_type;
 }
 
@@ -116,7 +119,13 @@ void WriterManager::written_frame(size_t frame_index)
     n_written_frames++;
 }
 
-bool WriterManager::are_all_parameters_set() {
+void WriterManager::lost_frame(size_t frame_index)
+{
+    n_lost_frames++;
+}
+
+bool WriterManager::are_all_parameters_set() 
+{
     lock_guard<mutex> lock(parameters_mutex);
 
     for (const auto& parameter : *parameters_type) {

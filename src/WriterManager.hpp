@@ -22,6 +22,7 @@ class WriterManager
     std::atomic_bool killed_flag;
     std::atomic<uint64_t> n_received_frames;
     std::atomic<uint64_t> n_written_frames;
+    std::atomic<uint64_t> n_lost_frames;
 
     public:
         WriterManager(const std::map<std::string, DATA_TYPE>* parameters_type, uint64_t n_frames=0);
@@ -39,6 +40,7 @@ class WriterManager
         std::map<std::string, uint64_t> get_statistics();
         void received_frame(size_t frame_index);
         void written_frame(size_t frame_index);
+        void lost_frame(size_t frame_index);
 };
 
 #endif

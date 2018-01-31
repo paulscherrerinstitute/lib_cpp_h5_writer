@@ -30,7 +30,7 @@ void write_h5(WriterManager& manager, RingBuffer& ring_buffer, string output_fil
             continue;
         }
 
-        pair<FrameMetadata, char*> received_data = ring_buffer.read();
+        const pair<FrameMetadata, char*> received_data = ring_buffer.read();
         
         // NULL pointer means that the ringbuffer->read() timeouted. Faster than rising an exception.
         if(!received_data.second) {
@@ -61,7 +61,7 @@ void write_h5(WriterManager& manager, RingBuffer& ring_buffer, string output_fil
 
         // Need to check again if we have all parameters to write down the format.
         if (manager.are_all_parameters_set()) {
-            auto parameters = manager.get_parameters();
+            const auto parameters = manager.get_parameters();
             
             // Even if we can't write the format, lets try to preserve the data.
             try {
@@ -116,9 +116,9 @@ void receive_zmq(WriterManager& manager, RingBuffer& ring_buffer, string connect
         frame_metadata.frame_index = json_header.get<uint64_t>("frame");
 
         uint8_t index = 0;
-        for (auto item : json_header.get_child("shape")) {
+        for (const auto& item : json_header.get_child("shape")) {
             frame_metadata.frame_shape[index] = item.second.get_value<size_t>();
-            index++;
+            ++index;
         }
 
         // Array 1.0 specified little endian as the default encoding.
@@ -127,8 +127,14 @@ void receive_zmq(WriterManager& manager, RingBuffer& ring_buffer, string connect
         frame_metadata.type = json_header.get<string>("type");
 
         // Get the message data.
-        // TODO: Check if the message was received, otherwise log the exception.
-        receiver.recv(&message_data);
+        if (!receiver.recv(&message_data)) {
+            cout << "[h5_zmq_writer::receive_zmq] ERROR: Error while reading from ZMQ. Frame index " << frame_metadata.frame_index << " lost."; 
+            cout << " Trying to continue with the next frame." << endl;
+
+            manager.lost_frame(frame_metadata.frame_index);
+
+            continue;
+        }
 
         frame_metadata.frame_bytes_size = message_data.size();
 
