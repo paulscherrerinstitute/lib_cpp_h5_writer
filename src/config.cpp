@@ -5,9 +5,9 @@ namespace config {
     int zmq_n_io_threads = 1;
     int zmq_receive_timeout = 100;
     
-    // JSON header buffer size.
-    int zmq_buffer_size_header = 1024 * 1024 * 0.2;
-    // Data message buffer size.
+    // JSON header buffer size - 1MB.
+    int zmq_buffer_size_header = 1024 * 1024 * 1;
+    // Data message buffer size - 10MB.
     int zmq_buffer_size_data = 1024 * 1024 * 10;
 
     // Ring buffer config.
@@ -21,5 +21,5 @@ namespace config {
     hsize_t initial_dataset_size = 1000;
 
     // Delay in between attempts to see if the requred parameters were passed over the REST api.
-    uint32_t parameters_read_retry_interval = 100;
+    uint32_t parameters_read_retry_interval = 300;
 }
