@@ -72,8 +72,8 @@ const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_
     }
 }
 
-H5::PredType H5FormatUtils::get_dataset_data_type(const string& type){
-
+H5::PredType H5FormatUtils::get_dataset_data_type(const string& type)
+{
     #ifdef DEBUG_OUTPUT
         cout << "[H5FormatUtils::get_dataset_data_type] Getting dataset type for received frame type " << type << endl;
     #endif
@@ -105,7 +105,8 @@ H5::PredType H5FormatUtils::get_dataset_data_type(const string& type){
     }
 }
 
-H5::DataSet H5FormatUtils::write_dataset(H5::Group& target, const h5_dataset& dataset, const map<string, boost::any>& values){
+H5::DataSet H5FormatUtils::write_dataset(H5::Group& target, const h5_dataset& dataset, const map<string, boost::any>& values)
+{
     string name = dataset.name;
     boost::any value;
 
@@ -259,7 +260,8 @@ void H5FormatUtils::write_attribute(H5::H5Object& target, const h5_attr& attribu
     }
 }
 
-void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& format_node, const std::map<std::string, h5_value>& values) {
+void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& format_node, const std::map<std::string, h5_value>& values) 
+{
     auto node_group = H5FormatUtils::create_group(file_node, format_node.name);
 
     for (const auto item : format_node.items) {
@@ -294,7 +296,9 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
     }
 }
 
-void H5FormatUtils::write_format(H5::H5File& file, const std::map<std::string, h5_value>& input_values, const string& raw_frames_dataset_name, const string& frames_dataset_name){
+void H5FormatUtils::write_format(H5::H5File& file, const std::map<std::string, h5_value>& input_values, 
+    const string& raw_frames_dataset_name, const string& frames_dataset_name)
+{
     
     auto format = get_format_definition();
     auto values = get_default_values();

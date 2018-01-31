@@ -159,8 +159,8 @@ void receive_zmq(WriterManager& manager, RingBuffer& ring_buffer, string connect
     #endif
 }
 
-void run_writer(string connect_address, string output_file, uint64_t n_frames, uint16_t rest_port){
-
+void run_writer(string connect_address, string output_file, uint64_t n_frames, uint16_t rest_port)
+{
     size_t n_slots = config::ring_buffer_n_slots;
     int n_io_threads = config::zmq_n_io_threads;
     int receive_timeout = config::zmq_receive_timeout;

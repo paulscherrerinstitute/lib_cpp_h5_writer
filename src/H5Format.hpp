@@ -10,13 +10,15 @@
 
 typedef boost::any h5_value;
 
-enum NODE_TYPE {
+enum NODE_TYPE 
+{
     ATTRIBUTE,
     DATASET,
     GROUP
 };
 
-enum DATA_TYPE {
+enum DATA_TYPE 
+{
     NX_FLOAT,
     NX_CHAR,
     NX_INT,
@@ -25,48 +27,56 @@ enum DATA_TYPE {
     NXnote
 };
 
-enum DATA_LOCATION {
+enum DATA_LOCATION 
+{
     IMMEDIATE,
     REFERENCE
 };
 
 
-struct h5_base {
+struct h5_base 
+{
     h5_base(const std::string& name, NODE_TYPE node_type) : name(name), node_type(node_type){};
     virtual ~h5_base(){};
     std::string name;
     NODE_TYPE node_type;
 };
 
-struct h5_data_base{
+struct h5_data_base
+{
     h5_data_base(DATA_TYPE data_type, DATA_LOCATION data_location) : data_type(data_type), data_location(data_location) {};
     DATA_TYPE data_type;
     DATA_LOCATION data_location;
 };
 
-struct h5_parent: public h5_base{
+struct h5_parent: public h5_base
+{
     h5_parent(const std::string& name, NODE_TYPE node_type, const std::list<h5_base*>& items) : h5_base(name, node_type), items(items) {};
     std::list<h5_base*> items;
 };
 
-struct h5_group : public h5_parent {
+struct h5_group : public h5_parent 
+{
     h5_group(const std::string& name, const std::list<h5_base*>& items) : h5_parent(name, GROUP, items) {};
 };
 
-struct h5_dataset : public h5_parent, public h5_data_base{
+struct h5_dataset : public h5_parent, public h5_data_base
+{
     h5_dataset(const std::string& name, const std::string& value, DATA_TYPE data_type, const std::list<h5_base*>& items={})
         : h5_parent(name, DATASET, items), h5_data_base(data_type, REFERENCE), value(value) {};
     
     std::string value;
 };
 
-struct h5_attr : public h5_base, public h5_data_base {
+struct h5_attr : public h5_base, public h5_data_base 
+{
     h5_attr(const std::string& name, const h5_value& value, DATA_TYPE data_types, DATA_LOCATION data_location=IMMEDIATE)
         : h5_base(name, ATTRIBUTE), h5_data_base(data_types, data_location), value(value){};
     h5_value value;
 };
 
-namespace H5FormatUtils {
+namespace H5FormatUtils 
+{
     hsize_t expand_dataset(H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
     void compact_dataset(H5::DataSet& dataset, hsize_t max_frame_index);
 
@@ -87,7 +97,6 @@ namespace H5FormatUtils {
     void write_format_data(H5::Group& file_node, const h5_parent& format_node, const std::map<std::string, h5_value>& values);
     void write_format(H5::H5File& file, const std::map<std::string, h5_value>& input_values, const std::string& raw_frames_dataset_name, const std::string& frames_dataset_name);
 };
-
 
 // Move this somewhere else.
 const std::map<std::string, DATA_TYPE>* get_input_value_type();

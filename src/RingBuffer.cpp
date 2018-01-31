@@ -8,13 +8,15 @@
 
 using namespace std;
 
-RingBuffer::RingBuffer(size_t n_slots) : n_slots(n_slots), ringbuffer_slots(n_slots, 0){
+RingBuffer::RingBuffer(size_t n_slots) : n_slots(n_slots), ringbuffer_slots(n_slots, 0)
+{
     #ifdef DEBUG_OUTPUT
         cout << "[RingBuffer::RingBuffer] Creating ring buffer with n_slots " << n_slots << endl;
     #endif
 }
 
-RingBuffer::~RingBuffer() {
+RingBuffer::~RingBuffer() 
+{
     // If the frame buffer is allocated, free it.
     if (frame_data_buffer != NULL) {
         free(frame_data_buffer);
@@ -115,7 +117,8 @@ void RingBuffer::write(FrameMetadata &frame_metadata, const char* data)
     #endif
 }
 
-char* RingBuffer::get_buffer_slot_address(size_t buffer_slot_index) {
+char* RingBuffer::get_buffer_slot_address(size_t buffer_slot_index)
+{
     char* slot_memory_address = frame_data_buffer + (buffer_slot_index * slot_size);
 
     // Check if the memory address is valid.
@@ -175,7 +178,8 @@ pair<FrameMetadata, char*> RingBuffer::read()
     return {frame_metadata, slot_memory_address};
 }
 
-void RingBuffer::release(size_t buffer_slot_index) {
+void RingBuffer::release(size_t buffer_slot_index)
+{
     // Cannot release a slot index that is out of range.
     if (buffer_slot_index >= n_slots) {
         stringstream error_message;
@@ -204,7 +208,8 @@ void RingBuffer::release(size_t buffer_slot_index) {
     ringbuffer_slots_mutex.unlock();
 }
 
-bool RingBuffer::is_empty(){
+bool RingBuffer::is_empty()
+{
     ringbuffer_slots_mutex.lock();
 
     bool is_empty = buffer_used_slots == 0;
