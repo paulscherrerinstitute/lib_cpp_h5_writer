@@ -85,7 +85,7 @@ namespace H5Format {
     const boost::any& get_value_from_reference(const std::string& dataset_name, const boost::any& value_reference, const std::map<std::string, boost::any>& values);
 
     void write_format_data(H5::Group& file_node, const h5_parent& format_node, const std::map<std::string, h5_value>& values);
-    void write_format(H5::H5File& file, const std::map<std::string, h5_value>& input_values, const std::string& frames_dataset_name);
+    void write_format(H5::H5File& file, const std::map<std::string, h5_value>& input_values, const std::string& raw_frames_dataset_name, const std::string& frames_dataset_name);
 };
 
 // Move this somewhere else.
