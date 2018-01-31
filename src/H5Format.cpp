@@ -7,7 +7,7 @@
 
 using namespace std;
 
-hsize_t H5Format::expand_dataset(const H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step)
+hsize_t H5Format::expand_dataset(H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step)
 {
     hsize_t dataset_rank = 3;
     hsize_t dataset_dimension[dataset_rank];
@@ -28,7 +28,7 @@ hsize_t H5Format::expand_dataset(const H5::DataSet& dataset, hsize_t frame_index
     return dataset_dimension[0];
 }
 
-void H5Format::compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_index)
+void H5Format::compact_dataset(H5::DataSet& dataset, hsize_t max_frame_index)
 {
     hsize_t dataset_rank = 3;
     hsize_t dataset_dimension[dataset_rank];
@@ -47,12 +47,12 @@ void H5Format::compact_dataset(const H5::DataSet& dataset, hsize_t max_frame_ind
     dataset.extend(dataset_dimension);
 }
 
-H5::Group H5Format::create_group(H5::Group& target, std::string name)
+H5::Group H5Format::create_group(H5::Group& target, const string& name)
 {
     return target.createGroup(name.c_str());
 }
 
-boost::any H5Format::get_value_from_reference(string& dataset_name, boost::any value_reference, map<string, boost::any>& values)
+const boost::any& H5Format::get_value_from_reference(const string& dataset_name, const boost::any& value_reference, const map<string, boost::any>& values)
 {
     try {
         auto reference_string = boost::any_cast<string>(value_reference);
@@ -72,7 +72,7 @@ boost::any H5Format::get_value_from_reference(string& dataset_name, boost::any v
     }
 }
 
-H5::PredType H5Format::get_dataset_data_type(string& type){
+H5::PredType H5Format::get_dataset_data_type(const string& type){
 
     #ifdef DEBUG_OUTPUT
         cout << "[H5Format::get_dataset_data_type] Getting dataset type for received frame type " << type << endl;
@@ -105,7 +105,7 @@ H5::PredType H5Format::get_dataset_data_type(string& type){
     }
 }
 
-H5::DataSet H5Format::write_dataset(H5::Group& target, h5_dataset& dataset, map<string, boost::any>& values){
+H5::DataSet H5Format::write_dataset(H5::Group& target, const h5_dataset& dataset, const map<string, boost::any>& values){
     string name = dataset.name;
     boost::any value;
 
@@ -162,7 +162,7 @@ H5::DataSet H5Format::write_dataset(H5::Group& target, h5_dataset& dataset, map<
     }
 }
 
-H5::DataSet H5Format::write_dataset(H5::Group& target, string name, double value)
+H5::DataSet H5Format::write_dataset(H5::Group& target, const string& name, double value)
 {
     H5::DataSpace att_space(H5S_SCALAR);
     auto data_type = H5::PredType::NATIVE_DOUBLE;
@@ -173,7 +173,7 @@ H5::DataSet H5Format::write_dataset(H5::Group& target, string name, double value
     return dataset;
 }
 
-H5::DataSet H5Format::write_dataset(H5::Group& target, string name, int value)
+H5::DataSet H5Format::write_dataset(H5::Group& target, const string& name, int value)
 {
     H5::DataSpace att_space(H5S_SCALAR);
     auto data_type = H5::PredType::NATIVE_INT;
@@ -184,7 +184,7 @@ H5::DataSet H5Format::write_dataset(H5::Group& target, string name, int value)
     return dataset;
 }
 
-H5::DataSet H5Format::write_dataset(H5::Group& target, string name, string value)
+H5::DataSet H5Format::write_dataset(H5::Group& target, const string& name, const string& value)
 {
     H5::DataSpace att_space(H5S_SCALAR);
     H5::DataType data_type = H5::StrType(0, H5T_VARIABLE);
@@ -195,7 +195,7 @@ H5::DataSet H5Format::write_dataset(H5::Group& target, string name, string value
     return dataset;
 }
 
-void H5Format::write_attribute(H5::H5Object& target, string name, string value)
+void H5Format::write_attribute(H5::H5Object& target, const string& name, const string& value)
 {
     H5::DataSpace att_space(H5S_SCALAR);
     H5::DataType data_type = H5::StrType(H5::PredType::C_S1, H5T_VARIABLE);
@@ -204,7 +204,7 @@ void H5Format::write_attribute(H5::H5Object& target, string name, string value)
     h5_attribute.write(data_type, &value);
 }
 
-void H5Format::write_attribute(H5::H5Object& target, string name, int value)
+void H5Format::write_attribute(H5::H5Object& target, const string& name, int value)
 {
     H5::DataSpace att_space(H5S_SCALAR);
     auto data_type = H5::PredType::NATIVE_INT;
@@ -213,7 +213,7 @@ void H5Format::write_attribute(H5::H5Object& target, string name, int value)
     h5_attribute.write(data_type, &value);
 }
 
-void H5Format::write_attribute(H5::H5Object& target, h5_attr& attribute, map<string, boost::any>& values) 
+void H5Format::write_attribute(H5::H5Object& target, const h5_attr& attribute, const map<string, boost::any>& values) 
 {
     string name = attribute.name;
     boost::any value;
@@ -259,10 +259,10 @@ void H5Format::write_attribute(H5::H5Object& target, h5_attr& attribute, map<str
     }
 }
 
-void H5Format::write_format_data(H5::Group& file_node, h5_parent& format_node, std::map<std::string, h5_value>& values) {
+void H5Format::write_format_data(H5::Group& file_node, const h5_parent& format_node, const std::map<std::string, h5_value>& values) {
     auto node_group = H5Format::create_group(file_node, format_node.name);
 
-    for (auto item : format_node.items) {
+    for (const auto item : format_node.items) {
 
         if (item->node_type == GROUP) {
             auto sub_group = dynamic_cast<h5_group*>(item); 
@@ -276,7 +276,7 @@ void H5Format::write_format_data(H5::Group& file_node, h5_parent& format_node, s
             auto sub_dataset = dynamic_cast<h5_dataset*>(item);
             auto current_dataset = H5Format::write_dataset(node_group, *sub_dataset, values);
 
-            for (auto dataset_attr : sub_dataset->items) {
+            for (const auto dataset_attr : sub_dataset->items) {
 
                 // You can specify only attributes inside a dataset.
                 if (dataset_attr->node_type != ATTRIBUTE) {
@@ -294,7 +294,7 @@ void H5Format::write_format_data(H5::Group& file_node, h5_parent& format_node, s
     }
 }
 
-void H5Format::write_format(H5::H5File& file, std::map<std::string, h5_value>& input_values, string frames_dataset_name){
+void H5Format::write_format(H5::H5File& file, const std::map<std::string, h5_value>& input_values, const string& frames_dataset_name){
     
     auto format = get_format_definition();
     auto values = get_default_values();

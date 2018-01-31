@@ -11,7 +11,7 @@ string get_frames_dataset_name() {
     return "entry/plottable_data/data";
 }
 
-h5_group* get_format_definition(){
+const h5_group* get_format_definition(){
 
     auto format = 
     new h5_group("entry", {
@@ -883,7 +883,7 @@ void add_calculated_values(map<string, boost::any>& values){
     }
 }
 
-void add_input_values(map<string, boost::any>& values, map<string, boost::any>& input_values) {
+void add_input_values(map<string, boost::any>& values, const map<string, boost::any>& input_values) {
     map<string, list<string>> input_mapping = {
         {"sl2wv", {"slit_2/y_gap"}},
         {"sl0ch", {"slit_0/x_translation"}},
@@ -956,12 +956,12 @@ void add_input_values(map<string, boost::any>& values, map<string, boost::any>& 
 
     for (auto input : input_mapping) {
         for (auto destination_name : input.second) {
-            values[destination_name] = input_values[input.first];
+            values[destination_name] = input_values.at(input.first);
         }
     }
 }
 
-std::map<string, DATA_TYPE>* get_input_value_type() {
+const std::map<string, DATA_TYPE>* get_input_value_type() {
     auto input_value_types = new std::map<string, DATA_TYPE>({
         {"sl2wv", NX_FLOAT},
         {"sl0ch", NX_FLOAT},

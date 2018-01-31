@@ -5,7 +5,7 @@
 
 using namespace std;
 
-WriterManager::WriterManager(map<string, DATA_TYPE>* parameters_type, uint64_t n_frames):
+WriterManager::WriterManager(const map<string, DATA_TYPE>* parameters_type, uint64_t n_frames):
     parameters_type(parameters_type), n_frames(n_frames), running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0)
 {
     #ifdef DEBUG_OUTPUT
@@ -84,7 +84,7 @@ void WriterManager::set_parameters(map<string, boost::any>& new_parameters)
     #endif
 }
 
-map<string, DATA_TYPE>* WriterManager::get_parameters_type() {
+const map<string, DATA_TYPE>* WriterManager::get_parameters_type() {
     return parameters_type;
 }
 

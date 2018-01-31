@@ -16,7 +16,7 @@ class WriterManager
     std::mutex parameters_mutex;
 
     // Initialize in constructor.
-    std::map<std::string, DATA_TYPE>* parameters_type;
+    const std::map<std::string, DATA_TYPE>* parameters_type;
     size_t n_frames;
     std::atomic_bool running_flag;
     std::atomic_bool killed_flag;
@@ -24,7 +24,7 @@ class WriterManager
     std::atomic<uint64_t> n_written_frames;
 
     public:
-        WriterManager(std::map<std::string, DATA_TYPE>* parameters_type, uint64_t n_frames=0);
+        WriterManager(const std::map<std::string, DATA_TYPE>* parameters_type, uint64_t n_frames=0);
         void stop();
         void kill();
         bool is_running();
@@ -32,7 +32,7 @@ class WriterManager
         std::string get_status();
         bool are_all_parameters_set();
 
-        std::map<std::string, DATA_TYPE>* get_parameters_type();
+        const std::map<std::string, DATA_TYPE>* get_parameters_type();
         std::map<std::string, boost::any> get_parameters();
         void set_parameters(std::map<std::string, boost::any>& new_parameters);
         
