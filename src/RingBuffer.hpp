@@ -25,7 +25,7 @@ struct FrameMetadata
     
     // Image header data.
     uint64_t frame_index = 0;
-    std::string endianness = "";
+    std::string endianness;
     std::string type;
     size_t frame_shape[2];
 };
@@ -59,7 +59,6 @@ class RingBuffer
         std::pair<FrameMetadata, char*> read();
         void release(size_t buffer_slot_index);
         bool is_empty();
-        
 };
 
 #endif
