@@ -63,12 +63,12 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port)
 
         if (req.method == "GET"_method) {
 
-            for (auto item : writer_manager.get_parameters()) {
+            for (const auto& item : writer_manager.get_parameters()) {
                 auto parameter_name = item.first;
                 auto parameter_value = item.second;
 
                 try {
-                    auto parameter_type = parameters_type->at(parameter_name);
+                    auto parameter_type = parameters_type.at(parameter_name);
 
                     if (parameter_type == NX_FLOAT || parameter_type == NX_NUMBER) {
                         result[parameter_name] = boost::any_cast<double>(parameter_value);
@@ -99,11 +99,11 @@ void start_rest_api(WriterManager& writer_manager, uint16_t port)
             auto request_parameters = crow::json::load(req.body);
             std::map<std::string, boost::any> new_parameters;
 
-            for (auto item : request_parameters) {
+            for (const auto& item : request_parameters) {
                 string parameter_name = item.key();
                 
                 try{
-                    auto parameter_type = parameters_type->at(parameter_name);
+                    auto parameter_type = parameters_type.at(parameter_name);
 
                     if (parameter_type == NX_FLOAT || parameter_type == NX_NUMBER) {
                         new_parameters[parameter_name] = double(item.d());
