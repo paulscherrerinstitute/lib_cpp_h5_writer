@@ -5,7 +5,7 @@
 
 using namespace std;
 
-WriterManager::WriterManager(const map<string, DATA_TYPE>* parameters_type, uint64_t n_frames):
+WriterManager::WriterManager(const map<string, DATA_TYPE>& parameters_type, uint64_t n_frames):
     parameters_type(parameters_type), n_frames(n_frames), running_flag(true), killed_flag(false), 
     n_received_frames(0), n_written_frames(0), n_lost_frames(0)
 {
@@ -89,7 +89,7 @@ void WriterManager::set_parameters(const map<string, boost::any>& new_parameters
     #endif
 }
 
-const map<string, DATA_TYPE>* WriterManager::get_parameters_type() 
+const map<string, DATA_TYPE>& WriterManager::get_parameters_type() 
 {
     return parameters_type;
 }
@@ -128,7 +128,7 @@ bool WriterManager::are_all_parameters_set()
 {
     lock_guard<mutex> lock(parameters_mutex);
 
-    for (const auto& parameter : *parameters_type) {
+    for (const auto& parameter : parameters_type) {
         const auto& parameter_name = parameter.first;
 
         if (parameters.count(parameter_name) == 0) {
