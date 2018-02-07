@@ -7,6 +7,7 @@
 
 using namespace std;
 
+
 hsize_t H5FormatUtils::expand_dataset(H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step)
 {
     hsize_t dataset_rank = 3;
@@ -56,6 +57,12 @@ const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_
 {
     try {
         auto reference_string = boost::any_cast<string>(value_reference);
+        
+        #ifdef DEBUG_OUTPUT
+            cout << "[H5FormatUtils::get_value_from_reference] Getting dataset " << dataset_name;
+            cout << " reference value '" << reference_string << "'." << endl;
+        #endif
+
         return values.at(reference_string);
 
     } catch (const boost::bad_any_cast& exception) {
@@ -107,7 +114,7 @@ H5::PredType H5FormatUtils::get_dataset_data_type(const string& type)
 
 H5::DataSet H5FormatUtils::write_dataset(H5::Group& target, const h5_dataset& dataset, const map<string, boost::any>& values)
 {
-    string name = dataset.name;
+    const string& name = dataset.name;
     boost::any value;
 
     // Value is stored directly in the struct.
@@ -264,33 +271,37 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
 {
     auto node_group = H5FormatUtils::create_group(file_node, format_node.name);
 
-    for (const auto item : format_node.items) {
+    for (const auto item_ptr : format_node.items) {
+        const h5_base& item = *item_ptr;
 
-        if (item->node_type == GROUP) {
-            auto sub_group = dynamic_cast<h5_group*>(item); 
+        if (item.node_type == GROUP) {
+            auto sub_group = dynamic_cast<const h5_group&>(item); 
 
-            write_format_data(node_group, *sub_group, values);
-        } else if (item->node_type == ATTRIBUTE) {
-            auto sub_attribute = dynamic_cast<h5_attr*>(item);
+            write_format_data(node_group, sub_group, values);
 
-            H5FormatUtils::write_attribute(node_group, *sub_attribute, values);
-        } else if (item->node_type == DATASET) {
-            auto sub_dataset = dynamic_cast<h5_dataset*>(item);
-            auto current_dataset = H5FormatUtils::write_dataset(node_group, *sub_dataset, values);
+        } else if (item.node_type == ATTRIBUTE) {
+            auto sub_attribute = dynamic_cast<const h5_attr&>(item);
+            
+            H5FormatUtils::write_attribute(node_group, sub_attribute, values);
 
-            for (const auto dataset_attr : sub_dataset->items) {
+        } else if (item.node_type == DATASET) {
+            auto sub_dataset = dynamic_cast<const h5_dataset&>(item);
+            auto current_dataset = H5FormatUtils::write_dataset(node_group, sub_dataset, values);
+
+            for (const auto dataset_attr_ptr : sub_dataset.items) {
+                const h5_base& dataset_attr = *dataset_attr_ptr;
 
                 // You can specify only attributes inside a dataset.
-                if (dataset_attr->node_type != ATTRIBUTE) {
+                if (dataset_attr.node_type != ATTRIBUTE) {
                     stringstream error_message;
-                    error_message << "Invalid element " << dataset_attr->name << " on dataset " << sub_dataset->name << ". Only attributes allowd.";
+                    error_message << "Invalid element " << dataset_attr.name << " on dataset " << sub_dataset.name << ". Only attributes allowd.";
 
                     throw invalid_argument( error_message.str() );
                 }
 
-                auto sub_attribute = dynamic_cast<h5_attr*>(dataset_attr);
+                auto sub_attribute = dynamic_cast<const h5_attr&>(dataset_attr);
 
-                H5FormatUtils::write_attribute(current_dataset, *sub_attribute, values);
+                H5FormatUtils::write_attribute(current_dataset, sub_attribute, values);
             }
         }
     }
@@ -298,14 +309,15 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
 
 void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format, const std::map<std::string, h5_value>& input_values)
 {
-    
     auto format_definition = format.get_format_definition();
-    auto values = format.get_default_values();
+    auto default_values = format.get_default_values();
+
+    map<string, boost::any> format_values(default_values);
     
-    format.add_input_values(*values, input_values);
-    format.add_calculated_values(*values);
+    format.add_input_values(format_values, input_values);
+    format.add_calculated_values(format_values);
     
-    write_format_data(file, *format_definition, *values);
+    write_format_data(file, format_definition, format_values);
 
     file.move(format.get_raw_frames_dataset_name().c_str(), format.get_frames_dataset_name().c_str());
 }

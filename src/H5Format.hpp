@@ -5,6 +5,7 @@
 #include <list>
 #include <map>
 #include <H5Cpp.h>
+#include <memory>
 #include <boost/any.hpp>
 
 
@@ -37,7 +38,7 @@ enum DATA_LOCATION
 struct h5_base 
 {
     h5_base(const std::string& name, NODE_TYPE node_type) : name(name), node_type(node_type){};
-    virtual ~h5_base(){};
+    virtual ~h5_base(){}
     std::string name;
     NODE_TYPE node_type;
 };
@@ -45,24 +46,27 @@ struct h5_base
 struct h5_data_base
 {
     h5_data_base(DATA_TYPE data_type, DATA_LOCATION data_location) : data_type(data_type), data_location(data_location) {};
+    virtual ~h5_data_base(){}
     DATA_TYPE data_type;
     DATA_LOCATION data_location;
 };
 
 struct h5_parent: public h5_base
 {
-    h5_parent(const std::string& name, NODE_TYPE node_type, const std::list<h5_base*>& items) : h5_base(name, node_type), items(items) {};
-    std::list<h5_base*> items;
+    h5_parent(const std::string& name, NODE_TYPE node_type, const std::list<std::shared_ptr<h5_base>>& items) : 
+        h5_base(name, node_type), items(items) {};
+    std::list<std::shared_ptr<h5_base>> items;
 };
 
 struct h5_group : public h5_parent 
 {
-    h5_group(const std::string& name, const std::list<h5_base*>& items) : h5_parent(name, GROUP, items) {};
+    h5_group(const std::string& name, const std::list<std::shared_ptr<h5_base>>& items) : 
+        h5_parent(name, GROUP, items) {};
 };
 
 struct h5_dataset : public h5_parent, public h5_data_base
 {
-    h5_dataset(const std::string& name, const std::string& value, DATA_TYPE data_type, const std::list<h5_base*>& items={})
+    h5_dataset(const std::string& name, const std::string& value, DATA_TYPE data_type, const std::list<std::shared_ptr<h5_base>>& items={})
         : h5_parent(name, DATASET, items), h5_data_base(data_type, REFERENCE), value(value) {};
     
     std::string value;
@@ -80,9 +84,9 @@ class H5Format
     public:
         virtual ~H5Format(){};
 
-        virtual const std::map<std::string, DATA_TYPE>* get_input_value_type() const = 0;
-        virtual std::map<std::string, boost::any>* get_default_values() const = 0;
-        virtual const h5_group* get_format_definition() const = 0;
+        virtual const std::map<std::string, DATA_TYPE>& get_input_value_type() const = 0;
+        virtual const std::map<std::string, boost::any>& get_default_values() const = 0;
+        virtual const h5_group& get_format_definition() const = 0;
         virtual void add_calculated_values(std::map<std::string, boost::any>& values) const = 0;
         virtual void add_input_values(std::map<std::string, boost::any>& values, const std::map<std::string, boost::any>& input_values) const = 0;
         
