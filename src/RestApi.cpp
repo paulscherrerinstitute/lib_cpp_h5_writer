@@ -2,11 +2,11 @@
 #include <string>
 
 #include "crow_all.h"
-#include "rest_interface.hpp"
+#include "RestApi.hpp"
 
 using namespace std;
 
-void start_rest_api(WriterManager& writer_manager, uint16_t port)
+void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
 {
 
     #ifdef DEBUG_OUTPUT

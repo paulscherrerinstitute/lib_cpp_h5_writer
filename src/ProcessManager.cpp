@@ -10,7 +10,7 @@
 #include "ProcessManager.hpp"
 #include "config.hpp"
 #include "H5Writer.hpp"
-#include "rest_interface.hpp"
+#include "RestApi.hpp"
 
 using namespace std;
 namespace pt = boost::property_tree;
@@ -179,7 +179,7 @@ void ProcessManager::run_writer(WriterManager& manager, const H5Format& format,
     boost::thread receiver_thread(receive_zmq, boost::ref(manager), boost::ref(ring_buffer), connect_address, n_io_threads, receive_timeout);
     boost::thread writer_thread(write_h5, boost::ref(manager), boost::ref(format), boost::ref(ring_buffer));
 
-    start_rest_api(manager, rest_port);
+    RestApi::start_rest_api(manager, rest_port);
 
     #ifdef DEBUG_OUTPUT
         cout << "[h5_zmq_writer::run_writer] Rest API stopped." << endl;
