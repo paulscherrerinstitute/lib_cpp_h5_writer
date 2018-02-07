@@ -59,8 +59,8 @@ const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_
         auto reference_string = boost::any_cast<string>(value_reference);
         
         #ifdef DEBUG_OUTPUT
-            cout << "[H5FormatUtils::get_value_from_reference] Getting dataset " << dataset_name;
-            cout << " reference value '" << reference_string << "'." << endl;
+            cout << "[H5FormatUtils::get_value_from_reference] Getting dataset '"<< dataset_name;
+            cout << "' reference value '" << reference_string << "'." << endl;
         #endif
 
         return values.at(reference_string);
