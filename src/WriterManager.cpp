@@ -5,8 +5,8 @@
 
 using namespace std;
 
-WriterManager::WriterManager(const map<string, DATA_TYPE>& parameters_type, uint64_t n_frames):
-    parameters_type(parameters_type), n_frames(n_frames), running_flag(true), killed_flag(false), 
+WriterManager::WriterManager(const map<string, DATA_TYPE>& parameters_type, const string& output_file, uint64_t n_frames):
+    parameters_type(parameters_type), output_file(output_file), n_frames(n_frames), running_flag(true), killed_flag(false), 
     n_received_frames(0), n_written_frames(0), n_lost_frames(0)
 {
     #ifdef DEBUG_OUTPUT
@@ -45,6 +45,11 @@ string WriterManager::get_status()
     } else {
         return "finished";
     }
+}
+
+string WriterManager::get_output_file()
+{
+    return output_file;
 }
 
 map<string, uint64_t> WriterManager::get_statistics()

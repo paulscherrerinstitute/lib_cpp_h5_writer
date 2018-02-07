@@ -23,15 +23,17 @@ class WriterManager
     std::atomic<uint64_t> n_received_frames;
     std::atomic<uint64_t> n_written_frames;
     std::atomic<uint64_t> n_lost_frames;
+    std::string output_file;
 
     public:
-        WriterManager(const std::map<std::string, DATA_TYPE>& parameters_type, uint64_t n_frames=0);
+        WriterManager(const std::map<std::string, DATA_TYPE>& parameters_type, const std::string& output_file, uint64_t n_frames=0);
         void stop();
         void kill();
         bool is_running();
         bool is_killed();
         std::string get_status();
         bool are_all_parameters_set();
+        std::string get_output_file();
 
         const std::map<std::string, DATA_TYPE>& get_parameters_type();
         std::map<std::string, boost::any> get_parameters();
