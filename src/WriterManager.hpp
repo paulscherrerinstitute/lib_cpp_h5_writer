@@ -17,13 +17,13 @@ class WriterManager
 
     // Initialize in constructor.
     const std::map<std::string, DATA_TYPE>& parameters_type;
+    std::string output_file;
     size_t n_frames;
     std::atomic_bool running_flag;
     std::atomic_bool killed_flag;
     std::atomic<uint64_t> n_received_frames;
     std::atomic<uint64_t> n_written_frames;
     std::atomic<uint64_t> n_lost_frames;
-    std::string output_file;
 
     public:
         WriterManager(const std::map<std::string, DATA_TYPE>& parameters_type, const std::string& output_file, uint64_t n_frames=0);
