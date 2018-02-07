@@ -7,7 +7,7 @@
 #include "../H5Format.hpp"
 
 using namespace std;
-using s_ptr = s_ptr;
+using s_ptr = shared_ptr<h5_base>;
 
 class NXmxFormat : public H5Format
 {
