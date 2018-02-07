@@ -15,7 +15,7 @@
 #include "rest_interface.hpp"
 #include "H5Format.hpp"
 
-#include "NXmxFormat.cpp"
+#include "format/NXmxFormat.cpp"
 
 using namespace std;
 namespace pt = boost::property_tree;
