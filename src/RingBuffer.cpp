@@ -50,19 +50,19 @@ void RingBuffer::initialize(size_t slot_size)
     #endif
 }
 
-void RingBuffer::write(FrameMetadata &frame_metadata, const char* data)
+void RingBuffer::write(shared_ptr<FrameMetadata> frame_metadata, const char* data)
 {
     // Initialize the buffer on the first write.
     if (!ring_buffer_initialized) {
-        initialize(frame_metadata.frame_bytes_size);
+        initialize(frame_metadata->frame_bytes_size);
     }
 
     // All images must fit in the ring buffer.
-    if (frame_metadata.frame_bytes_size > slot_size) {
+    if (frame_metadata->frame_bytes_size > slot_size) {
         stringstream error_message;
-        error_message << "[RingBuffer::write] Received frame index "<< frame_metadata.frame_index;
+        error_message << "[RingBuffer::write] Received frame index "<< frame_metadata->frame_index;
         error_message << " that is too large for ring buffer slot. ";
-        error_message << "Slot size " << slot_size << ", but frame bytes size " << frame_metadata.frame_bytes_size << endl;
+        error_message << "Slot size " << slot_size << ", but frame bytes size " << frame_metadata->frame_bytes_size << endl;
 
         throw runtime_error(error_message.str());
     }
@@ -75,11 +75,11 @@ void RingBuffer::write(FrameMetadata &frame_metadata, const char* data)
             ringbuffer_slots[write_index] = 1;
             
             // Set the write index in the FrameMetadata object.
-            frame_metadata.buffer_slot_index = write_index;
+            frame_metadata->buffer_slot_index = write_index;
 
             #ifdef DEBUG_OUTPUT
-                cout << "[RingBuffer::write] Ring buffer slot " << frame_metadata.buffer_slot_index << " reserved for frame_index ";
-                cout << frame_metadata.frame_index << endl;
+                cout << "[RingBuffer::write] Ring buffer slot " << frame_metadata->buffer_slot_index << " reserved for frame_index ";
+                cout << frame_metadata->frame_index << endl;
             #endif
 
             // Increase and wrap the write index around if needed.
@@ -97,12 +97,12 @@ void RingBuffer::write(FrameMetadata &frame_metadata, const char* data)
     }
 
     // The slot is already reserved, no need for synchronization.
-    char* slot_memory_address = get_buffer_slot_address(frame_metadata.buffer_slot_index);
-    memcpy(slot_memory_address, data, frame_metadata.frame_bytes_size);
+    char* slot_memory_address = get_buffer_slot_address(frame_metadata->buffer_slot_index);
+    memcpy(slot_memory_address, data, frame_metadata->frame_bytes_size);
 
     #ifdef DEBUG_OUTPUT
-        cout << "[RingBuffer::write] Copied " << frame_metadata.frame_bytes_size << " frame bytes to buffer_slot_index ";
-        cout << frame_metadata.buffer_slot_index << endl;
+        cout << "[RingBuffer::write] Copied " << frame_metadata->frame_bytes_size << " frame bytes to buffer_slot_index ";
+        cout << frame_metadata->buffer_slot_index << endl;
     #endif
 
     // Add metadata header to the inter-thread communication queue.
@@ -113,7 +113,7 @@ void RingBuffer::write(FrameMetadata &frame_metadata, const char* data)
     }
 
     #ifdef DEBUG_OUTPUT
-        cout << "[RingBuffer::write] Metadata for frame_index " << frame_metadata.frame_index << " added to metadata queue." << endl;
+        cout << "[RingBuffer::write] Metadata for frame_index " << frame_metadata->frame_index << " added to metadata queue." << endl;
     #endif
 }
 
@@ -138,9 +138,9 @@ char* RingBuffer::get_buffer_slot_address(size_t buffer_slot_index)
     return slot_memory_address;
 }
 
-pair<FrameMetadata, char*> RingBuffer::read()
+pair<shared_ptr<FrameMetadata>, char*> RingBuffer::read()
 {
-    FrameMetadata frame_metadata;
+    shared_ptr<FrameMetadata> frame_metadata;
 
     // Read data from the metadata queue.
     {
@@ -148,7 +148,7 @@ pair<FrameMetadata, char*> RingBuffer::read()
 
         // A NULL char* indicates that there are no available data in the ring buffer.
         if (frame_metadata_queue.empty()) {
-            return {frame_metadata, NULL};
+            return {NULL, NULL};
         }
 
         frame_metadata = frame_metadata_queue.front();
@@ -156,24 +156,23 @@ pair<FrameMetadata, char*> RingBuffer::read()
     }
 
     #ifdef DEBUG_OUTPUT
-        cout << "[RingBuffer::read] Received metadata for frame_index " << frame_metadata.frame_index << endl;
+        cout << "[RingBuffer::read] Received metadata for frame_index " << frame_metadata->frame_index << endl;
     #endif
 
     // Check if the references ring buffer slot is valid.
     {
         lock_guard<mutex> lock(ringbuffer_slots_mutex);
 
-        if (!ringbuffer_slots[frame_metadata.buffer_slot_index]) {
+        if (!ringbuffer_slots[frame_metadata->buffer_slot_index]) {
             stringstream error_message;
             error_message << "[RingBuffer::read] Ring buffer slot referenced in message header ";
-            error_message << frame_metadata.buffer_slot_index << " is empty." << endl;
+            error_message << frame_metadata->buffer_slot_index << " is empty." << endl;
 
             throw runtime_error(error_message.str());
         }
-        
     }
 
-    char* slot_memory_address = get_buffer_slot_address(frame_metadata.buffer_slot_index);
+    char* slot_memory_address = get_buffer_slot_address(frame_metadata->buffer_slot_index);
             
     return {frame_metadata, slot_memory_address};
 }

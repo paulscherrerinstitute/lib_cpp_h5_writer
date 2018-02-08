@@ -5,26 +5,20 @@
 #include <vector>
 #include <map>
 #include <mutex>
+#include <memory>
 #include <string>
 
 
 struct FrameMetadata
 {
     FrameMetadata(){}
-    
-    FrameMetadata(const FrameMetadata& other) : 
-        buffer_slot_index(other.buffer_slot_index), frame_bytes_size(other.frame_bytes_size), frame_index(other.frame_index), 
-        endianness(other.endianness), type(other.type), header_string(other.header_string) {
-        frame_shape[0] = other.frame_shape[0];
-        frame_shape[1] = other.frame_shape[1];
-    }
 
     // Ring buffer needed data.
-    size_t buffer_slot_index = 0;
-    size_t frame_bytes_size = 0;
+    size_t buffer_slot_index;
+    size_t frame_bytes_size;
     
     // Image header data.
-    uint64_t frame_index = 0;
+    uint64_t frame_index;
     std::string endianness;
     std::string type;
     size_t frame_shape[2];
@@ -47,7 +41,7 @@ class RingBuffer
     size_t buffer_used_slots = 0;
     bool ring_buffer_initialized = false;
 
-    std::list<FrameMetadata> frame_metadata_queue;
+    std::list< std::shared_ptr<FrameMetadata> > frame_metadata_queue;
     std::mutex frame_metadata_queue_mutex;
     std::mutex ringbuffer_slots_mutex;
 
@@ -58,8 +52,8 @@ class RingBuffer
         virtual ~RingBuffer();
         void initialize(size_t slot_size);
         
-        void write(FrameMetadata &metadata, const char* data);
-        std::pair<FrameMetadata, char*> read();
+        void write(const std::shared_ptr<FrameMetadata> metadata, const char* data);
+        std::pair<std::shared_ptr<FrameMetadata>, char*> read();
         void release(size_t buffer_slot_index);
         bool is_empty();
 };

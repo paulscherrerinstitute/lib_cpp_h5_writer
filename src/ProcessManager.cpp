@@ -6,6 +6,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/thread.hpp>
 #include <iostream>
+#include <memory>
 
 #include "ProcessManager.hpp"
 #include "config.hpp"
@@ -27,23 +28,23 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
             continue;
         }
 
-        const pair<FrameMetadata, char*> received_data = ring_buffer.read();
+        const pair< shared_ptr<FrameMetadata>, char* > received_data = ring_buffer.read();
         
         // NULL pointer means that the ringbuffer->read() timeouted. Faster than rising an exception.
         if(!received_data.second) {
             continue;
         }
 
-        writer.write_frame_data(received_data.first.frame_index, 
-                                received_data.first.frame_shape,
-                                received_data.first.frame_bytes_size, 
+        writer.write_frame_data(received_data.first->frame_index, 
+                                received_data.first->frame_shape,
+                                received_data.first->frame_bytes_size, 
                                 received_data.second,
-                                received_data.first.type,
-                                received_data.first.endianness);
+                                received_data.first->type,
+                                received_data.first->endianness);
 
-        ring_buffer.release(received_data.first.buffer_slot_index);
+        ring_buffer.release(received_data.first->buffer_slot_index);
 
-        manager.written_frame(received_data.first.frame_index);
+        manager.written_frame(received_data.first->frame_index);
     }
 
     if (writer.is_file_open()) {
@@ -94,8 +95,6 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
     zmq::message_t message_header(config::zmq_buffer_size_header);
     zmq::message_t message_data(config::zmq_buffer_size_data);
 
-    FrameMetadata frame_metadata;
-
     pt::ptree json_header;
 
     while (manager.is_running()) {
@@ -105,51 +104,55 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
         }
 
         // Parse JSON header.
-        frame_metadata.header_string = string(static_cast<char*>(message_header.data()), message_header.size());
+        auto frame_metadata = make_shared<FrameMetadata>();
+
+        frame_metadata->header_string = string(static_cast<char*>(message_header.data()), message_header.size());
+        
         stringstream header_stream;
-        header_stream << frame_metadata.header_string << endl;
+        header_stream << frame_metadata->header_string << endl;
+
         pt::read_json(header_stream, json_header);
 
         // Extract data from message header.
-        frame_metadata.frame_index = json_header.get<uint64_t>("frame");
+        frame_metadata->frame_index = json_header.get<uint64_t>("frame");
 
         uint8_t index = 0;
         for (const auto& item : json_header.get_child("shape")) {
-            frame_metadata.frame_shape[index] = item.second.get_value<size_t>();
+            frame_metadata->frame_shape[index] = item.second.get_value<size_t>();
             ++index;
         }
 
         // Array 1.0 specified little endian as the default encoding.
-        frame_metadata.endianness = json_header.get("endianness", "little");
+        frame_metadata->endianness = json_header.get("endianness", "little");
 
-        frame_metadata.type = json_header.get<string>("type");
+        frame_metadata->type = json_header.get<string>("type");
 
         // Get the message data.
         if (!receiver.recv(&message_data)) {
-            cout << "[h5_zmq_writer::receive_zmq] ERROR: Error while reading from ZMQ. Frame index " << frame_metadata.frame_index << " lost."; 
+            cout << "[h5_zmq_writer::receive_zmq] ERROR: Error while reading from ZMQ. Frame index " << frame_metadata->frame_index << " lost."; 
             cout << " Trying to continue with the next frame." << endl;
 
-            manager.lost_frame(frame_metadata.frame_index);
+            manager.lost_frame(frame_metadata->frame_index);
 
             continue;
         }
 
-        frame_metadata.frame_bytes_size = message_data.size();
+        frame_metadata->frame_bytes_size = message_data.size();
 
         #ifdef DEBUG_OUTPUT
             cout << "[h5_zmq_writer::receive_zmq] Processing FrameMetadata"; 
-            cout << " with frame_index " << frame_metadata.frame_index;
-            cout << " and frame_shape [" << frame_metadata.frame_shape[0] << ", " << frame_metadata.frame_shape[1] << "]";
-            cout << " and endianness " << frame_metadata.endianness;
-            cout << " and type " << frame_metadata.type;
-            cout << " and frame_bytes_size " << frame_metadata.frame_bytes_size;
+            cout << " with frame_index " << frame_metadata->frame_index;
+            cout << " and frame_shape [" << frame_metadata->frame_shape[0] << ", " << frame_metadata->frame_shape[1] << "]";
+            cout << " and endianness " << frame_metadata->endianness;
+            cout << " and type " << frame_metadata->type;
+            cout << " and frame_bytes_size " << frame_metadata->frame_bytes_size;
             cout << "." << endl;
         #endif
 
         // Commit the frame to the buffer.
         ring_buffer.write(frame_metadata, static_cast<char*>(message_data.data()));
 
-        manager.received_frame(frame_metadata.frame_index);
+        manager.received_frame(frame_metadata->frame_index);
    }
 
     #ifdef DEBUG_OUTPUT
