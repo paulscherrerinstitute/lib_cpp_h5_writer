@@ -79,7 +79,7 @@ const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_
     }
 }
 
-H5::PredType H5FormatUtils::get_dataset_data_type(const string& type)
+const H5::PredType& H5FormatUtils::get_dataset_data_type(const string& type)
 {
     #ifdef DEBUG_OUTPUT
         cout << "[H5FormatUtils::get_dataset_data_type] Getting dataset type for received frame type " << type << endl;

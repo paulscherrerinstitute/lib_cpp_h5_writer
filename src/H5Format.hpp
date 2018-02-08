@@ -100,7 +100,7 @@ namespace H5FormatUtils
     void compact_dataset(H5::DataSet& dataset, hsize_t max_frame_index);
 
     H5::Group create_group(H5::Group& target, const std::string& name);
-    H5::PredType get_dataset_data_type(const std::string& type);
+    const H5::PredType& get_dataset_data_type(const std::string& type);
 
     H5::DataSet write_dataset(H5::Group& target, const h5_dataset& dataset, const std::map<std::string, boost::any>& values);
     H5::DataSet write_dataset(H5::Group& target, const std::string& name, double value);
