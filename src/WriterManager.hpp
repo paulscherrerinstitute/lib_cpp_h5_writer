@@ -27,6 +27,8 @@ class WriterManager
 
     public:
         WriterManager(const std::map<std::string, DATA_TYPE>& parameters_type, const std::string& output_file, uint64_t n_frames=0);
+        virtual ~WriterManager();
+
         void stop();
         void kill();
         bool is_running();

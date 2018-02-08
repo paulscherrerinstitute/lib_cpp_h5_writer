@@ -14,6 +14,8 @@ WriterManager::WriterManager(const map<string, DATA_TYPE>& parameters_type, cons
     #endif
 }
 
+WriterManager::~WriterManager(){}
+
 void WriterManager::stop()
 {
     #ifdef DEBUG_OUTPUT
