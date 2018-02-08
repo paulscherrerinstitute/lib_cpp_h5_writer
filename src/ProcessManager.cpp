@@ -105,9 +105,9 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
         }
 
         // Parse JSON header.
-        string header_string(static_cast<char*>(message_header.data()), message_header.size());
+        frame_metadata.header_string = string(static_cast<char*>(message_header.data()), message_header.size());
         stringstream header_stream;
-        header_stream << header_string << endl;
+        header_stream << frame_metadata.header_string << endl;
         pt::read_json(header_stream, json_header);
 
         // Extract data from message header.

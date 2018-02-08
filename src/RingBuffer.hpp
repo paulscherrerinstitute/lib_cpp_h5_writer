@@ -11,10 +11,10 @@
 struct FrameMetadata
 {
     FrameMetadata(){}
-
+    
     FrameMetadata(const FrameMetadata& other) : 
         buffer_slot_index(other.buffer_slot_index), frame_bytes_size(other.frame_bytes_size), frame_index(other.frame_index), 
-        endianness(other.endianness), type(other.type) {
+        endianness(other.endianness), type(other.type), header_string(other.header_string) {
         frame_shape[0] = other.frame_shape[0];
         frame_shape[1] = other.frame_shape[1];
     }
@@ -28,6 +28,9 @@ struct FrameMetadata
     std::string endianness;
     std::string type;
     size_t frame_shape[2];
+
+    // Pass the original header as well.
+    std::string header_string;
 };
 
 class RingBuffer
