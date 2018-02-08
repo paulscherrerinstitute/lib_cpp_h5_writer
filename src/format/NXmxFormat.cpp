@@ -16,6 +16,7 @@ class NXmxFormat : public H5Format
     shared_ptr<h5_group> file_format = NULL;
 
     public:
+        ~NXmxFormat(){};
 
         NXmxFormat()
         {
