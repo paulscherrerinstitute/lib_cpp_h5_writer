@@ -8,6 +8,19 @@
 #include <memory>
 #include <boost/any.hpp>
 
+enum HEADER_DATA_TYPE
+{
+    UINT8,
+    UINT16,
+    UINT32,
+    UINT64,
+    INT8,
+    INT16,
+    INT32,
+    INT64,
+    FLOAT32,
+    FLOAT64
+};
 
 typedef boost::any h5_value;
 
@@ -87,6 +100,8 @@ class H5Format
         virtual const std::map<std::string, DATA_TYPE>& get_input_value_type() const = 0;
         virtual const std::map<std::string, boost::any>& get_default_values() const = 0;
         virtual const h5_group& get_format_definition() const = 0;
+        virtual const std::map<std::string, HEADER_DATA_TYPE>& get_header_value_type() const = 0;
+
         virtual void add_calculated_values(std::map<std::string, boost::any>& values) const = 0;
         virtual void add_input_values(std::map<std::string, boost::any>& values, const std::map<std::string, boost::any>& input_values) const = 0;
         
