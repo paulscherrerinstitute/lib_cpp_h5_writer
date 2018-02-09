@@ -34,6 +34,7 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
             continue;
         }
 
+        // Write image data.
         writer.write_frame_data(received_data.first->frame_index, 
                                 received_data.first->frame_shape,
                                 received_data.first->frame_bytes_size, 
@@ -42,6 +43,9 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
                                 received_data.first->endianness);
 
         ring_buffer.release(received_data.first->buffer_slot_index);
+
+        // Write header data.
+        writer.write_data();
 
         manager.written_frame(received_data.first->frame_index);
     }
@@ -139,7 +143,7 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
     #endif
 }
 
-boost::any get_value_from_json(const pt::ptree& json_header, const string& value_name, const HEADER_DATA_TYPE data_type)
+boost::any ProcessManager::get_value_from_json(const pt::ptree& json_header, const string& value_name, const HEADER_DATA_TYPE data_type)
 {
     switch(data_type) {
         case UINT8 : 
@@ -181,10 +185,8 @@ shared_ptr<FrameMetadata> ProcessManager::read_json_header(pt::ptree& json_heade
 
     header_data->frame_index = json_header.get<uint64_t>("frame");
 
-    uint8_t index = 0;
     for (const auto& item : json_header.get_child("shape")) {
-        header_data->frame_shape[index] = item.second.get_value<size_t>();
-        ++index;
+        header_data->frame_shape.insert(item.second.get_value<size_t>());
     }
 
     // Array 1.0 specified little endian as the default encoding.
