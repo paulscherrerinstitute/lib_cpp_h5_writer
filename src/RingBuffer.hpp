@@ -7,12 +7,10 @@
 #include <mutex>
 #include <memory>
 #include <string>
-
+#include <boost/any.hpp>
 
 struct FrameMetadata
 {
-    FrameMetadata(){}
-
     // Ring buffer needed data.
     size_t buffer_slot_index;
     size_t frame_bytes_size;
@@ -23,8 +21,8 @@ struct FrameMetadata
     std::string type;
     size_t frame_shape[2];
 
-    // Pass the original header as well.
-    std::string header_string;
+    // Pass additional header values.
+    std::map<std::string, boost::any> header_values;
 };
 
 class RingBuffer
