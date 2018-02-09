@@ -17,7 +17,8 @@ namespace pt = boost::property_tree;
 
 void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, RingBuffer& ring_buffer) 
 {
-    H5Writer writer(manager.get_output_file(), format.get_raw_frames_dataset_name());
+    H5Writer writer(manager.get_output_file());
+    auto raw_frames_dataset_name = format.get_raw_frames_dataset_name();
     
     // Run until the running flag is set or the ring_buffer is empty.  
     while(manager.is_running() || !ring_buffer.is_empty()) {
@@ -35,17 +36,15 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
         }
 
         // Write image data.
-        writer.write_frame_data(received_data.first->frame_index, 
-                                received_data.first->frame_shape,
-                                received_data.first->frame_bytes_size, 
-                                received_data.second,
-                                received_data.first->type,
-                                received_data.first->endianness);
+        writer.write_data(raw_frames_dataset_name,
+                          received_data.first->frame_index, 
+                          received_data.second,
+                          received_data.first->frame_shape,
+                          received_data.first->frame_bytes_size, 
+                          received_data.first->type,
+                          received_data.first->endianness);
 
         ring_buffer.release(received_data.first->buffer_slot_index);
-
-        // Write header data.
-        writer.write_data();
 
         manager.written_frame(received_data.first->frame_index);
     }
@@ -186,7 +185,7 @@ shared_ptr<FrameMetadata> ProcessManager::read_json_header(pt::ptree& json_heade
     header_data->frame_index = json_header.get<uint64_t>("frame");
 
     for (const auto& item : json_header.get_child("shape")) {
-        header_data->frame_shape.insert(item.second.get_value<size_t>());
+        header_data->frame_shape.push_back(item.second.get_value<size_t>());
     }
 
     // Array 1.0 specified little endian as the default encoding.

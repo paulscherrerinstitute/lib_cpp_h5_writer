@@ -1,37 +1,42 @@
 #ifndef H5WRITER_H
 #define H5WRITER_H
 
-#include <map>
+#include <unordered_map>
+#include <memory>
+#include <vector>
 #include <H5Cpp.h>
 
 class H5Writer
 {
     // Initialized in constructor.
     const std::string filename;
-    const std::string dataset_name;
     hsize_t frames_per_file;
     hsize_t initial_dataset_size;
     hsize_t dataset_increase_step = 0;
 
     // State variables.
-    hsize_t max_frame_index = 0;
-    hsize_t current_dataset_size = 0;
+    hsize_t max_data_index = 0;
     hsize_t current_frame_chunk = 0;
 
     H5::H5File file;
-    H5::DataSet dataset;
+    std::unordered_map<std::string, H5::DataSet> datasets;
+    std::unordered_map<std::string, hsize_t> datasets_current_size;
     
-    hsize_t prepare_storage_for_frame(size_t frame_index, const size_t* frame_shape, const std::string& data_type, const std::string& endianness);
-    void create_file(const size_t* frame_shape, hsize_t frame_chunk, const std::string& data_type, const std::string& endianness);
+    hsize_t prepare_storage_for_data(const std::string& dataset_name, const size_t data_index, const std::vector<size_t>& data_shape, 
+        const std::string& data_type, const std::string& endianness);
+
+    void create_file(const hsize_t frame_chunk=0);
+
+    void create_dataset(const std::string& dataset_name, const std::vector<size_t>& data_shape, 
+        const std::string& data_type, const std::string& endianness);
 
     public:
-        H5Writer(const std::string& filename, const std::string& dataset_name, 
-            hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
-        ~H5Writer();
+        H5Writer(const std::string& filename, hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
+        virtual ~H5Writer();
         bool is_file_open();
         void close_file();
-        void write_frame_data(size_t frame_index, const size_t* frame_shape, size_t data_bytes_size, 
-            const char* data, const std::string& data_type, const std::string& endianness);
+        void write_data(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
+            const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
         H5::H5File& get_h5_file();
 };
 

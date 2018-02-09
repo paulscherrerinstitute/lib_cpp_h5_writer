@@ -19,5 +19,5 @@ namespace ProcessManager
         const std::string& header, const std::map<std::string, HEADER_DATA_TYPE>& header_data_type);
 
     boost::any get_value_from_json(const boost::property_tree::ptree& json_header, 
-        const string& value_name, const HEADER_DATA_TYPE data_type);
+        const std::string& value_name, const HEADER_DATA_TYPE data_type);
 };
