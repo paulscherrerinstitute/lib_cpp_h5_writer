@@ -18,7 +18,7 @@ namespace pt = boost::property_tree;
 void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, RingBuffer& ring_buffer) 
 {
     H5Writer writer(manager.get_output_file(), format.get_raw_frames_dataset_name());
-
+    
     // Run until the running flag is set or the ring_buffer is empty.  
     while(manager.is_running() || !ring_buffer.is_empty()) {
         
@@ -95,6 +95,7 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
     zmq::message_t message_data(config::zmq_buffer_size_data);
 
     pt::ptree json_header;
+    const auto& header_value_type = format.get_header_value_type();
 
     while (manager.is_running()) {
         // Get the message header.
@@ -103,7 +104,7 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
         }
 
         auto header_string = string(static_cast<char*>(message_header.data()), message_header.size());
-        auto frame_metadata = read_json_header(json_header, header_string, format.get_header_value_type());
+        auto frame_metadata = read_json_header(json_header, header_string, header_value_type);
 
         // Get the message data.
         if (!receiver.recv(&message_data)) {
