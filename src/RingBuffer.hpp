@@ -19,7 +19,7 @@ struct FrameMetadata
     uint64_t frame_index;
     std::string endianness;
     std::string type;
-    size_t frame_shape[2];
+    std::vector<size_t> frame_shape;
 
     // Pass additional header values.
     std::map<std::string, boost::any> header_values;
