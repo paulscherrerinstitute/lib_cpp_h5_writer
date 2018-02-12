@@ -14,7 +14,6 @@ class NXmxFormat : public H5Format
     shared_ptr<map<string, DATA_TYPE>> input_value_type = NULL;
     shared_ptr<map<string, boost::any>> default_values = NULL;
     shared_ptr<h5_group> file_format = NULL;
-    shared_ptr<map<string, HEADER_DATA_TYPE>> header_value_type = NULL;
 
     public:
         ~NXmxFormat(){};
@@ -92,11 +91,6 @@ class NXmxFormat : public H5Format
                 {"bpm6x", NX_FLOAT},
                 {"ftrans", NX_FLOAT},
                 {"samz", NX_FLOAT},
-            }));
-
-            header_value_type.reset(
-            new map<string, HEADER_DATA_TYPE>({
-                {"pulse_id", UINT64 },
             }));
 
             // Default values used in the file format.
@@ -1060,10 +1054,6 @@ class NXmxFormat : public H5Format
 
         const std::map<string, DATA_TYPE>& get_input_value_type() const override {
             return *input_value_type;
-        }
-
-        const std::map<string, HEADER_DATA_TYPE>& get_header_value_type() const override {
-            return *header_value_type;
         }
 
 };
