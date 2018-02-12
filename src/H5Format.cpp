@@ -93,8 +93,11 @@ const H5::PredType& H5FormatUtils::get_dataset_data_type(const string& type)
 
     } else if (type == "uint32") {
         return H5::PredType::NATIVE_UINT32;
+    
+    } else if (type == "uint64") {
+        return H5::PredType::NATIVE_UINT64;
 
-    }if (type == "int8") {
+    } else if (type == "int8") {
         return H5::PredType::NATIVE_INT8;
         
     } else if (type == "int16") {
@@ -103,10 +106,13 @@ const H5::PredType& H5FormatUtils::get_dataset_data_type(const string& type)
     } else if (type == "int32") {
         return H5::PredType::NATIVE_INT32;
 
+    } else if (type == "int64") {
+        return H5::PredType::NATIVE_INT64;
+
     } else {
         // We cannot really convert this attribute.
         stringstream error_message;
-        error_message << "[H5FormatUtils::get_dataset_data_type] Unsupported array data_type " << type << endl;
+        error_message << "[H5FormatUtils::get_dataset_data_type] Unsupported dataset data_type " << type << endl;
 
         throw runtime_error(error_message.str());
     }

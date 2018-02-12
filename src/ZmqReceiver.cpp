@@ -84,7 +84,10 @@ shared_ptr<char> ZmqReceiver::get_value_from_json(const pt::ptree& json_header, 
     } else if (type == "uint32") {
         return shared_ptr<char>(reinterpret_cast<char*>(new uint32_t(json_header.get<uint32_t>(name))));
 
-    }if (type == "int8") {
+    } else if (type == "uint64") {
+        return shared_ptr<char>(reinterpret_cast<char*>(new uint64_t(json_header.get<uint64_t>(name))));
+
+    } else if (type == "int8") {
         return shared_ptr<char>(reinterpret_cast<char*>(new int8_t(json_header.get<int8_t>(name))));
         
     } else if (type == "int16") {
@@ -92,7 +95,10 @@ shared_ptr<char> ZmqReceiver::get_value_from_json(const pt::ptree& json_header, 
 
     } else if (type == "int32") {
         return shared_ptr<char>(reinterpret_cast<char*>(new int32_t(json_header.get<int32_t>(name))));
-
+    
+    } else if (type == "int64") {
+        return shared_ptr<char>(reinterpret_cast<char*>(new int64_t(json_header.get<uint32_t>(name))));
+    
     } else if (type == "float32") {
         return shared_ptr<char>(reinterpret_cast<char*>(new float(json_header.get<float>(name))));
 
