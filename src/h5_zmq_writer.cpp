@@ -2,8 +2,10 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "config.hpp"
 #include "ProcessManager.hpp"
 #include "WriterManager.hpp"
+#include "ZmqReceiver.hpp"
 #include "format/NXmxFormat.cpp"
 
 int main (int argc, char *argv[])
@@ -44,6 +46,10 @@ int main (int argc, char *argv[])
     WriterManager manager(format.get_input_value_type(), output_file, n_frames);
 
     string connect_address = string(argv[1]);
+    int n_io_threads = config::zmq_n_io_threads;
+    int receive_timeout = config::zmq_receive_timeout;
+    ZmqReceiver receiver(connect_address, n_io_threads, receive_timeout);
+
     int rest_port = atoi(argv[4]);
 
     ProcessManager::run_writer(manager, format, connect_address, rest_port);
