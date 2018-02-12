@@ -89,7 +89,7 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
 void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, RingBuffer& ring_buffer,
     const unordered_map<string, string>& header_values_type)
 {
-    H5Writer writer(manager.get_output_file());
+    H5Writer writer(manager.get_output_file(), 0, config::initial_dataset_size, config::dataset_increase_step);
     auto raw_frames_dataset_name = format.get_raw_frames_dataset_name();
     
     // Run until the running flag is set or the ring_buffer is empty.  
