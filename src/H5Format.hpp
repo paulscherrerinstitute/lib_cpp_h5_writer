@@ -93,7 +93,7 @@ class H5Format
 
         virtual const std::unordered_map<std::string, boost::any>& get_default_values() const = 0;
 
-        virtual const h5_group& get_format_definition() const = 0;
+        virtual const h5_parent& get_format_definition() const = 0;
 
         virtual void add_calculated_values(std::unordered_map<std::string, boost::any>& values) const = 0;
 

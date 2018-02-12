@@ -15,7 +15,7 @@ class NXmxFormat : public H5Format
     shared_ptr<unordered_map<string, DATA_TYPE>> input_value_type = NULL;
     shared_ptr<unordered_map<string, boost::any>> default_values = NULL;
     shared_ptr<unordered_map<string, std::string>> dataset_move_mapping = NULL;
-    shared_ptr<h5_group> file_format = NULL;
+    shared_ptr<h5_parent> file_format = NULL;
 
     public:
         ~NXmxFormat(){};
@@ -904,7 +904,7 @@ class NXmxFormat : public H5Format
             }));
         }
 
-        const h5_group& get_format_definition() const override {
+        const h5_parent& get_format_definition() const override {
             return *file_format;
         }
 
