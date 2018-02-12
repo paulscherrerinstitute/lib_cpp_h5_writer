@@ -91,6 +91,21 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
 {
     H5Writer writer(manager.get_output_file(), 0, config::initial_dataset_size, config::dataset_increase_step);
     auto raw_frames_dataset_name = format.get_raw_frames_dataset_name();
+
+    // Mapping for header values.
+    // TODO: This should be moved into future PROTOCOL FORMAT file.
+    std::unordered_map<std::string, int> type_to_size_mapping {
+        {"uint8", 1},
+        {"uint16", 2},
+        {"uint32", 4},
+        {"uint64", 8},
+        {"int8", 1},
+        {"int16", 2},
+        {"int32", 4},
+        {"int64", 8},
+        {"float32", 4},
+        {"float64", 8},
+    };
     
     // Run until the running flag is set or the ring_buffer is empty.  
     while(manager.is_running() || !ring_buffer.is_empty()) {
@@ -125,13 +140,18 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
 
             auto value = received_data.first->header_values.at(name);
 
+            // Header data are fixed to scalars in little endian.
+            vector<size_t> value_shape = {1};
+            auto endianness = "little";
+            auto value_bytes_size = type_to_size_mapping.at(type);
+
             writer.write_data(name,
                               received_data.first->frame_index,
                               value.get(),
-                              {1},
-                              4,
+                              value_shape,
+                              value_bytes_size,
                               type,
-                              "little");
+                              endianness);
         }
 
         manager.written_frame(received_data.first->frame_index);
