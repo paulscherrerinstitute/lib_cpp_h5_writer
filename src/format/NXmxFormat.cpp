@@ -11,8 +11,8 @@ using s_ptr = shared_ptr<h5_base>;
 
 class NXmxFormat : public H5Format
 {
-    shared_ptr<map<string, DATA_TYPE>> input_value_type = NULL;
-    shared_ptr<map<string, boost::any>> default_values = NULL;
+    shared_ptr<unordered_map<string, DATA_TYPE>> input_value_type = NULL;
+    shared_ptr<unordered_map<string, boost::any>> default_values = NULL;
     shared_ptr<h5_group> file_format = NULL;
 
     public:
@@ -23,7 +23,7 @@ class NXmxFormat : public H5Format
             // Input values definition type. 
             // Which type should be the parameters you receive over the REST api.
             input_value_type.reset(
-            new map<string, DATA_TYPE>({
+            new unordered_map<string, DATA_TYPE>({
                 {"sl2wv", NX_FLOAT},
                 {"sl0ch", NX_FLOAT},
                 {"sl2wh", NX_FLOAT},
@@ -94,7 +94,7 @@ class NXmxFormat : public H5Format
             }));
 
             // Default values used in the file format.
-            default_values.reset(new std::map<string, boost::any>(
+            default_values.reset(new std::unordered_map<string, boost::any>(
             {    
                 {"filter_set/description", "The filter set consists of 4 linear stages, each with five filter positions. Additionally each one allows for an out position to allow no filtering."},
                 {"XBPM4/calibration_date", "???"},
@@ -905,12 +905,12 @@ class NXmxFormat : public H5Format
             return *file_format;
         }
 
-        const map<string, boost::any>& get_default_values() const override {
+        const unordered_map<string, boost::any>& get_default_values() const override {
             return *default_values;
         }
 
-        void add_calculated_values(map<string, boost::any>& values) const override {
-            map<string, string> input_mapping = {
+        void add_calculated_values(unordered_map<string, boost::any>& values) const override {
+            unordered_map<string, string> input_mapping = {
                 {"source/distance", "input/samz"},
                 {"slit_0/distance", "input/samz"},
                 {"slit_1/distance", "input/samz"},
@@ -924,7 +924,7 @@ class NXmxFormat : public H5Format
                 {"filter_set/attenuator_transmission", "input/ftrans"},
             };
             
-            map<string, function<double(double)>> functions = {
+            unordered_map<string, function<double(double)>> functions = {
                 {"source/distance", [](double x) -> double { return -33800 - x;}},
                 {"slit_0/distance", [](double x) -> double { return -33800 + 12100 - x;}},
                 {"slit_1/distance", [](double x) -> double { return -33800 + 26000 - x;}},
@@ -969,8 +969,9 @@ class NXmxFormat : public H5Format
             }
         }
 
-        void add_input_values(map<string, boost::any>& values, const map<string, boost::any>& input_values) const override {
-            map<string, list<string>> input_mapping = {
+        void add_input_values(unordered_map<string, boost::any>& values, 
+            const unordered_map<string, boost::any>& input_values) const override {
+            unordered_map<string, list<string>> input_mapping = {
                 {"sl2wv", {"slit_2/y_gap"}},
                 {"sl0ch", {"slit_0/x_translation"}},
                 {"sl2wh", {"slit_2/x_gap"}},
@@ -1047,7 +1048,7 @@ class NXmxFormat : public H5Format
             }
         }
 
-        const std::map<string, DATA_TYPE>& get_input_value_type() const override {
+        const std::unordered_map<string, DATA_TYPE>& get_input_value_type() const override {
             return *input_value_type;
         }
 

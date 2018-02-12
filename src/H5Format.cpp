@@ -58,7 +58,8 @@ H5::Group H5FormatUtils::create_group(H5::Group& target, const string& name)
     return target.createGroup(name.c_str());
 }
 
-const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_name, const boost::any& value_reference, const map<string, boost::any>& values)
+const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_name, 
+    const boost::any& value_reference, const unordered_map<string, boost::any>& values)
 {
     try {
         auto reference_string = boost::any_cast<string>(value_reference);
@@ -78,7 +79,8 @@ const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_
 
     } catch (const out_of_range& exception){
         stringstream error_message;
-        error_message << "Dataset " << dataset_name << " value reference " << boost::any_cast<string>(value_reference) << " not present in values map." << endl;
+        error_message << "Dataset " << dataset_name << " value reference " << boost::any_cast<string>(value_reference);
+        error_message << " not present in values map." << endl;
 
         throw runtime_error(error_message.str());
     }
@@ -123,7 +125,8 @@ const H5::PredType& H5FormatUtils::get_dataset_data_type(const string& type)
     }
 }
 
-H5::DataSet H5FormatUtils::write_dataset(H5::Group& target, const h5_dataset& dataset, const map<string, boost::any>& values)
+H5::DataSet H5FormatUtils::write_dataset(H5::Group& target, const h5_dataset& dataset, 
+    const unordered_map<string, boost::any>& values)
 {
     const string& name = dataset.name;
     boost::any value;
@@ -232,7 +235,8 @@ void H5FormatUtils::write_attribute(H5::H5Object& target, const string& name, in
     h5_attribute.write(data_type, &value);
 }
 
-void H5FormatUtils::write_attribute(H5::H5Object& target, const h5_attr& attribute, const map<string, boost::any>& values) 
+void H5FormatUtils::write_attribute(H5::H5Object& target, const h5_attr& attribute, 
+    const unordered_map<string, boost::any>& values) 
 {
     string name = attribute.name;
     boost::any value;
@@ -278,7 +282,8 @@ void H5FormatUtils::write_attribute(H5::H5Object& target, const h5_attr& attribu
     }
 }
 
-void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& format_node, const std::map<std::string, h5_value>& values) 
+void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& format_node, 
+    const std::unordered_map<std::string, h5_value>& values) 
 {
     H5::Group node_group = file_node;
 
@@ -322,12 +327,13 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
     }
 }
 
-void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format, const std::map<std::string, h5_value>& input_values)
+void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format, 
+    const std::unordered_map<std::string, h5_value>& input_values)
 {
     auto format_definition = format.get_format_definition();
     auto default_values = format.get_default_values();
 
-    map<string, boost::any> format_values(default_values);
+    auto format_values(default_values);
     
     format.add_input_values(format_values, input_values);
     format.add_calculated_values(format_values);

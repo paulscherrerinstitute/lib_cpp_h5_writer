@@ -5,9 +5,10 @@
 
 using namespace std;
 
-WriterManager::WriterManager(const map<string, DATA_TYPE>& parameters_type, const string& output_file, uint64_t n_frames):
-    parameters_type(parameters_type), output_file(output_file), n_frames(n_frames), running_flag(true), killed_flag(false), 
-    n_received_frames(0), n_written_frames(0), n_lost_frames(0)
+WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type, 
+    const string& output_file, uint64_t n_frames):
+        parameters_type(parameters_type), output_file(output_file), n_frames(n_frames), 
+        running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0), n_lost_frames(0)
 {
     #ifdef DEBUG_OUTPUT
         cout << "[WriterManager::WriterManager] Writer manager for n_frames " << n_frames << endl;
@@ -54,9 +55,9 @@ string WriterManager::get_output_file() const
     return output_file;
 }
 
-map<string, uint64_t> WriterManager::get_statistics() const
+unordered_map<string, uint64_t> WriterManager::get_statistics() const
 {
-    map<string, uint64_t> result = {{"n_received_frames", n_received_frames.load()},
+    unordered_map<string, uint64_t> result = {{"n_received_frames", n_received_frames.load()},
                                     {"n_written_frames", n_written_frames.load()},
                                     {"n_lost_frames", n_lost_frames.load()},
                                     {"total_expected_frames", n_frames}};
@@ -64,14 +65,14 @@ map<string, uint64_t> WriterManager::get_statistics() const
     return result;
 }
 
-map<string, boost::any> WriterManager::get_parameters()
+unordered_map<string, boost::any> WriterManager::get_parameters()
 {
     lock_guard<mutex> lock(parameters_mutex);
 
     return parameters;
 }
 
-void WriterManager::set_parameters(const map<string, boost::any>& new_parameters)
+void WriterManager::set_parameters(const unordered_map<string, boost::any>& new_parameters)
 {
     lock_guard<mutex> lock(parameters_mutex);
 
@@ -96,7 +97,7 @@ void WriterManager::set_parameters(const map<string, boost::any>& new_parameters
     #endif
 }
 
-const map<string, DATA_TYPE>& WriterManager::get_parameters_type() const
+const unordered_map<string, DATA_TYPE>& WriterManager::get_parameters_type() const
 {
     return parameters_type;
 }

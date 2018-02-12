@@ -3,7 +3,7 @@
 
 #include <string>
 #include <list>
-#include <map>
+#include <unordered_map>
 #include <H5Cpp.h>
 #include <memory>
 #include <tuple>
@@ -89,16 +89,16 @@ class H5Format
     public:
         virtual ~H5Format(){};
 
-        virtual const std::map<std::string, DATA_TYPE>& get_input_value_type() const = 0;
+        virtual const std::unordered_map<std::string, DATA_TYPE>& get_input_value_type() const = 0;
 
-        virtual const std::map<std::string, boost::any>& get_default_values() const = 0;
+        virtual const std::unordered_map<std::string, boost::any>& get_default_values() const = 0;
 
         virtual const h5_group& get_format_definition() const = 0;
 
-        virtual void add_calculated_values(std::map<std::string, boost::any>& values) const = 0;
+        virtual void add_calculated_values(std::unordered_map<std::string, boost::any>& values) const = 0;
 
-        virtual void add_input_values(std::map<std::string, boost::any>& values, 
-            const std::map<std::string, boost::any>& input_values) const = 0;
+        virtual void add_input_values(std::unordered_map<std::string, boost::any>& values, 
+            const std::unordered_map<std::string, boost::any>& input_values) const = 0;
 
         virtual std::string get_frames_dataset_name() const = 0;
 };
@@ -106,24 +106,36 @@ class H5Format
 namespace H5FormatUtils 
 {
     hsize_t expand_dataset(H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
+    
     void compact_dataset(H5::DataSet& dataset, hsize_t max_frame_index);
 
     H5::Group create_group(H5::Group& target, const std::string& name);
     const H5::PredType& get_dataset_data_type(const std::string& type);
 
-    H5::DataSet write_dataset(H5::Group& target, const h5_dataset& dataset, const std::map<std::string, boost::any>& values);
+    H5::DataSet write_dataset(H5::Group& target, const h5_dataset& dataset, 
+        const std::unordered_map<std::string, boost::any>& values);
+
     H5::DataSet write_dataset(H5::Group& target, const std::string& name, double value);
+
     H5::DataSet write_dataset(H5::Group& target, const std::string& name, int value);
+
     H5::DataSet write_dataset(H5::Group& target, const std::string& name, const std::string& value);
 
-    void write_attribute(H5::H5Object& target, const h5_attr& attribute, const std::map<std::string, boost::any>& values);
+    void write_attribute(H5::H5Object& target, const h5_attr& attribute, 
+        const std::unordered_map<std::string, boost::any>& values);
+
     void write_attribute(H5::H5Object& target, const std::string& name, const std::string& value);
+
     void write_attribute(H5::H5Object& target, const std::string& name, int value);
 
-    const boost::any& get_value_from_reference(const std::string& dataset_name, const boost::any& value_reference, const std::map<std::string, boost::any>& values);
+    const boost::any& get_value_from_reference(const std::string& dataset_name, 
+        const boost::any& value_reference, const std::unordered_map<std::string, boost::any>& values);
 
-    void write_format_data(H5::Group& file_node, const h5_parent& format_node, const std::map<std::string, h5_value>& values);
-    void write_format(H5::H5File& file, const H5Format& format, const std::map<std::string, h5_value>& input_values);
+    void write_format_data(H5::Group& file_node, const h5_parent& format_node, 
+        const std::unordered_map<std::string, h5_value>& values);
+
+    void write_format(H5::H5File& file, const H5Format& format, 
+        const std::unordered_map<std::string, h5_value>& input_values);
 };
 
 #endif

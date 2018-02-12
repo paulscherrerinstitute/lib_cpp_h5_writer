@@ -97,7 +97,7 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
             return result;
         } else {
             auto request_parameters = crow::json::load(req.body);
-            std::map<std::string, boost::any> new_parameters;
+            std::unordered_map<std::string, boost::any> new_parameters;
 
             for (const auto& item : request_parameters) {
                 string parameter_name = item.key();
