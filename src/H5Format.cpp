@@ -106,7 +106,7 @@ const H5::PredType& H5FormatUtils::get_dataset_data_type(const string& type)
     } else {
         // We cannot really convert this attribute.
         stringstream error_message;
-        error_message << "Unsupported array data_type " << type << endl;
+        error_message << "[H5FormatUtils::get_dataset_data_type] Unsupported array data_type " << type << endl;
 
         throw runtime_error(error_message.str());
     }
