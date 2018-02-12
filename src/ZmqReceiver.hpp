@@ -39,7 +39,7 @@ class ZmqReceiver
 
         std::pair<std::shared_ptr<FrameMetadata>, char*> receive();
 
-        const auto get_header_values_type() const;
+        const std::shared_ptr<std::unordered_map<std::string, std::string>> get_header_values_type() const;
 
 };
 
