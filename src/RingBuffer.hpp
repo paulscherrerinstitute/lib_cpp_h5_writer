@@ -22,7 +22,7 @@ struct FrameMetadata
     std::vector<size_t> frame_shape;
 
     // Pass additional header values.
-    std::map<std::string, boost::any> header_values;
+    std::map<std::string, std::shared_ptr<boost::any>> header_values;
 };
 
 class RingBuffer

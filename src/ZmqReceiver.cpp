@@ -127,7 +127,7 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
         
         const auto& name = value_mapping.first;
         const auto& data_type = value_mapping.second;
-        const boost::any& value = get_value_from_json(json_header, name, data_type);
+        auto value = make_shared<boost::any>(get_value_from_json(json_header, name, data_type));
 
         header_data->header_values.insert(
             {name, value}
