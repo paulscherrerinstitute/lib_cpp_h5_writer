@@ -43,6 +43,7 @@ int main (int argc, char *argv[])
     string output_file = string(argv[2]);
 
     NXmxFormat format;
+    
     WriterManager manager(format.get_input_value_type(), output_file, n_frames);
 
     string connect_address = string(argv[1]);
@@ -52,7 +53,7 @@ int main (int argc, char *argv[])
 
     int rest_port = atoi(argv[4]);
 
-    ProcessManager::run_writer(manager, format, connect_address, rest_port);
+    ProcessManager::run_writer(manager, format, receiver, rest_port);
 
     return 0;
 }
