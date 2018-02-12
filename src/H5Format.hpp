@@ -1,5 +1,5 @@
-#ifndef H5_FILE_FORMAT_H
-#define H5_FILE_FORMAT_H
+#ifndef H5FORMAT_H
+#define H5FORMAT_H
 
 #include <string>
 #include <list>

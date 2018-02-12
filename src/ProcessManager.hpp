@@ -1,3 +1,6 @@
+#ifndef PROCESSMANAGER_H
+#define PROCESSMANAGER_H
+
 #include "WriterManager.hpp"
 #include "H5Format.hpp"
 #include "RingBuffer.hpp"
@@ -11,3 +14,5 @@ namespace ProcessManager
 
     void write_h5(WriterManager& manager, const H5Format& format, RingBuffer& ring_buffer);
 };
+
+#endif

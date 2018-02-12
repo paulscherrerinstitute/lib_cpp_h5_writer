@@ -1,5 +1,5 @@
-#ifndef REST_INTERFACE_H
-#define REST_INTERFACE_H
+#ifndef RESTAPI_H
+#define RESTAPI_H
 
 #include "WriterManager.hpp"
 
