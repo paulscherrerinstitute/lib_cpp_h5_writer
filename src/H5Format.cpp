@@ -10,10 +10,12 @@ using namespace std;
 
 hsize_t H5FormatUtils::expand_dataset(H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step)
 {
-    hsize_t dataset_rank = 3;
+    const auto& data_space = dataset.getSpace();
+
+    int dataset_rank = data_space.getSimpleExtentNdims();
     hsize_t dataset_dimension[dataset_rank];
 
-    dataset.getSpace().getSimpleExtentDims(dataset_dimension);
+    data_space.getSimpleExtentDims(dataset_dimension);
     dataset_dimension[0] = frame_index + dataset_increase_step;
 
     #ifdef DEBUG_OUTPUT
@@ -31,10 +33,12 @@ hsize_t H5FormatUtils::expand_dataset(H5::DataSet& dataset, hsize_t frame_index,
 
 void H5FormatUtils::compact_dataset(H5::DataSet& dataset, hsize_t max_frame_index)
 {
-    hsize_t dataset_rank = 3;
+    const auto& data_space = dataset.getSpace();
+
+    int dataset_rank = data_space.getSimpleExtentNdims();
     hsize_t dataset_dimension[dataset_rank];
 
-    dataset.getSpace().getSimpleExtentDims(dataset_dimension);
+    data_space.getSimpleExtentDims(dataset_dimension);
     dataset_dimension[0] = max_frame_index + 1;
 
     #ifdef DEBUG_OUTPUT
