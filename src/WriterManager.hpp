@@ -32,16 +32,16 @@ class WriterManager
         void stop();
         void kill();
         bool is_running();
-        bool is_killed();
+        bool is_killed() const;
         std::string get_status();
         bool are_all_parameters_set();
-        std::string get_output_file();
+        std::string get_output_file() const;
 
-        const std::map<std::string, DATA_TYPE>& get_parameters_type();
+        const std::map<std::string, DATA_TYPE>& get_parameters_type() const;
         std::map<std::string, boost::any> get_parameters();
         void set_parameters(const std::map<std::string, boost::any>& new_parameters);
         
-        std::map<std::string, uint64_t> get_statistics();
+        std::map<std::string, uint64_t> get_statistics() const;
         void received_frame(size_t frame_index);
         void written_frame(size_t frame_index);
         void lost_frame(size_t frame_index);

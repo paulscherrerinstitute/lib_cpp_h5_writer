@@ -195,7 +195,7 @@ void H5Writer::create_file(hsize_t frame_chunk)
     current_frame_chunk = frame_chunk;
 }
 
-bool H5Writer::is_file_open() 
+bool H5Writer::is_file_open() const
 {
     return (file.getId() != -1);
 }

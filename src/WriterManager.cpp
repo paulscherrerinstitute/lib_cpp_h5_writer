@@ -49,12 +49,12 @@ string WriterManager::get_status()
     }
 }
 
-string WriterManager::get_output_file()
+string WriterManager::get_output_file() const
 {
     return output_file;
 }
 
-map<string, uint64_t> WriterManager::get_statistics()
+map<string, uint64_t> WriterManager::get_statistics() const
 {
     map<string, uint64_t> result = {{"n_received_frames", n_received_frames.load()},
                                     {"n_written_frames", n_written_frames.load()},
@@ -96,7 +96,7 @@ void WriterManager::set_parameters(const map<string, boost::any>& new_parameters
     #endif
 }
 
-const map<string, DATA_TYPE>& WriterManager::get_parameters_type() 
+const map<string, DATA_TYPE>& WriterManager::get_parameters_type() const
 {
     return parameters_type;
 }
@@ -111,7 +111,7 @@ bool WriterManager::is_running()
     return running_flag.load();
 }
 
-bool WriterManager::is_killed()
+bool WriterManager::is_killed() const
 {
     return killed_flag.load();
 }
@@ -131,7 +131,7 @@ void WriterManager::lost_frame(size_t frame_index)
     n_lost_frames++;
 }
 
-bool WriterManager::are_all_parameters_set() 
+bool WriterManager::are_all_parameters_set()
 {
     lock_guard<mutex> lock(parameters_mutex);
 

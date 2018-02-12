@@ -33,7 +33,7 @@ class H5Writer
     public:
         H5Writer(const std::string& filename, hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
         virtual ~H5Writer();
-        bool is_file_open();
+        bool is_file_open() const;
         void close_file();
         void write_data(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
             const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
