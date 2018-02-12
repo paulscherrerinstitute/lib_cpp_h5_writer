@@ -136,3 +136,7 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
 
     return header_data;
 }
+
+const std::shared_ptr<std::unordered_map<std::string, HEADER_DATA_TYPE>> ZmqReceiver::get_header_values_type() const{
+    return header_values_type;
+}
