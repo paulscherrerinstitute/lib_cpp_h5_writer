@@ -29,7 +29,7 @@ void ProcessManager::run_writer(WriterManager& manager, const H5Format& format,
     boost::thread receiver_thread(receive_zmq, boost::ref(manager), boost::ref(ring_buffer), 
         boost::ref(receiver), boost::ref(format));
     boost::thread writer_thread(write_h5, boost::ref(manager), 
-        boost::ref(format), boost::ref(ring_buffer));
+        boost::ref(format), boost::ref(ring_buffer), boost::ref(*receiver.get_header_values_type()));
 
     RestApi::start_rest_api(manager, rest_port);
 
@@ -86,7 +86,8 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
     #endif
 }
 
-void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, RingBuffer& ring_buffer)
+void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, RingBuffer& ring_buffer,
+    const unordered_map<string, string>& header_values_type)
 {
     H5Writer writer(manager.get_output_file());
     auto raw_frames_dataset_name = format.get_raw_frames_dataset_name();
@@ -116,6 +117,22 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
                           received_data.first->endianness);
 
         ring_buffer.release(received_data.first->buffer_slot_index);
+
+        // Write image metadata.
+        for (const auto& header_type : header_values_type) {
+            auto& name = header_type.first;
+            auto& type = header_type.second;
+
+            auto value = received_data.first->header_values.at(name);
+
+            writer.write_data(name,
+                              received_data.first->frame_index,
+                              value.get(),
+                              {1},
+                              4,
+                              type,
+                              "little");
+        }
 
         manager.written_frame(received_data.first->frame_index);
     }
