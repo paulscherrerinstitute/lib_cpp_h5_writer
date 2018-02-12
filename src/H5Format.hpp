@@ -6,21 +6,8 @@
 #include <map>
 #include <H5Cpp.h>
 #include <memory>
+#include <tuple>
 #include <boost/any.hpp>
-
-enum HEADER_DATA_TYPE
-{
-    UINT8,
-    UINT16,
-    UINT32,
-    UINT64,
-    INT8,
-    INT16,
-    INT32,
-    INT64,
-    FLOAT32,
-    FLOAT64
-};
 
 typedef boost::any h5_value;
 
@@ -59,7 +46,9 @@ struct h5_base
 struct h5_data_base
 {
     h5_data_base(DATA_TYPE data_type, DATA_LOCATION data_location) : data_type(data_type), data_location(data_location) {};
+    
     virtual ~h5_data_base(){}
+
     DATA_TYPE data_type;
     DATA_LOCATION data_location;
 };
@@ -68,6 +57,7 @@ struct h5_parent: public h5_base
 {
     h5_parent(const std::string& name, NODE_TYPE node_type, const std::list<std::shared_ptr<h5_base>>& items) : 
         h5_base(name, node_type), items(items) {};
+
     std::list<std::shared_ptr<h5_base>> items;
 };
 
@@ -89,6 +79,7 @@ struct h5_attr : public h5_base, public h5_data_base
 {
     h5_attr(const std::string& name, const h5_value& value, DATA_TYPE data_types, DATA_LOCATION data_location=IMMEDIATE)
         : h5_base(name, ATTRIBUTE), h5_data_base(data_types, data_location), value(value){};
+
     h5_value value;
 };
 
@@ -98,14 +89,18 @@ class H5Format
         virtual ~H5Format(){};
 
         virtual const std::map<std::string, DATA_TYPE>& get_input_value_type() const = 0;
+
         virtual const std::map<std::string, boost::any>& get_default_values() const = 0;
+
         virtual const h5_group& get_format_definition() const = 0;
-        virtual const std::map<std::string, HEADER_DATA_TYPE>& get_header_value_type() const = 0;
 
         virtual void add_calculated_values(std::map<std::string, boost::any>& values) const = 0;
-        virtual void add_input_values(std::map<std::string, boost::any>& values, const std::map<std::string, boost::any>& input_values) const = 0;
+
+        virtual void add_input_values(std::map<std::string, boost::any>& values, 
+            const std::map<std::string, boost::any>& input_values) const = 0;
         
         virtual std::string get_raw_frames_dataset_name() const = 0;
+
         virtual std::string get_frames_dataset_name() const = 0;
 };
 
