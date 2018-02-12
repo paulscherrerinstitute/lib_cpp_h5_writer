@@ -51,6 +51,8 @@ void ProcessManager::run_writer(WriterManager& manager, const H5Format& format,
 void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer,
     ZmqReceiver& receiver, const H5Format& format)
 {
+    receiver.connect();
+
     while (manager.is_running()) {
         
         auto frame = receiver.receive();
