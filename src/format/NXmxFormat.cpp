@@ -897,11 +897,6 @@ class NXmxFormat : public H5Format
             }));
         }
 
-
-        string get_raw_frames_dataset_name() const override {
-            return "raw_data";
-        }
-
         string get_frames_dataset_name() const override {
             return "entry/plottable_data/data";
         }

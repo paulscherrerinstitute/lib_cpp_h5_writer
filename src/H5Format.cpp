@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <iostream>
 
+#include "config.hpp"
 #include "H5Format.hpp"
 
 using namespace std;
@@ -329,5 +330,5 @@ void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format, const
     
     write_format_data(file, format_definition, format_values);
 
-    file.move(format.get_raw_frames_dataset_name().c_str(), format.get_frames_dataset_name().c_str());
+    file.move(config::raw_image_dataset_name.c_str(), format.get_frames_dataset_name().c_str());
 }

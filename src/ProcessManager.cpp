@@ -90,7 +90,7 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
     const unordered_map<string, string>& header_values_type)
 {
     H5Writer writer(manager.get_output_file(), 0, config::initial_dataset_size, config::dataset_increase_step);
-    auto raw_frames_dataset_name = format.get_raw_frames_dataset_name();
+    auto raw_frames_dataset_name = config::raw_image_dataset_name;
 
     // Mapping for header values.
     // TODO: This should be moved into future PROTOCOL FORMAT file.

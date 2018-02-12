@@ -98,8 +98,6 @@ class H5Format
 
         virtual void add_input_values(std::map<std::string, boost::any>& values, 
             const std::map<std::string, boost::any>& input_values) const = 0;
-        
-        virtual std::string get_raw_frames_dataset_name() const = 0;
 
         virtual std::string get_frames_dataset_name() const = 0;
 };
