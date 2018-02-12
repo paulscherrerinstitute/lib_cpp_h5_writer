@@ -20,7 +20,7 @@ hsize_t H5FormatUtils::expand_dataset(H5::DataSet& dataset, hsize_t frame_index,
 
     #ifdef DEBUG_OUTPUT
         cout << "[H5FormatUtils::expand_dataset] Expanding dataspace to size (";
-        for (hsize_t i=0; i<dataset_rank; ++i) {
+        for (int i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
         }
         cout << ")" << endl;
@@ -43,7 +43,7 @@ void H5FormatUtils::compact_dataset(H5::DataSet& dataset, hsize_t max_frame_inde
 
     #ifdef DEBUG_OUTPUT
         cout << "[H5FormatUtils::compact_dataset] Compacting dataspace to size (";
-        for (hsize_t i=0; i<dataset_rank; ++i) {
+        for (int i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
         }
         cout << ")" << endl;
