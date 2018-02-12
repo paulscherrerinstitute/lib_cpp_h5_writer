@@ -88,7 +88,6 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
 {
     H5Writer writer(manager.get_output_file());
     auto raw_frames_dataset_name = format.get_raw_frames_dataset_name();
-    const auto& header_value_type = format.get_header_value_type();
     
     // Run until the running flag is set or the ring_buffer is empty.  
     while(manager.is_running() || !ring_buffer.is_empty()) {
