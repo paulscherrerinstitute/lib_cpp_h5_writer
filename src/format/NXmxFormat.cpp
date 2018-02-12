@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 
+#include "../config.hpp"
 #include "../H5Format.hpp"
 
 using namespace std;
@@ -13,6 +14,7 @@ class NXmxFormat : public H5Format
 {
     shared_ptr<unordered_map<string, DATA_TYPE>> input_value_type = NULL;
     shared_ptr<unordered_map<string, boost::any>> default_values = NULL;
+    shared_ptr<unordered_map<string, std::string>> dataset_move_mapping = NULL;
     shared_ptr<h5_group> file_format = NULL;
 
     public:
@@ -91,6 +93,11 @@ class NXmxFormat : public H5Format
                 {"bpm6x", NX_FLOAT},
                 {"ftrans", NX_FLOAT},
                 {"samz", NX_FLOAT},
+            }));
+
+            dataset_move_mapping.reset(new std::unordered_map<string, string>(
+            {
+                {config::raw_image_dataset_name, "entry/plottable_data/image"},
             }));
 
             // Default values used in the file format.
@@ -897,10 +904,6 @@ class NXmxFormat : public H5Format
             }));
         }
 
-        string get_frames_dataset_name() const override {
-            return "entry/plottable_data/data";
-        }
-
         const h5_group& get_format_definition() const override {
             return *file_format;
         }
@@ -1050,6 +1053,10 @@ class NXmxFormat : public H5Format
 
         const std::unordered_map<string, DATA_TYPE>& get_input_value_type() const override {
             return *input_value_type;
+        }
+
+        const unordered_map<string, string>& get_dataset_move_mapping() const override {
+            return *dataset_move_mapping;
         }
 
 };

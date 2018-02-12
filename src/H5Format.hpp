@@ -100,13 +100,13 @@ class H5Format
         virtual void add_input_values(std::unordered_map<std::string, boost::any>& values, 
             const std::unordered_map<std::string, boost::any>& input_values) const = 0;
 
-        virtual std::string get_frames_dataset_name() const = 0;
+        virtual const std::unordered_map<std::string, std::string>& get_dataset_move_mapping() const = 0;
 };
 
 namespace H5FormatUtils 
 {
     hsize_t expand_dataset(H5::DataSet& dataset, hsize_t frame_index, hsize_t dataset_increase_step);
-    
+
     void compact_dataset(H5::DataSet& dataset, hsize_t max_frame_index);
 
     H5::Group create_group(H5::Group& target, const std::string& name);

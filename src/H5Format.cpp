@@ -340,5 +340,7 @@ void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format,
     
     write_format_data(file, format_definition, format_values);
 
-    file.move(config::raw_image_dataset_name.c_str(), format.get_frames_dataset_name().c_str());
+    for (const auto& mapping : format.get_dataset_move_mapping()) {
+        file.move(mapping.first.c_str(), mapping.second.c_str());
+    }
 }
