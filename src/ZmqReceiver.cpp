@@ -23,8 +23,8 @@ ZmqReceiver::ZmqReceiver(const std::string& connect_address, const int n_io_thre
     message_data = zmq::message_t(config::zmq_buffer_size_data);
 
     header_values_type.reset(
-        new unordered_map<string, HEADER_DATA_TYPE>({
-            {"pulse_id", UINT64 },
+        new unordered_map<string, string>({
+            {"pulse_id", "uint64"},
         }));
 }
 
@@ -62,7 +62,7 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
 
     // Get the message data.
     if (!receiver->recv(&message_data)) {
-        cout << "[ZmqReceiver::receive] ERROR: Error while reading from ZMQ. Frame index " << frame_metadata->frame_index << " lost."; 
+        cout << "[ZmqReceiver::receive] Error while reading from ZMQ. Frame index " << frame_metadata->frame_index << " lost."; 
         cout << " Trying to continue with the next frame." << endl;\
 
         return {NULL, NULL};
@@ -73,34 +73,38 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
     return {frame_metadata, static_cast<char*>(message_data.data())};
 }
 
-boost::any ZmqReceiver::get_value_from_json(const pt::ptree& json_header, const string& value_name, const HEADER_DATA_TYPE data_type)
+shared_ptr<char> ZmqReceiver::get_value_from_json(const pt::ptree& json_header, const string& name, const string& type)
 {
-    switch(data_type) {
-        case UINT8 : 
-            return json_header.get<uint8_t>(value_name);
-        case UINT16 : 
-            return json_header.get<uint16_t>(value_name);
-        case UINT32 : 
-            return json_header.get<uint32_t>(value_name);
-        case UINT64 : 
-            return json_header.get<uint64_t>(value_name);
-        case INT8 : 
-            return json_header.get<int8_t>(value_name);
-        case INT16 : 
-            return json_header.get<int16_t>(value_name);
-        case INT32 : 
-            return json_header.get<int32_t>(value_name);
-        case INT64 : 
-            return json_header.get<int64_t>(value_name);
-        case FLOAT32 :
-            return json_header.get<float>(value_name);
-        case FLOAT64 :
-            return json_header.get<double>(value_name);
-        default:
-            stringstream error_message;
-            error_message << "[ZmqReceiver::get_value_from_json] Unknown value type for header value " << value_name << endl;
+    if (type == "uint8") {
+        return shared_ptr<char>(reinterpret_cast<char*>(new uint8_t(json_header.get<uint8_t>(name))));
 
-            throw runtime_error(error_message.str());
+    } else if (type == "uint16") {
+        return shared_ptr<char>(reinterpret_cast<char*>(new uint16_t(json_header.get<uint16_t>(name))));
+
+    } else if (type == "uint32") {
+        return shared_ptr<char>(reinterpret_cast<char*>(new uint32_t(json_header.get<uint32_t>(name))));
+
+    }if (type == "int8") {
+        return shared_ptr<char>(reinterpret_cast<char*>(new int8_t(json_header.get<int8_t>(name))));
+        
+    } else if (type == "int16") {
+        return shared_ptr<char>(reinterpret_cast<char*>(new int16_t(json_header.get<int16_t>(name))));
+
+    } else if (type == "int32") {
+        return shared_ptr<char>(reinterpret_cast<char*>(new int32_t(json_header.get<int32_t>(name))));
+
+    } else if (type == "float32") {
+        return shared_ptr<char>(reinterpret_cast<char*>(new float(json_header.get<float>(name))));
+
+    } else if (type == "float64") {
+        return shared_ptr<char>(reinterpret_cast<char*>(new double(json_header.get<double>(name))));
+
+    } else {
+        // We cannot really convert this attribute.
+        stringstream error_message;
+        error_message << "[ZmqReceiver::get_value_from_json] Unsupported header data type " << type << endl;
+
+        throw runtime_error(error_message.str());
     }
 }
 
@@ -126,8 +130,9 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
     for (const auto& value_mapping : *header_values_type) {
         
         const auto& name = value_mapping.first;
-        const auto& data_type = value_mapping.second;
-        auto value = make_shared<boost::any>(get_value_from_json(json_header, name, data_type));
+        const auto& type = value_mapping.second;
+
+        auto value = get_value_from_json(json_header, name, type);
 
         header_data->header_values.insert(
             {name, value}
@@ -137,6 +142,6 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
     return header_data;
 }
 
-const std::shared_ptr<std::unordered_map<std::string, HEADER_DATA_TYPE>> ZmqReceiver::get_header_values_type() const{
+const auto ZmqReceiver::get_header_values_type() const{
     return header_values_type;
 }
