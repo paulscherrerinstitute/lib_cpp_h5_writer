@@ -13,6 +13,7 @@ typedef boost::any h5_value;
 
 enum NODE_TYPE 
 {
+    EMPTY_ROOT,
     ATTRIBUTE,
     DATASET,
     GROUP
@@ -63,7 +64,7 @@ struct h5_parent: public h5_base
 
 struct h5_group : public h5_parent 
 {
-    h5_group(const std::string& name, const std::list<std::shared_ptr<h5_base>>& items) : 
+    h5_group(const std::string& name, const std::list<std::shared_ptr<h5_base>>& items={}) : 
         h5_parent(name, GROUP, items) {};
 };
 

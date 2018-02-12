@@ -280,7 +280,11 @@ void H5FormatUtils::write_attribute(H5::H5Object& target, const h5_attr& attribu
 
 void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& format_node, const std::map<std::string, h5_value>& values) 
 {
-    auto node_group = H5FormatUtils::create_group(file_node, format_node.name);
+    H5::Group node_group = file_node;
+
+    if (format_node.node_type == GROUP) {
+        node_group = H5FormatUtils::create_group(file_node, format_node.name);
+    }
 
     for (const auto item_ptr : format_node.items) {
         const h5_base& item = *item_ptr;
