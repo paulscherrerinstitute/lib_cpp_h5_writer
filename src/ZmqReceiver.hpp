@@ -31,7 +31,8 @@ class ZmqReceiver
         const std::string& name, const std::string& type);
 
     public:
-        ZmqReceiver(const std::string& connect_address, const int n_io_threads, const int receive_timeout);
+        ZmqReceiver(const std::string& connect_address, const int n_io_threads, const int receive_timeout,
+            std::shared_ptr<std::unordered_map<std::string, std::string>> header_values_type=NULL);
 
         virtual ~ZmqReceiver(){};
 

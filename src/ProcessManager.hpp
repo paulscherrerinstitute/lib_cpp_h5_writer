@@ -13,7 +13,7 @@ namespace ProcessManager
     void receive_zmq(WriterManager& manager, RingBuffer& ring_buffer, ZmqReceiver& receiver, const H5Format& format);
 
     void write_h5(WriterManager& manager, const H5Format& format, RingBuffer& ring_buffer,
-        const std::unordered_map<std::string, std::string>& header_values_type);
+        const std::shared_ptr<std::unordered_map<std::string, std::string>> header_values_type);
 };
 
 #endif

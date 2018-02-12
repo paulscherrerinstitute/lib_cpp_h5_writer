@@ -8,8 +8,11 @@
 using namespace std;
 namespace pt = boost::property_tree;
 
-ZmqReceiver::ZmqReceiver(const std::string& connect_address, const int n_io_threads, const int receive_timeout) :
-    connect_address(connect_address), n_io_threads(n_io_threads), receive_timeout(receive_timeout), receiver(NULL)
+ZmqReceiver::ZmqReceiver(const std::string& connect_address, const int n_io_threads, const int receive_timeout,
+    shared_ptr<unordered_map<string, string>> header_values_type) :
+        connect_address(connect_address), n_io_threads(n_io_threads), 
+        receive_timeout(receive_timeout), receiver(NULL), header_values_type(header_values_type)
+
 {
     #ifdef DEBUG_OUTPUT
         cout << "[ZmqReceiver::ZmqReceiver] Creating ZMQ receiver with";
@@ -21,11 +24,6 @@ ZmqReceiver::ZmqReceiver(const std::string& connect_address, const int n_io_thre
 
     message_header = zmq::message_t(config::zmq_buffer_size_header);
     message_data = zmq::message_t(config::zmq_buffer_size_data);
-
-    header_values_type.reset(
-        new unordered_map<string, string>({
-            {"pulse_id", "uint64"},
-        }));
 }
 
 void ZmqReceiver::connect()
@@ -133,18 +131,20 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
 
     header_data->type = json_header.get<string>("type");
 
-    for (const auto& value_mapping : *header_values_type) {
-        
-        const auto& name = value_mapping.first;
-        const auto& type = value_mapping.second;
+    if (header_values_type) {
+        for (const auto& value_mapping : *header_values_type) {
+            
+            const auto& name = value_mapping.first;
+            const auto& type = value_mapping.second;
 
-        auto value = get_value_from_json(json_header, name, type);
+            auto value = get_value_from_json(json_header, name, type);
 
-        header_data->header_values.insert(
-            {name, value}
-        );
+            header_data->header_values.insert(
+                {name, value}
+            );
+        }
     }
-
+    
     return header_data;
 }
 

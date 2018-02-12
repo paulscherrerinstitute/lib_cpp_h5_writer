@@ -29,7 +29,7 @@ void ProcessManager::run_writer(WriterManager& manager, const H5Format& format,
     boost::thread receiver_thread(receive_zmq, boost::ref(manager), boost::ref(ring_buffer), 
         boost::ref(receiver), boost::ref(format));
     boost::thread writer_thread(write_h5, boost::ref(manager), 
-        boost::ref(format), boost::ref(ring_buffer), boost::ref(*receiver.get_header_values_type()));
+        boost::ref(format), boost::ref(ring_buffer), receiver.get_header_values_type());
 
     RestApi::start_rest_api(manager, rest_port);
 
@@ -87,7 +87,7 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
 }
 
 void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, RingBuffer& ring_buffer,
-    const unordered_map<string, string>& header_values_type)
+    const shared_ptr<unordered_map<string, string>> header_values_type)
 {
     H5Writer writer(manager.get_output_file(), 0, config::initial_dataset_size, config::dataset_increase_step);
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
@@ -133,27 +133,31 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
 
         ring_buffer.release(received_data.first->buffer_slot_index);
 
-        // Write image metadata.
-        for (const auto& header_type : header_values_type) {
-            auto& name = header_type.first;
-            auto& type = header_type.second;
+        // Write image metadata if mapping specified.
+        if (header_values_type) {
 
-            auto value = received_data.first->header_values.at(name);
+            for (const auto& header_type : *header_values_type) {
 
-            // Header data are fixed to scalars in little endian.
-            vector<size_t> value_shape = {1};
-            auto endianness = "little";
-            auto value_bytes_size = type_to_size_mapping.at(type);
+                auto& name = header_type.first;
+                auto& type = header_type.second;
 
-            writer.write_data(name,
-                              received_data.first->frame_index,
-                              value.get(),
-                              value_shape,
-                              value_bytes_size,
-                              type,
-                              endianness);
+                auto value = received_data.first->header_values.at(name);
+
+                // Header data are fixed to scalars in little endian.
+                vector<size_t> value_shape = {1};
+                auto endianness = "little";
+                auto value_bytes_size = type_to_size_mapping.at(type);
+
+                writer.write_data(name,
+                                received_data.first->frame_index,
+                                value.get(),
+                                value_shape,
+                                value_bytes_size,
+                                type,
+                                endianness);
+            }
         }
-
+        
         manager.written_frame(received_data.first->frame_index);
     }
 
