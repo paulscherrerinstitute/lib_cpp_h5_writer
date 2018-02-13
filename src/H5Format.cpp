@@ -285,46 +285,50 @@ void H5FormatUtils::write_attribute(H5::H5Object& target, const h5_attr& attribu
 void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& format_node, 
     const std::unordered_map<std::string, h5_value>& values) 
 {
-    H5::Group node_group = file_node;
+    auto process_items = [&format_node, &values](H5::Group& node_group){
+        for (const auto item_ptr : format_node.items) {
+            const h5_base& item = *item_ptr;
 
-    if (format_node.node_type == GROUP) {
-        node_group = H5FormatUtils::create_group(file_node, format_node.name);
-    }
+            if (item.node_type == GROUP) {
+                auto sub_group = dynamic_cast<const h5_group&>(item); 
 
-    for (const auto item_ptr : format_node.items) {
-        const h5_base& item = *item_ptr;
+                write_format_data(node_group, sub_group, values);
 
-        if (item.node_type == GROUP) {
-            auto sub_group = dynamic_cast<const h5_group&>(item); 
+            } else if (item.node_type == ATTRIBUTE) {
+                auto sub_attribute = dynamic_cast<const h5_attr&>(item);
+                
+                H5FormatUtils::write_attribute(node_group, sub_attribute, values);
 
-            write_format_data(node_group, sub_group, values);
+            } else if (item.node_type == DATASET) {
+                auto sub_dataset = dynamic_cast<const h5_dataset&>(item);
+                auto current_dataset = H5FormatUtils::write_dataset(node_group, sub_dataset, values);
 
-        } else if (item.node_type == ATTRIBUTE) {
-            auto sub_attribute = dynamic_cast<const h5_attr&>(item);
-            
-            H5FormatUtils::write_attribute(node_group, sub_attribute, values);
+                for (const auto dataset_attr_ptr : sub_dataset.items) {
+                    const h5_base& dataset_attr = *dataset_attr_ptr;
 
-        } else if (item.node_type == DATASET) {
-            auto sub_dataset = dynamic_cast<const h5_dataset&>(item);
-            auto current_dataset = H5FormatUtils::write_dataset(node_group, sub_dataset, values);
+                    // You can specify only attributes inside a dataset.
+                    if (dataset_attr.node_type != ATTRIBUTE) {
+                        stringstream error_message;
+                        error_message << "Invalid element " << dataset_attr.name << " on dataset " << sub_dataset.name << ". Only attributes allowd.";
 
-            for (const auto dataset_attr_ptr : sub_dataset.items) {
-                const h5_base& dataset_attr = *dataset_attr_ptr;
+                        throw invalid_argument( error_message.str() );
+                    }
 
-                // You can specify only attributes inside a dataset.
-                if (dataset_attr.node_type != ATTRIBUTE) {
-                    stringstream error_message;
-                    error_message << "Invalid element " << dataset_attr.name << " on dataset " << sub_dataset.name << ". Only attributes allowd.";
+                    auto sub_attribute = dynamic_cast<const h5_attr&>(dataset_attr);
 
-                    throw invalid_argument( error_message.str() );
+                    H5FormatUtils::write_attribute(current_dataset, sub_attribute, values);
                 }
-
-                auto sub_attribute = dynamic_cast<const h5_attr&>(dataset_attr);
-
-                H5FormatUtils::write_attribute(current_dataset, sub_attribute, values);
             }
         }
+    };
+
+    if (format_node.node_type == GROUP) {
+        auto x = H5FormatUtils::create_group(file_node, format_node.name);
+        process_items(x);
+    }else {
+        process_items(file_node);
     }
+    
 }
 
 void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format, 
