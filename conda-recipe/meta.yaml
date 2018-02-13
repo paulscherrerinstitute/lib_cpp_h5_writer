@@ -1,5 +1,5 @@
 package:
-    name: zmq_h5_writer 
+    name: libCppH5Writer 
     version: 0.0.1
 
 build:
@@ -23,5 +23,5 @@ requirements:
 
 
 about:
-    summary: "C++ implementation of a ZMQ to H5 writer."
+    summary: "C++ library for a ZMQ to H5 writer."
 
