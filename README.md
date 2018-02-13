@@ -17,9 +17,9 @@ Key features:
     2. [Local build](#local_build)
 3. [Basic concepts](#basic_concepts)
     1. [ZmqReceiver](#zmq_receiver)
-        [Stream header values](#stream_header_values)
-    2. [H5Writer](#h5_writer)
-    3. [H5Format](#h5_format)
+    2. [Stream header values](#stream_header_values)
+    3. [H5Writer](#h5_writer)
+    4. [H5Format](#h5_format)
 4. [REST interface](#rest_interface)
 5. [Examples](#examples)
 
@@ -120,7 +120,7 @@ class SfFormat: public H5Format
             // No calculated values.
         }
 
-        // This functions adds REST parameters to your H5 variables - the input mapping might not be 1:1.
+        // This functions adds REST parameters to your H5 variables - might not be 1:1.
         // If you need to rename of modify your input variables, do it here.
         void add_input_values(unordered_map<string, boost::any>& values, 
             const unordered_map<string, boost::any>& input_values) const override 
