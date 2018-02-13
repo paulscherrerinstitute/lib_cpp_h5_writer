@@ -1,4 +1,6 @@
 make
 
 cp bin/* ${PREFIX}/lib
-cp src/*.hpp ${PREFIX}/include
+
+mkdir -p ${PREFIX}/include/cpp_h5_writer
+cp src/*.hpp ${PREFIX}/include/cpp_h5_writer

@@ -1,7 +1,6 @@
-# libCppH5Writer
-This is the library used for creating C++ based stream writer for H5 files.
-
-It focuses on the functionality needed for high performance detectors integrations.
+# lib_cpp_h5_writer
+This library is used for creating C++ based stream writer for H5 files. It focuses on the functionality 
+and performance needed for high performance detectors integrations.
 
 Key features:
 - Get data from ZMQ stream (Array-1.0 protocol) - [htypes specification](https://github.com/datastreaming/htypes)
