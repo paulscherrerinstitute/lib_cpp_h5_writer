@@ -1,3 +1,5 @@
+[![Build Status](https://api.travis-ci.org/paulscherrerinstitute/lib_cpp_h5_writer.svg?branch=master)](https://travis-ci.org/paulscherrerinstitute/lib_cpp_h5_writer/) 
+
 # lib_cpp_h5_writer
 This library is used for creating C++ based stream writer for H5 files. It focuses on the functionality 
 and performance needed for high performance detectors integrations.
