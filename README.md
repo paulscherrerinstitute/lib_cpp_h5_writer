@@ -35,6 +35,8 @@ To create your own stream writer you need to specify:
 - The mapping between the stream header metadata and your H5 file format.
 - Additional metadata that is transfer in the stream message header.
 
+The complete repository of the example below can be found here: [sf_cpp_h5_writer](https://github.com/paulscherrerinstitute/sf_cpp_h5_writer)
+
 For example, lets see the SF file format. You will need to extend the abstract class H5Format. Lets 
 save this file into **SfFormat.cpp**.
 ```cpp
