@@ -147,7 +147,7 @@ class SfFormat: public H5Format
 ```
 
 In addition, you need to write a starter script for your writer. Lets again see the SF example.
-This file is called **sf\_h5\_zmq\_writer\_h5**.
+This file is called **sf\_cpp\_h5\_writer.cpp**.
 ```cpp
 #include <iostream>
 #include <sstream>
@@ -263,11 +263,12 @@ The library relies on the following packages:
 - hdf5 ==1.10.1
 - boost ==1.61.0
 
-When you are using conda to install the packages, you might need to add the **conda-forge** channel to
+When you are using conda to install the packages, you might need to add the **conda-forge** and **paulscherrerinstitute** channels to
 your conda config:
 
 ```
 conda config --add channels conda-forge
+conda config --add channels paulscherrerinstitute
 ```
 
 <a id="basic_concepts"></a>
