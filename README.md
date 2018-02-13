@@ -41,8 +41,8 @@ save this file into **SfFormat.cpp**.
 #include <memory>
 #include <unordered_map>
 
-#include "config.hpp"
-#include "H5Format.hpp"
+#include "cpp_h5_writer/config.hpp"
+#include "cpp_h5_writer/H5Format.hpp"
 
 using namespace std;
 using s_ptr = shared_ptr<h5_base>;
@@ -153,10 +153,11 @@ This file is called **sf\_h5\_zmq\_writer\_h5**.
 #include <sstream>
 #include <stdexcept>
 
-#include "config.hpp"
-#include "ProcessManager.hpp"
-#include "WriterManager.hpp"
-#include "ZmqReceiver.hpp"
+#include "cpp_h5_writer/config.hpp"
+#include "cpp_h5_writer/ProcessManager.hpp"
+#include "cpp_h5_writer/WriterManager.hpp"
+#include "cpp_h5_writer/ZmqReceiver.hpp"
+
 #include "SfFormat.cpp"
 
 int main (int argc, char *argv[])
