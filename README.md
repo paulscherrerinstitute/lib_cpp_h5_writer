@@ -6,7 +6,7 @@ and performance needed for high performance detectors integrations.
 
 Key features:
 - Get data from ZMQ stream (Array-1.0 protocol) - [htypes specification](https://github.com/datastreaming/htypes)
-- Write Nexus complaint H5 file (User specified) - [nexus format] (http://www.nexusformat.org/)
+- Write Nexus complaint H5 file (User specified) - [nexus format](http://www.nexusformat.org/)
 - Specify additional zmq stream parameters to write to file.
 - Receive additional parameters to write to file via REST api.
 - Interaction with the writer over REST api (stop, kill, get_statistics).
