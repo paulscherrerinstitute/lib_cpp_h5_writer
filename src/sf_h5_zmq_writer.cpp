@@ -52,7 +52,7 @@ int main (int argc, char *argv[])
     auto header_values = shared_ptr<unordered_map<string, string>>(new unordered_map<string, string> {
         {"pulse_id", "uint64"},
     });
-    ZmqReceiver receiver(connect_address, n_io_threads, receive_timeout);
+    ZmqReceiver receiver(connect_address, n_io_threads, receive_timeout, header_values);
 
     int rest_port = atoi(argv[4]);
 
