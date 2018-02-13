@@ -6,7 +6,15 @@ MKDIR = mkdir -p
 CPP = g++
 CPPFLAGS = -Wall -fPIC -pthread -std=c++1y -I./include -I${CONDA_PREFIX}/include
 LDLIBS = -L/usr/lib64 -L${CONDA_PREFIX}/lib -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex -lboost_thread -lpthread
-LDFLAGS = -shared -Wl,-install_name,libcpp_h5_writer.so
+LDFLAGS = -shared
+
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+	LDFLAGS += -Wl,-soname,libcpp_h5_writer.so
+endif
+ifeq ($(UNAME), Darwin)
+	LDFLAGS += -Wl,-install_name,libcpp_h5_writer.so
+endif
 
 HEADERS = $(wildcard $(SRC_DIR)/*.hpp)
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
