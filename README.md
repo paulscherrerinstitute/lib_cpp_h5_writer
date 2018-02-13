@@ -230,10 +230,10 @@ please see the [Local build](#local_build) chapter.
 
 <a id="conda_setup"></a>
 ## Conda setup
-If you use conda, you can create an environment with the libCppH5Writer library by running:
+If you use conda, you can create an environment with the lib_cpp_h5_writer library by running:
 
 ```bash
-conda create -c paulscherrerinstitute --name <env_name> libCppH5Writer
+conda create -c paulscherrerinstitute --name <env_name> lib_cpp_h5_writer
 ```
 
 After that you can just source you newly created environment and start linking your builds against the library.
