@@ -25,7 +25,7 @@ Key features:
 
 
 <a id="quick_start"></a>
-# Quick start using the library
+# Quick start for using the library
 
 To create your own stream writer you need to specify:
 - The H5 file format you want to write.

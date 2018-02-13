@@ -1,4 +1,4 @@
 make
 
-cp bin/* ${PREFIX}/bin
+cp bin/* ${PREFIX}/lib
 cp src/*.hpp ${PREFIX}/include
