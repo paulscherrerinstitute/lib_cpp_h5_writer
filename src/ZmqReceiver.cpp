@@ -74,34 +74,55 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
 shared_ptr<char> ZmqReceiver::get_value_from_json(const pt::ptree& json_header, const string& name, const string& type)
 {
     if (type == "uint8") {
-        return shared_ptr<char>(reinterpret_cast<char*>(new uint8_t(json_header.get<uint8_t>(name))));
+        return shared_ptr<char>(reinterpret_cast<char*>(new uint8_t(json_header.get<uint8_t>(name))), default_delete<char[]>());
 
     } else if (type == "uint16") {
-        return shared_ptr<char>(reinterpret_cast<char*>(new uint16_t(json_header.get<uint16_t>(name))));
+        return shared_ptr<char>(reinterpret_cast<char*>(new uint16_t(json_header.get<uint16_t>(name))), default_delete<char[]>());
 
     } else if (type == "uint32") {
-        return shared_ptr<char>(reinterpret_cast<char*>(new uint32_t(json_header.get<uint32_t>(name))));
+        return shared_ptr<char>(reinterpret_cast<char*>(new uint32_t(json_header.get<uint32_t>(name))), default_delete<char[]>());
 
     } else if (type == "uint64") {
-        return shared_ptr<char>(reinterpret_cast<char*>(new uint64_t(json_header.get<uint64_t>(name))));
+        return shared_ptr<char>(reinterpret_cast<char*>(new uint64_t(json_header.get<uint64_t>(name))), default_delete<char[]>());
 
     } else if (type == "int8") {
-        return shared_ptr<char>(reinterpret_cast<char*>(new int8_t(json_header.get<int8_t>(name))));
+        return shared_ptr<char>(reinterpret_cast<char*>(new int8_t(json_header.get<int8_t>(name))), default_delete<char[]>());
         
     } else if (type == "int16") {
-        return shared_ptr<char>(reinterpret_cast<char*>(new int16_t(json_header.get<int16_t>(name))));
+        return shared_ptr<char>(reinterpret_cast<char*>(new int16_t(json_header.get<int16_t>(name))), default_delete<char[]>());
 
     } else if (type == "int32") {
-        return shared_ptr<char>(reinterpret_cast<char*>(new int32_t(json_header.get<int32_t>(name))));
+        return shared_ptr<char>(reinterpret_cast<char*>(new int32_t(json_header.get<int32_t>(name))), default_delete<char[]>());
     
     } else if (type == "int64") {
-        return shared_ptr<char>(reinterpret_cast<char*>(new int64_t(json_header.get<uint32_t>(name))));
+        return shared_ptr<char>(reinterpret_cast<char*>(new int64_t(json_header.get<int64_t>(name))), default_delete<char[]>());
     
     } else if (type == "float32") {
-        return shared_ptr<char>(reinterpret_cast<char*>(new float(json_header.get<float>(name))));
+        return shared_ptr<char>(reinterpret_cast<char*>(new float(json_header.get<float>(name))), default_delete<char[]>());
 
     } else if (type == "float64") {
-        return shared_ptr<char>(reinterpret_cast<char*>(new double(json_header.get<double>(name))));
+        return shared_ptr<char>(reinterpret_cast<char*>(new double(json_header.get<double>(name))), default_delete<char[]>());
+
+    // TODO: This is so ugly I cannot even talk about it. Remove after production panic is over.
+    } else if (type == "JF4.5M_header") {
+
+        // 8 bytes (int64) * 9 values
+        char* buffer = new char[72];
+        
+        size_t index = 0;
+
+        for (const auto& item : json_header.get_child(name)) {
+
+            auto value = item.second.get_value<int64_t>();
+            char* value_buffer = reinterpret_cast<char*>(&value);
+
+            // 8 bytes per value.
+            memcpy(buffer + (index * 8), value_buffer, 8);
+
+            ++index;
+        }
+
+        return shared_ptr<char>(buffer, default_delete<char[]>());
 
     } else {
         // We cannot really convert this attribute.
