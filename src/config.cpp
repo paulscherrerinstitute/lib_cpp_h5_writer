@@ -11,7 +11,8 @@ namespace config {
     int zmq_buffer_size_data = 1024 * 1024 * 10;
 
     // Ring buffer config.
-    size_t ring_buffer_n_slots = 100;
+    // Allow for a couple of seconds (file creation might be slow).
+    size_t ring_buffer_n_slots = 1000;
     // Delay before trying again to get data from the ring buffer.
     uint32_t ring_buffer_read_retry_interval = 5;
 
