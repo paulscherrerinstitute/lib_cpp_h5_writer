@@ -191,7 +191,7 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
         
         return header_data;
 
-    } except (...) {
+    } catch (...) {
         cout << "[ZmqReceiver::read_json_header] Error while interpreting the JSON header. Header string: " << header << endl; 
         cout << "Expected JSON header format: " << endl; 
 
