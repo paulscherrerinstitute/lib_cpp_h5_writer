@@ -157,7 +157,7 @@ shared_ptr<char> ZmqReceiver::get_value_from_json(const pt::ptree& json_header, 
 shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
 {   
     try {
-        
+
         stringstream header_stream;
         header_stream << header << endl;
         pt::read_json(header_stream, json_header);
@@ -193,6 +193,15 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
 
     } except (...) {
         cout << "[ZmqReceiver::read_json_header] Error while interpreting the JSON header. Header string: " << header << endl; 
+        cout << "Expected JSON header format: " << endl; 
+
+        if (header_values_type) {
+            for (const auto& value_mapping : *header_values_type) {
+                cout << "\t" << value_mapping.first << ":" << value_mapping.second << endl;
+            }
+        } else {
+            cout << "\tExpected header value types is a null pointer." << endl; 
+        }
         throw;
     }
     
