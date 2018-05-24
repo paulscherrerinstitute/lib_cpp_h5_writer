@@ -61,7 +61,7 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
     // Get the message data.
     if (!receiver->recv(&message_data)) {
         cout << "[ZmqReceiver::receive] Error while reading from ZMQ. Frame index " << frame_metadata->frame_index << " lost."; 
-        cout << " Trying to continue with the next frame." << endl;\
+        cout << " Trying to continue with the next frame." << endl;
 
         return {NULL, NULL};
     }
@@ -124,6 +124,27 @@ shared_ptr<char> ZmqReceiver::get_value_from_json(const pt::ptree& json_header, 
 
         return shared_ptr<char>(buffer, default_delete<char[]>());
 
+    // TODO: This is so ugly I cannot even talk about it. Remove after production panic is over.
+    } else if (type == "JF2.0M_header") {
+
+        // 8 bytes (int64) * 4 values
+        char* buffer = new char[32];
+        
+        size_t index = 0;
+
+        for (const auto& item : json_header.get_child(name)) {
+
+            auto value = item.second.get_value<int64_t>();
+            char* value_buffer = reinterpret_cast<char*>(&value);
+
+            // 8 bytes per value.
+            memcpy(buffer + (index * 8), value_buffer, 8);
+
+            ++index;
+        }
+
+        return shared_ptr<char>(buffer, default_delete<char[]>());
+
     } else {
         // We cannot really convert this attribute.
         stringstream error_message;
@@ -135,38 +156,46 @@ shared_ptr<char> ZmqReceiver::get_value_from_json(const pt::ptree& json_header, 
 
 shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
 {   
-    stringstream header_stream;
-    header_stream << header << endl;
-    pt::read_json(header_stream, json_header);
+    try {
+        
+        stringstream header_stream;
+        header_stream << header << endl;
+        pt::read_json(header_stream, json_header);
 
-    auto header_data = make_shared<FrameMetadata>();
+        auto header_data = make_shared<FrameMetadata>();
 
-    header_data->frame_index = json_header.get<uint64_t>("frame");
+        header_data->frame_index = json_header.get<uint64_t>("frame");
 
-    for (const auto& item : json_header.get_child("shape")) {
-        header_data->frame_shape.push_back(item.second.get_value<size_t>());
-    }
-
-    // Array 1.0 specified little endian as the default encoding.
-    header_data->endianness = json_header.get("endianness", "little");
-
-    header_data->type = json_header.get<string>("type");
-
-    if (header_values_type) {
-        for (const auto& value_mapping : *header_values_type) {
-            
-            const auto& name = value_mapping.first;
-            const auto& type = value_mapping.second;
-
-            auto value = get_value_from_json(json_header, name, type);
-
-            header_data->header_values.insert(
-                {name, value}
-            );
+        for (const auto& item : json_header.get_child("shape")) {
+            header_data->frame_shape.push_back(item.second.get_value<size_t>());
         }
+
+        // Array 1.0 specified little endian as the default encoding.
+        header_data->endianness = json_header.get("endianness", "little");
+
+        header_data->type = json_header.get<string>("type");
+
+        if (header_values_type) {
+            for (const auto& value_mapping : *header_values_type) {
+                
+                const auto& name = value_mapping.first;
+                const auto& type = value_mapping.second;
+
+                auto value = get_value_from_json(json_header, name, type);
+
+                header_data->header_values.insert(
+                    {name, value}
+                );
+            }
+        }
+        
+        return header_data;
+
+    } except (...) {
+        cout << "[ZmqReceiver::read_json_header] Error while interpreting the JSON header. Header string: " << header << endl; 
+        throw;
     }
     
-    return header_data;
 }
 
 const shared_ptr<unordered_map<string, string>> ZmqReceiver::get_header_values_type() const{
