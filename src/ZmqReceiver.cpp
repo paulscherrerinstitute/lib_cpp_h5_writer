@@ -145,6 +145,49 @@ shared_ptr<char> ZmqReceiver::get_value_from_json(const pt::ptree& json_header, 
 
         return shared_ptr<char>(buffer, default_delete<char[]>());
 
+    // TODO: This is so ugly I cannot even talk about it. Remove after production panic is over.
+    } else if (type == "uJF4.5M_header") {
+
+        // 8 bytes (int64) * 9 values
+        char* buffer = new char[72];
+        
+        size_t index = 0;
+
+        for (const auto& item : json_header.get_child(name)) {
+
+            auto value = item.second.get_value<uint64_t>();
+            char* value_buffer = reinterpret_cast<char*>(&value);
+
+            // 8 bytes per value.
+            memcpy(buffer + (index * 8), value_buffer, 8);
+
+            ++index;
+        }
+
+        return shared_ptr<char>(buffer, default_delete<char[]>());
+
+    // TODO: This is so ugly I cannot even talk about it. Remove after production panic is over.
+    } else if (type == "uJF2.0M_header") {
+
+        // 8 bytes (int64) * 4 values
+        char* buffer = new char[32];
+        
+        size_t index = 0;
+
+        for (const auto& item : json_header.get_child(name)) {
+
+            auto value = item.second.get_value<uint64_t>();
+            char* value_buffer = reinterpret_cast<char*>(&value);
+
+            // 8 bytes per value.
+            memcpy(buffer + (index * 8), value_buffer, 8);
+
+            ++index;
+        }
+
+        return shared_ptr<char>(buffer, default_delete<char[]>());
+
+
     } else {
         // We cannot really convert this attribute.
         stringstream error_message;
