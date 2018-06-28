@@ -83,30 +83,37 @@ void H5Writer::close_file()
 void H5Writer::write_data(const string& dataset_name, const size_t data_index, const char* data,
     const std::vector<size_t>& data_shape, const size_t data_bytes_size, const string& data_type, const string& endianness)
 {
-    // Define the ofset of the currently received image in the file.
-    hsize_t relative_data_index = prepare_storage_for_data(dataset_name, data_index, data_shape, data_type, endianness);
+    try {
 
-    // Define the offset where to write the data.
-    size_t data_rank = data_shape.size();
-    hsize_t offset[data_rank+1];
-    
-    offset[0] = relative_data_index;
-    for (uint index=0; index<data_rank; ++index) {
-        offset[index+1] = 0;
-    }
+        // Define the ofset of the currently received image in the file.
+        hsize_t relative_data_index = prepare_storage_for_data(dataset_name, data_index, data_shape, data_type, endianness);
 
-    // No compression for now.
-    uint32_t filters = 0;
+        // Define the offset where to write the data.
+        size_t data_rank = data_shape.size();
+        hsize_t offset[data_rank+1];
+        
+        offset[0] = relative_data_index;
+        for (uint index=0; index<data_rank; ++index) {
+            offset[index+1] = 0;
+        }
 
-    const auto& dataset = datasets.at(dataset_name);
-    
-    if( H5DOwrite_chunk(dataset.getId(), H5P_DEFAULT, filters, offset, data_bytes_size, data) )
-    {
-        stringstream error_message;
-        error_message << "Error while writing dataset " << dataset_name << " chunk to file at offset ";
-        error_message << relative_data_index << "." << endl;
+        // No compression for now.
+        uint32_t filters = 0;
 
-        throw invalid_argument( error_message.str() );
+        const auto& dataset = datasets.at(dataset_name);
+        
+        if( H5DOwrite_chunk(dataset.getId(), H5P_DEFAULT, filters, offset, data_bytes_size, data) )
+        {
+            stringstream error_message;
+            error_message << "Error while writing dataset " << dataset_name << " chunk to file at offset ";
+            error_message << relative_data_index << "." << endl;
+
+            throw invalid_argument( error_message.str() );
+        }
+    } catch (...) {
+        cout << "[H5Writer::write_data] Error while trying to write data to dataset " << dataset_name << endl; 
+        
+        throw;
     }
 }
 
