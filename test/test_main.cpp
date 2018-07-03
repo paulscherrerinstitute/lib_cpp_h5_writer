@@ -1,11 +1,7 @@
 #include "gtest/gtest.h"
-#include "RingBuffer.hpp"
+#include "test_ZmqReceiver.cpp"
 
-TEST(RingBufferTest, simple_operation)
-{
-    
-    EXPECT_EQ(1000, 1000);	
-}
+using namespace std;
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
