@@ -40,7 +40,7 @@ TEST(ZmqReceiver, get_value_from_json)
   
   ASSERT_TRUE(*scalar_value == frame_number);
 
-  int32_t modules_number[] = {-345, 1234567, -2323456};
+  double modules_number[] = {-345.12, 1234567.43, -2323456.32};
   pt::ptree modulus_number_child;
 
   for (int i=0; i<3; i++) {
@@ -51,10 +51,10 @@ TEST(ZmqReceiver, get_value_from_json)
 
   json_header.add_child("modules_number", modulus_number_child);
 
-  HeaderDataType header_data_type_array("int32", 3);
+  HeaderDataType header_data_type_array("float64", 3);
   
   auto array_buffer = get_value_from_json(json_header, "modules_number", header_data_type_array);
-  auto array_values = reinterpret_cast<uint64_t*>(array_buffer.get());
+  auto array_values = reinterpret_cast<double*>(array_buffer.get());
 
   for (int i=0; i<3; i++) {
     ASSERT_TRUE(array_values[i] == modules_number[i]);
