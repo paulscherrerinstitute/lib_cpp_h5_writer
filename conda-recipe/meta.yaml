@@ -1,6 +1,6 @@
 package:
     name: lib_cpp_h5_writer 
-    version: 0.0.3
+    version: 0.0.4
 
 build:
   number: 0
