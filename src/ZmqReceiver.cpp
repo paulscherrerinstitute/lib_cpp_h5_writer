@@ -202,7 +202,7 @@ void copy_value_to_buffer(char* buffer, const size_t offset, const pt::ptree& js
     }
 }
 
-shared_ptr<char> ZmqReceiver::get_value_from_json(const pt::ptree& json_header, const string& name, const HeaderDataType& header_data_type) const
+shared_ptr<char> get_value_from_json(const pt::ptree& json_header, const string& name, const HeaderDataType& header_data_type)
 {
     char* buffer = new char[header_data_type.value_bytes_size * header_data_type.value_shape];
 
@@ -214,7 +214,7 @@ shared_ptr<char> ZmqReceiver::get_value_from_json(const pt::ptree& json_header, 
 
         for (const auto& item : json_header.get_child(name)) {
             auto offset = index * header_data_type.value_bytes_size;
-            copy_value_to_buffer(buffer, offset, json_header.get_child(name), header_data_type);
+            copy_value_to_buffer(buffer, offset, item.second, header_data_type);
 
             ++index;
         }
