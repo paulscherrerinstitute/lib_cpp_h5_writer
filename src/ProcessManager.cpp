@@ -87,25 +87,10 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
 }
 
 void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, RingBuffer& ring_buffer,
-    const shared_ptr<unordered_map<string, string>> header_values_type)
+    const shared_ptr<unordered_map<string, HeaderDataType>> header_values_type)
 {
     H5Writer writer(manager.get_output_file(), 0, config::initial_dataset_size, config::dataset_increase_step);
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
-
-    // Mapping for header values.
-    // TODO: This should be moved into future PROTOCOL FORMAT file.
-    std::unordered_map<std::string, int> type_to_size_mapping {
-        {"uint8", 1},
-        {"uint16", 2},
-        {"uint32", 4},
-        {"uint64", 8},
-        {"int8", 1},
-        {"int16", 2},
-        {"int32", 4},
-        {"int64", 8},
-        {"float32", 4},
-        {"float64", 8},
-    };
     
     // Run until the running flag is set or the ring_buffer is empty.  
     while(manager.is_running() || !ring_buffer.is_empty()) {
@@ -139,22 +124,20 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
             for (const auto& header_type : *header_values_type) {
 
                 auto& name = header_type.first;
-                auto& type = header_type.second;
+                auto& header_data_type = header_type.second;
 
                 auto value = received_data.first->header_values.at(name);
 
                 // Header data are fixed to scalars in little endian.
-                vector<size_t> value_shape = {1};
-                auto endianness = "little";
-                auto value_bytes_size = type_to_size_mapping.at(type);
+                vector<size_t> value_shape = {header_data_type.value_shape};
 
                 writer.write_data(name,
-                                received_data.first->frame_index,
-                                value.get(),
-                                value_shape,
-                                value_bytes_size,
-                                type,
-                                endianness);
+                                  received_data.first->frame_index,
+                                  value.get(),
+                                  value_shape,
+                                  header_data_type.value_bytes_size,
+                                  header_data_type.type,
+                                  header_data_type.endianness);
             }
         }
         
