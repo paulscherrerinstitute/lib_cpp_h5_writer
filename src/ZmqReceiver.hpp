@@ -19,7 +19,7 @@ struct HeaderDataType
     std::string endianness;
     size_t value_bytes_size;
 
-    HeaderDataType(const std::string& type, size_t n_values);
+    HeaderDataType(const std::string& type, size_t shape);
 };
 
 size_t get_type_byte_size(const std::string& type);

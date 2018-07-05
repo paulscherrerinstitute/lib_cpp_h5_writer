@@ -8,8 +8,8 @@
 using namespace std;
 namespace pt = boost::property_tree;
 
-HeaderDataType::HeaderDataType(const std::string& type, size_t value_shape) : 
-    type(type), value_shape(value_shape), endianness("little") {
+HeaderDataType::HeaderDataType(const std::string& type, size_t shape) : 
+    type(type), value_shape(shape), endianness("little") {
         value_bytes_size = get_type_byte_size(type);
 }
 
