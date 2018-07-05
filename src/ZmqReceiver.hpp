@@ -12,6 +12,19 @@
 
 #include "RingBuffer.hpp"
 
+struct HeaderDataType
+{
+    std::string type;
+    size_t value_shape;
+    std::string endianness;
+    size_t value_bytes_size;
+
+    HeaderDataType(const std::string& type, size_t n_values);
+};
+
+size_t get_type_byte_size(const std::string& type);
+void copy_value_to_buffer(const char* buffer, size_t offset, const boost::property_tree::ptree& json_value, const HeaderDataType& header_data_type);
+
 class ZmqReceiver
 {
     const std::string connect_address;
@@ -23,16 +36,16 @@ class ZmqReceiver
     zmq::message_t message_data;
     boost::property_tree::ptree json_header;
 
-    std::shared_ptr<std::unordered_map<std::string, std::string>> header_values_type = NULL;
+    std::shared_ptr<std::unordered_map<std::string, HeaderDataType>> header_values_type = NULL;
 
     std::shared_ptr<FrameMetadata> read_json_header(const std::string& header);
-
+    
     std::shared_ptr<char> get_value_from_json(const boost::property_tree::ptree& json_header, 
-        const std::string& name, const std::string& type);
+        const std::string& name, const HeaderDataType& header_data_type) const;
 
     public:
         ZmqReceiver(const std::string& connect_address, const int n_io_threads, const int receive_timeout,
-            std::shared_ptr<std::unordered_map<std::string, std::string>> header_values_type=NULL);
+            std::shared_ptr<std::unordered_map<std::string, HeaderDataType>> header_values_type=NULL);
 
         virtual ~ZmqReceiver(){};
 
@@ -40,7 +53,7 @@ class ZmqReceiver
 
         std::pair<std::shared_ptr<FrameMetadata>, char*> receive();
 
-        const std::shared_ptr<std::unordered_map<std::string, std::string>> get_header_values_type() const;
+        const std::shared_ptr<std::unordered_map<std::string, HeaderDataType>> get_header_values_type() const;
 
 };
 
