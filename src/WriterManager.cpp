@@ -5,6 +5,42 @@
 
 using namespace std;
 
+void writer_utils::set_process_id(int user_id)
+{
+
+    #ifdef DEBUG_OUTPUT
+        cout << "[writer_utils::set_process_id] Setting process uid to " << user_id << endl;
+    #endif
+
+    if (setgid(user_id)) {
+        stringstream error_message;
+        error_message << "[writer_utils::set_process_id] Cannot set group_id to " << user_id << endl;
+
+        throw runtime_error(error_message.str());
+    }
+
+    if (setuid(user_id)) {
+        stringstream error_message;
+        error_message << "[writer_utils::set_process_id] Cannot set user_id to " << user_id << endl;
+
+        throw runtime_error(error_message.str());
+    }
+}
+
+void writer_utils::create_destination_folder(const string& output_file)
+{
+    auto file_separator_index = output_file.rfind('/');
+
+    // Do not create folders for a reletive filename.
+    if (file_separator_index > -1) {
+        string output_folder(output_file.substr(0, file_separator_index));
+        cout << "[writer_utils::create_destination_folder] Creating folder " << output_folder << endl;
+
+        string create_folder_command("mkdir -p " + output_folder);
+        system(create_folder_command.c_str());
+    }
+}
+
 WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type, 
     const string& output_file, uint64_t n_frames):
         parameters_type(parameters_type), output_file(output_file), n_frames(n_frames), 

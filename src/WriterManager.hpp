@@ -9,6 +9,12 @@
 
 #include "H5Format.hpp"
 
+namespace writer_utils {
+    void set_process_id(int user_id);
+    void create_destination_folder(const std::string& output_file);
+}
+
+
 class WriterManager
 {
     
