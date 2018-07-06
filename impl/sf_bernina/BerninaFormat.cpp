@@ -35,19 +35,19 @@ class BerninaFormat : public H5Format
             // After format has been writen, where to move the raw datasets.
             dataset_move_mapping.reset(new std::unordered_map<string, string>(
             {
-                {config::raw_image_dataset_name, "data/JF4.5M/data"},
-                {"pulse_id", "data/JF4.5M/pulse_id"},
-                {"frame", "data/JF4.5M/frame"},
-                {"is_good_frame", "data/JF4.5M/is_good_frame"},
-                {"missing_packets_1", "data/JF4.5M/missing_packets_1"},
-                {"missing_packets_2", "data/JF4.5M/missing_packets_2"},
-                {"daq_recs", "data/JF4.5M/daq_recs"},
-                {"daq_rec", "data/JF4.5M/daq_rec"},
-                {"framenum_diff", "data/JF4.5M/framenum_diff"},
-                {"pulse_ids", "data/JF4.5M/pulse_ids"},
-                {"framenums", "data/JF4.5M/framenums"},
-                {"pulse_id_diff", "data/JF4.5M/pulse_id_diff"},
-                {"module_number", "data/JF4.5M/module_number"},
+                {config::raw_image_dataset_name, "data/JF_3.0M/data"},
+                {"pulse_id", "data/JF_3.0M/pulse_id"},
+                {"frame", "data/JF_3.0M/frame"},
+                {"is_good_frame", "data/JF_3.0M/is_good_frame"},
+                {"missing_packets_1", "data/JF_3.0M/missing_packets_1"},
+                {"missing_packets_2", "data/JF_3.0M/missing_packets_2"},
+                {"daq_recs", "data/JF_3.0M/daq_recs"},
+                {"daq_rec", "data/JF_3.0M/daq_rec"},
+                {"framenum_diff", "data/JF_3.0M/framenum_diff"},
+                {"pulse_ids", "data/JF_3.0M/pulse_ids"},
+                {"framenums", "data/JF_3.0M/framenums"},
+                {"pulse_id_diff", "data/JF_3.0M/pulse_id_diff"},
+                {"module_number", "data/JF_3.0M/module_number"},
             }));
 
             // Definition of the file format.
@@ -61,7 +61,7 @@ class BerninaFormat : public H5Format
                 })),
 
                 s_ptr(new h5_group("data", {
-                    s_ptr(new h5_group("JF4.5M", {}))
+                    s_ptr(new h5_group("JF_3.0M", {}))
                 }))
             }));
         }
