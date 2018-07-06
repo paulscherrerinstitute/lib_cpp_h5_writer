@@ -20,7 +20,7 @@ lib:
 all: build_dirs bernina_h5_writer
 
 debug: CPPFLAGS += -DDEBUG_OUTPUT -g
-debug: bernina_h5_writer
+debug: bernina
 
 bernina_h5_writer: $(OBJS)
 	$(CPP) $(LDFLAGS) -o $(BIN_DIR)/bernina_h5_writer $(OBJS) $(LDLIBS)
