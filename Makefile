@@ -21,11 +21,11 @@ HEADERS = $(wildcard $(SRC_DIR)/*.hpp)
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-all: build_dirs libcpp_h5_writer
+lib: build_dirs libcpp_h5_writer
 test: build_dirs build_test
 
 debug: CPPFLAGS += -DDEBUG_OUTPUT -g
-debug: all
+debug: lib
 
 libcpp_h5_writer: $(OBJS)
 	$(CPP) $(LDFLAGS) -o $(BIN_DIR)/libcpp_h5_writer.so $(OBJS) $(LDLIBS)
