@@ -9,11 +9,15 @@ void writer_utils::set_process_id(int user_id)
 {
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[writer_utils::set_process_id] Setting process uid to " << user_id << endl;
     #endif
 
     if (setgid(user_id)) {
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[writer_utils::set_process_id] Cannot set group_id to " << user_id << endl;
 
         throw runtime_error(error_message.str());
@@ -21,6 +25,8 @@ void writer_utils::set_process_id(int user_id)
 
     if (setuid(user_id)) {
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[writer_utils::set_process_id] Cannot set user_id to " << user_id << endl;
 
         throw runtime_error(error_message.str());
@@ -34,6 +40,8 @@ void writer_utils::create_destination_folder(const string& output_file)
     // Do not create folders for a reletive filename.
     if (file_separator_index > -1) {
         string output_folder(output_file.substr(0, file_separator_index));
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[writer_utils::create_destination_folder] Creating folder " << output_folder << endl;
 
         string create_folder_command("mkdir -p " + output_folder);
@@ -47,6 +55,8 @@ WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_
         running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0), n_lost_frames(0)
 {
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[WriterManager::WriterManager] Writer manager for n_frames " << n_frames << endl;
     #endif
 }
@@ -56,6 +66,8 @@ WriterManager::~WriterManager(){}
 void WriterManager::stop()
 {
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[WriterManager::stop] Stopping the writer manager." << endl;
     #endif
 
@@ -65,6 +77,8 @@ void WriterManager::stop()
 void WriterManager::kill()
 {
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[WriterManager::kills] Killing writer manager." << endl;
     #endif
 
@@ -114,6 +128,8 @@ void WriterManager::set_parameters(const unordered_map<string, boost::any>& new_
 
     #ifdef DEBUG_OUTPUT
         stringstream output_message;
+        using namespace date;
+        output_message << "[" << std::chrono::system_clock::now() << "]";
         output_message << "[WriterManager::set_parameters] Setting parameters: ";
     #endif
 
@@ -177,6 +193,8 @@ bool WriterManager::are_all_parameters_set()
 
         if (parameters.count(parameter_name) == 0) {
             #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
                 cout << "[WriterManager::are_all_parameters_set] Parameter " << parameter_name << " not set." << endl;
             #endif
 

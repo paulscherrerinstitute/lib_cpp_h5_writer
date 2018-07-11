@@ -6,6 +6,8 @@
 #include <atomic>
 #include <mutex>
 #include <boost/any.hpp>
+#include <chrono>
+#include "date.h"
 
 #include "H5Format.hpp"
 
