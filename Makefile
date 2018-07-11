@@ -24,8 +24,11 @@ OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 lib: build_dirs libcpp_h5_writer
 test: build_dirs build_test
 
-debug: CPPFLAGS += -DDEBUG_OUTPUT -g
+debug: CPPFLAGS += -DDEBUG_OUTPUT
 debug: lib
+
+perf: CPPFLAGS += -DPERF_OUTPUT
+perf: lib
 
 libcpp_h5_writer: $(OBJS)
 	$(CPP) $(LDFLAGS) -o $(BIN_DIR)/libcpp_h5_writer.so $(OBJS) $(LDLIBS)
