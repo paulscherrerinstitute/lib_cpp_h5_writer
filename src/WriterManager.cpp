@@ -37,8 +37,7 @@ void writer_utils::create_destination_folder(const string& output_file)
 {
     auto file_separator_index = output_file.rfind('/');
 
-    // Do not create folders for a reletive filename.
-    if (file_separator_index > -1) {
+    if (file_separator_index != string::npos) {
         string output_folder(output_file.substr(0, file_separator_index));
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
