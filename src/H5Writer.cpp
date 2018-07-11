@@ -225,10 +225,6 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
         relative_data_index = data_index - ((frame_chunk - 1) * frames_per_file);
     }
 
-    #ifdef DEBUG_OUTPUT
-        cout << "[H5Writer::prepare_storage_for_data] Received frame index " << data_index << " and processed as relative frame index " << relative_data_index << endl;
-    #endif
-
     // Open the file if needed.
     if (!is_file_open()) {
         create_file();

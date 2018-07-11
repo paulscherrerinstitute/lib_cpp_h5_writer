@@ -130,11 +130,6 @@ char* RingBuffer::get_buffer_slot_address(size_t buffer_slot_index)
         throw runtime_error(error_message.str());
     }
 
-    #ifdef DEBUG_OUTPUT
-        cout << "[RingBuffer::get_buffer_slot_address] For buffer_slot_index " << buffer_slot_index;
-        cout << " the calculated memory address is " << long(slot_memory_address) << endl;
-    #endif
-
     return slot_memory_address;
 }
 
