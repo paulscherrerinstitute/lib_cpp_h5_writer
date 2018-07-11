@@ -5,7 +5,7 @@ MKDIR = mkdir -p
 
 CPP = g++
 CPPFLAGS = -Wall -Wfatal-errors -fPIC -pthread -std=c++11 -I./include -I${CONDA_PREFIX}/include
-LDLIBS = -L/usr/lib64 -L${CONDA_PREFIX}/lib -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex -lboost_thread -lpthread
+LDLIBS = -L${CONDA_PREFIX}/lib -L/usr/lib64 -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex -lboost_thread -lpthread
 LDLIBS_TEST = -lgtest_main -lgtest
 LDFLAGS = -shared
 
