@@ -29,6 +29,8 @@ size_t get_type_byte_size(const string& type)
 
     } else {
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[ZmqReceiver::get_type_byte_size] Unsupported data type " << type << endl;
 
         throw runtime_error(error_message.str());
@@ -42,6 +44,8 @@ ZmqReceiver::ZmqReceiver(const std::string& connect_address, const int n_io_thre
 
 {
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ZmqReceiver::ZmqReceiver] Creating ZMQ receiver with";
         cout << " connect_address " << connect_address;
         cout << " n_io_threads " << n_io_threads;
@@ -56,6 +60,8 @@ ZmqReceiver::ZmqReceiver(const std::string& connect_address, const int n_io_thre
 void ZmqReceiver::connect()
 {
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ZmqReceiver::connect] Connecting to address " << connect_address;
         cout << " with n_io_threads " << n_io_threads << endl;
     #endif
@@ -71,6 +77,8 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
 {
     if (!receiver) {
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[ZmqReceiver::receive] Cannot receive before connecting. ";
         error_message << "Connect first." << endl;
 
@@ -87,6 +95,8 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
 
     // Get the message data.
     if (!receiver->recv(&message_data)) {
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ZmqReceiver::receive] Error while reading from ZMQ. Frame index " << frame_metadata->frame_index << " lost."; 
         cout << " Trying to continue with the next frame." << endl;
 
@@ -136,6 +146,8 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
         return header_data;
 
     } catch (...) {
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ZmqReceiver::read_json_header] Error while interpreting the JSON header. Header string: " << header << endl; 
         cout << "Expected JSON header format: " << endl; 
 
@@ -196,6 +208,8 @@ void copy_value_to_buffer(char* buffer, const size_t offset, const pt::ptree& js
     } else {
         // We cannot really convert this attribute.
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[ZmqReceiver::get_value_from_json] Unsupported header data type " << header_data_type.type << endl;
 
         throw runtime_error(error_message.str());
