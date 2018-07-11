@@ -117,6 +117,11 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
             continue;
         }
 
+        #ifdef PERF_OUTPUT
+            using namespace date;
+            auto start_time_frame = std::chrono::system_clock::now();
+        #endif
+
         // Write image data.
         writer.write_data(raw_frames_dataset_name,
                           received_data.first->frame_index, 
@@ -126,7 +131,24 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
                           received_data.first->type,
                           received_data.first->endianness);
 
+        #ifdef PERF_OUTPUT
+            using namespace date;
+            using namespace std::chrono;
+
+            auto frame_time_difference = std::chrono::system_clock::now() - start_time_frame;
+            auto frame_diff_ms = duration<float, milli>(frame_time_difference).count();
+
+            cout << "[" << std::chrono::system_clock::now() << "]";
+            cout << "[ProcessManager::write_h5] Frame index "; 
+            cout << received_data.first->frame_index << " written in " << frame_diff_ms << " ms." << endl;
+        #endif
+
         ring_buffer.release(received_data.first->buffer_slot_index);
+
+        #ifdef PERF_OUTPUT
+            using namespace date;
+            auto start_time_metadata = std::chrono::system_clock::now();
+        #endif
 
         // Write image metadata if mapping specified.
         if (header_values_type) {
@@ -150,6 +172,18 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
                                   header_data_type.endianness);
             }
         }
+
+        #ifdef PERF_OUTPUT
+            using namespace date;
+            using namespace std::chrono;
+
+            auto metadata_time_difference = std::chrono::system_clock::now() - start_time_metadata;
+            auto metadata_diff_ms = duration<float, milli>(metadata_time_difference).count();
+
+            cout << "[" << std::chrono::system_clock::now() << "]";
+            cout << "[ProcessManager::write_h5] Frame metadata index "; 
+            cout << received_data.first->frame_index << " written in " << metadata_diff_ms << " ms." << endl;
+        #endif
         
         manager.written_frame(received_data.first->frame_index);
     }
@@ -175,8 +209,8 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
                 H5FormatUtils::write_format(writer.get_h5_file(), format, parameters);
             } catch (const runtime_error& ex) {
                 using namespace date;
-                cout << "[" << std::chrono::system_clock::now() << "]";
-                cout << "[ProcessManager::write] Error while trying to write file format: "<< ex.what() << endl;
+                std::cout << "[" << std::chrono::system_clock::now() << "]";
+                std::cout << "[ProcessManager::write] Error while trying to write file format: "<< ex.what() << endl;
             }
         }
     }
