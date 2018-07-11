@@ -132,8 +132,6 @@ void H5Writer::write_data(const string& dataset_name, const size_t data_index, c
 void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& data_shape, 
     const string& data_type, const string& endianness)
 {
-    // TODO: Create folder if it does not exist.
-
     // Number of dimensions in each data point.
     const size_t data_rank = data_shape.size();
     // The +1 dimension is to account for the sequence of data points (time).
