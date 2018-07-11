@@ -20,6 +20,8 @@ void ProcessManager::run_writer(WriterManager& manager, const H5Format& format,
     RingBuffer ring_buffer(n_slots);
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::run_writer] Running writer";
         cout << " and output_file " << manager.get_output_file();
         cout << " and n_slots " << n_slots;
@@ -34,6 +36,8 @@ void ProcessManager::run_writer(WriterManager& manager, const H5Format& format,
     RestApi::start_rest_api(manager, rest_port);
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::run_writer] Rest API stopped." << endl;
     #endif
 
@@ -44,6 +48,8 @@ void ProcessManager::run_writer(WriterManager& manager, const H5Format& format,
     writer_thread.join();
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::run_writer] Writer properly stopped." << endl;
     #endif
 }
@@ -66,6 +72,8 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
         auto frame_data = frame.second;
 
         #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
             cout << "[ProcessManager::receive_zmq] Processing FrameMetadata"; 
             cout << " with frame_index " << frame_metadata->frame_index;
             cout << " and frame_shape [" << frame_metadata->frame_shape[0] << ", " << frame_metadata->frame_shape[1] << "]";
@@ -82,6 +90,8 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
    }
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::receive_zmq] Receiver thread stopped." << endl;
     #endif
 }
@@ -146,6 +156,8 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
 
     if (writer.is_file_open()) {
         #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
             cout << "[ProcessManager::write] Writing file format." << endl;
         #endif
 
@@ -162,18 +174,24 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
             try {
                 H5FormatUtils::write_format(writer.get_h5_file(), format, parameters);
             } catch (const runtime_error& ex) {
-                cerr << "[ProcessManager::write] Error while trying to write file format: "<< ex.what() << endl;
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
+                cout << "[ProcessManager::write] Error while trying to write file format: "<< ex.what() << endl;
             }
         }
     }
     
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::write] Closing file " << manager.get_output_file() << endl;
     #endif
     
     writer.close_file();
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::write] Writer thread stopped." << endl;
     #endif
 
