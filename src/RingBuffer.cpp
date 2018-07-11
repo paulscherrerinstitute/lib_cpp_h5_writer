@@ -11,6 +11,8 @@ using namespace std;
 RingBuffer::RingBuffer(size_t n_slots) : n_slots(n_slots), ringbuffer_slots(n_slots, 0)
 {
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[RingBuffer::RingBuffer] Creating ring buffer with n_slots " << n_slots << endl;
     #endif
 }
@@ -29,12 +31,16 @@ void RingBuffer::initialize(size_t slot_size)
     // Check if the ring buffer is already initialized.
     if (frame_data_buffer) {
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[RingBuffer::initialize] Ring buffer already initialized." << endl;
 
         throw runtime_error(error_message.str());
     }
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]"; 
         cout << "[RingBuffer::initialize] Initializing ring buffer with slot_size " << slot_size << endl;
     #endif
     
@@ -46,6 +52,8 @@ void RingBuffer::initialize(size_t slot_size)
     this->ring_buffer_initialized = true;
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[RingBuffer::initialize] Total buffer_size " << buffer_size << endl;
     #endif
 }
@@ -60,6 +68,8 @@ void RingBuffer::write(shared_ptr<FrameMetadata> frame_metadata, const char* dat
     // All images must fit in the ring buffer.
     if (frame_metadata->frame_bytes_size > slot_size) {
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[RingBuffer::write] Received frame index "<< frame_metadata->frame_index;
         error_message << " that is too large for ring buffer slot. ";
         error_message << "Slot size " << slot_size << ", but frame bytes size " << frame_metadata->frame_bytes_size << endl;
@@ -78,6 +88,8 @@ void RingBuffer::write(shared_ptr<FrameMetadata> frame_metadata, const char* dat
             frame_metadata->buffer_slot_index = write_index;
 
             #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
                 cout << "[RingBuffer::write] Ring buffer slot " << frame_metadata->buffer_slot_index << " reserved for frame_index ";
                 cout << frame_metadata->frame_index << endl;
             #endif
@@ -90,6 +102,8 @@ void RingBuffer::write(shared_ptr<FrameMetadata> frame_metadata, const char* dat
 
         } else {
             stringstream error_message;
+            using namespace date;
+            error_message << "[" << std::chrono::system_clock::now() << "]";
             error_message << "[RingBuffer::write] Ring buffer is full. Collision at write_index = " << write_index << endl;
 
             throw runtime_error(error_message.str());
@@ -101,6 +115,8 @@ void RingBuffer::write(shared_ptr<FrameMetadata> frame_metadata, const char* dat
     memcpy(slot_memory_address, data, frame_metadata->frame_bytes_size);
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[RingBuffer::write] Copied " << frame_metadata->frame_bytes_size << " frame bytes to buffer_slot_index ";
         cout << frame_metadata->buffer_slot_index << endl;
     #endif
@@ -113,6 +129,8 @@ void RingBuffer::write(shared_ptr<FrameMetadata> frame_metadata, const char* dat
     }
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[RingBuffer::write] Metadata for frame_index " << frame_metadata->frame_index << " added to metadata queue." << endl;
     #endif
 }
@@ -124,6 +142,8 @@ char* RingBuffer::get_buffer_slot_address(size_t buffer_slot_index)
     // Check if the memory address is valid.
     if (slot_memory_address > frame_data_buffer + buffer_size) {
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[RingBuffer::get_buffer_slot_address] Calculated ring buffer address is out of bound for buffer_slot_index ";
         error_message << buffer_slot_index << endl;
 
@@ -151,6 +171,8 @@ pair<shared_ptr<FrameMetadata>, char*> RingBuffer::read()
     }
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[RingBuffer::read] Received metadata for frame_index " << frame_metadata->frame_index << endl;
     #endif
 
@@ -160,6 +182,8 @@ pair<shared_ptr<FrameMetadata>, char*> RingBuffer::read()
 
         if (!ringbuffer_slots[frame_metadata->buffer_slot_index]) {
             stringstream error_message;
+            using namespace date;
+            error_message << "[" << std::chrono::system_clock::now() << "]";
             error_message << "[RingBuffer::read] Ring buffer slot referenced in message header ";
             error_message << frame_metadata->buffer_slot_index << " is empty." << endl;
 
@@ -177,6 +201,8 @@ void RingBuffer::release(size_t buffer_slot_index)
     // Cannot release a slot index that is out of range.
     if (buffer_slot_index >= n_slots) {
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[RingBuffer::release] Slot index to release " << buffer_slot_index;
         error_message << " is out of range. Ring buffer n_slots = " << n_slots << endl;
 
@@ -194,6 +220,8 @@ void RingBuffer::release(size_t buffer_slot_index)
 
     } else {
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[RingBuffer::release] Cannot release empty ring buffer slot " << buffer_slot_index << endl;
 
         throw runtime_error(error_message.str());

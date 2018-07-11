@@ -20,6 +20,8 @@ hsize_t H5FormatUtils::expand_dataset(H5::DataSet& dataset, hsize_t frame_index,
     dataset_dimension[0] = frame_index + dataset_increase_step;
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[H5FormatUtils::expand_dataset] Expanding dataspace to size (";
         for (int i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
@@ -43,6 +45,8 @@ void H5FormatUtils::compact_dataset(H5::DataSet& dataset, hsize_t max_frame_inde
     dataset_dimension[0] = max_frame_index + 1;
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[H5FormatUtils::compact_dataset] Compacting dataspace to size (";
         for (int i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
@@ -65,6 +69,8 @@ const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_
         auto reference_string = boost::any_cast<string>(value_reference);
         
         #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
             cout << "[H5FormatUtils::get_value_from_reference] Getting dataset '"<< dataset_name;
             cout << "' reference value '" << reference_string << "'." << endl;
         #endif
@@ -73,12 +79,16 @@ const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_
 
     } catch (const boost::bad_any_cast& exception) {
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << chrono::system_clock::now() << "]";
         error_message << "Cannot convert dataset " << dataset_name << " value reference to string." << endl;
 
         throw runtime_error(error_message.str());
 
     } catch (const out_of_range& exception){
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "Dataset " << dataset_name << " value reference " << boost::any_cast<string>(value_reference);
         error_message << " not present in values map." << endl;
 
@@ -89,6 +99,8 @@ const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_
 const H5::PredType& H5FormatUtils::get_dataset_data_type(const string& type)
 {
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[H5FormatUtils::get_dataset_data_type] Getting dataset type for received frame type " << type << endl;
     #endif
 
@@ -119,6 +131,8 @@ const H5::PredType& H5FormatUtils::get_dataset_data_type(const string& type)
     } else {
         // We cannot really convert this attribute.
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[H5FormatUtils::get_dataset_data_type] Unsupported dataset data_type " << type << endl;
 
         throw runtime_error(error_message.str());
@@ -152,6 +166,8 @@ H5::DataSet H5FormatUtils::write_dataset(H5::Group& target, const h5_dataset& da
 
         // We cannot really convert this attribute.
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "Cannot convert dataset " << name << " to string or const char*." << endl;
 
         throw runtime_error(error_message.str());
@@ -163,6 +179,8 @@ H5::DataSet H5FormatUtils::write_dataset(H5::Group& target, const h5_dataset& da
 
         // We cannot really convert this attribute.
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "Cannot convert dataset " << name << " to NX_INT." << endl;
 
         throw runtime_error(error_message.str());
@@ -173,11 +191,15 @@ H5::DataSet H5FormatUtils::write_dataset(H5::Group& target, const h5_dataset& da
 
         // We cannot really convert this attribute.
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "Cannot convert dataset " << name << " to NX_FLOAT." << endl;
 
         throw runtime_error(error_message.str());
     } else {
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "Unsupported dataset type for dataset " << name << "." << endl;
 
         throw runtime_error(error_message.str());
@@ -264,6 +286,8 @@ void H5FormatUtils::write_attribute(H5::H5Object& target, const h5_attr& attribu
 
         // We cannot really convert this attribute.
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "Cannot convert attribute " << name << " to string or const char*." << endl;
 
         throw runtime_error(error_message.str());
@@ -276,6 +300,8 @@ void H5FormatUtils::write_attribute(H5::H5Object& target, const h5_attr& attribu
 
         // We cannot really convert this attribute.
         stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "Cannot convert attribute " << name << " to INT." << endl;
 
         throw runtime_error(error_message.str());
@@ -309,6 +335,8 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
                     // You can specify only attributes inside a dataset.
                     if (dataset_attr.node_type != ATTRIBUTE) {
                         stringstream error_message;
+                        using namespace date;
+                        error_message << "[" << std::chrono::system_clock::now() << "]";
                         error_message << "Invalid element " << dataset_attr.name << " on dataset " << sub_dataset.name << ". Only attributes allowd.";
 
                         throw invalid_argument( error_message.str() );
