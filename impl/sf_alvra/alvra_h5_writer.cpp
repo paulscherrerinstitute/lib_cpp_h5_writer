@@ -11,7 +11,7 @@
 
 int main (int argc, char *argv[])
 {
-    if (argc != 7) {
+    if (argc != 8) {
         cout << endl;
         cout << "Usage: alvra_h5_writer [connection_address] [output_file] [n_frames]";
         cout << " [rest_port] [user_id] [bsread_address] [n_modules]" << endl;
