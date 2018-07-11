@@ -82,13 +82,17 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
 
                 } catch (const boost::bad_any_cast& exception) {
                     stringstream error_message;
-                    error_message << "Cannot cast parameter " << parameter_name << " into specified type." << endl;
+                    using namespace date;
+                    error_message << "[" << std::chrono::system_clock::now() << "]";
+                    error_message << "[RestApi::parameters(get)] Cannot cast parameter " << parameter_name << " into specified type." << endl;
 
                     throw runtime_error(error_message.str());
 
                 } catch (const out_of_range& exception){
                     stringstream error_message;
-                    error_message << "No type mapping for parameter " << parameter_name << " in file format."<< endl;
+                    using namespace date;
+                    error_message << "[" << std::chrono::system_clock::now() << "]";
+                    error_message << "[RestApi::parameters(get)] No type mapping for parameter " << parameter_name << " in file format."<< endl;
                     
                     throw runtime_error(error_message.str());
                 }
@@ -115,20 +119,26 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
                         new_parameters[parameter_name] = string(item.s());
                     } else {
                         stringstream error_message;
-                        error_message << "No NX type mapping for parameter " << parameter_name << endl;
+                        using namespace date;
+                        error_message << "[" << std::chrono::system_clock::now() << "]";
+                        error_message << "[RestApi::parameters(post)] No NX type mapping for parameter " << parameter_name << endl;
 
                         throw runtime_error(error_message.str());
                     }
                     
                 } catch (const out_of_range& exception){
                     stringstream error_message;
-                    error_message << "No type mapping for received parameter " << parameter_name << " in file format."<< endl;
+                    using namespace date;
+                    error_message << "[" << std::chrono::system_clock::now() << "]";
+                    error_message << "[RestApi::parameters(post)] No type mapping for received parameter " << parameter_name << " in file format."<< endl;
                     
                     throw runtime_error(error_message.str());
 
                 } catch (const boost::bad_any_cast& exception) {
                     stringstream error_message;
-                    error_message << "Cannot cast parameter " << parameter_name << " into specified type." << endl;
+                    using namespace date;
+                    error_message << "[" << std::chrono::system_clock::now() << "]";
+                    error_message << "[RestApi::parameters(post)] Cannot cast parameter " << parameter_name << " into specified type." << endl;
 
                     throw runtime_error(error_message.str());
 

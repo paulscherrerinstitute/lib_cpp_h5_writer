@@ -2,6 +2,8 @@
 #define RESTAPI_H
 
 #include "WriterManager.hpp"
+#include <chrono>
+#include "date.h"
 
 namespace RestApi
 {
