@@ -17,6 +17,8 @@ H5Writer::H5Writer(const std::string& filename, hsize_t frames_per_file, hsize_t
     initial_dataset_size(initial_dataset_size), dataset_increase_step(dataset_increase_step)
 {
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[H5Writer::H5Writer] Creating chunked writer"; 
         cout << " with filename " << filename;
         cout << " and frames_per_file " << frames_per_file;
@@ -35,6 +37,8 @@ void H5Writer::close_file()
     if (is_file_open()) {
 
         #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
             cout << "[H5Writer::close_file] Closing file." << endl;
         #endif
 
@@ -51,6 +55,8 @@ void H5Writer::close_file()
         auto image_nr_high = max_frame_in_dataset + 1;
 
         #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
             cout << "[H5Writer::close_file] Setting datasets attribute image_nr_low=" << image_nr_low;
             cout << " and image_nr_high=" << image_nr_high << endl;
         #endif
@@ -68,6 +74,8 @@ void H5Writer::close_file()
 
     } else {
         #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
             cout << "[H5Writer::close_file] Trying to close an already closed file." << endl;
         #endif
     }
@@ -105,12 +113,16 @@ void H5Writer::write_data(const string& dataset_name, const size_t data_index, c
         if( H5DOwrite_chunk(dataset.getId(), H5P_DEFAULT, filters, offset, data_bytes_size, data) )
         {
             stringstream error_message;
+            using namespace date;
+            error_message << "[" << std::chrono::system_clock::now() << "]";
             error_message << "Error while writing dataset " << dataset_name << " chunk to file at offset ";
             error_message << relative_data_index << "." << endl;
 
             throw invalid_argument( error_message.str() );
         }
     } catch (...) {
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[H5Writer::write_data] Error while trying to write data to dataset " << dataset_name << endl; 
         
         throw;
@@ -146,6 +158,8 @@ void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& 
     H5::DataSpace dataspace(dataset_rank, dataset_dimension, max_dataset_dimension);
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[H5Writer::create_dataset] Creating dataspace of size (";
         for (hsize_t i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
@@ -182,6 +196,8 @@ void H5Writer::create_file(hsize_t frame_chunk)
     // In case frames_per_file is > 0, the filename variable is a template for the filename.
     if (frames_per_file) {
         #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
             cout << "[H5Writer::create_file] Frames per file is defined. Format " << filename << " with frame_chunk " << frame_chunk << endl;
         #endif
 
@@ -193,6 +209,8 @@ void H5Writer::create_file(hsize_t frame_chunk)
     }
 
     #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[H5Writer::create_file] Creating filename " << target_filename << endl;
     #endif
 
