@@ -30,6 +30,12 @@ debug: lib
 perf: CPPFLAGS += -DPERF_OUTPUT
 perf: lib
 
+deploy: lib
+	cp bin/* ${CONDA_PREFIX}/lib
+	mkdir -p ${CONDA_PREFIX}/include/cpp_h5_writer
+	cp src/*.hpp ${CONDA_PREFIX}/include/cpp_h5_writer
+	cp include/date.h ${CONDA_PREFIX}/include/cpp_h5_writer
+
 libcpp_h5_writer: $(OBJS)
 	$(CPP) $(LDFLAGS) -o $(BIN_DIR)/libcpp_h5_writer.so $(OBJS) $(LDLIBS)
 
