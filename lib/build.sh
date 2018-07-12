@@ -1,4 +1,4 @@
-make
+make $1
 
 cp bin/* ${PREFIX}/lib
 
