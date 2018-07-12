@@ -4,8 +4,8 @@ BIN_DIR = ./bin
 MKDIR = mkdir -p
 
 CC = g++
-CFLAGS = -Wall -Wfatal-errors -fPIC -pthread -std=c++11 -I../../src -I${CONDA_PREFIX}/include
-LDFLAGS = -L../../bin -L${CONDA_PREFIX}/lib -L/usr/lib64 -lcpp_h5_writer -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex -lboost_thread -lpthread
+CFLAGS = -Wall -Wfatal-errors -std=c++11 -I${CONDA_PREFIX}/include -I${CONDA_PREFIX}/include/cpp_h5_writer
+LDFLAGS = -L${CONDA_PREFIX}/lib -L/usr/lib64 -lcpp_h5_writer -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex -lboost_thread -lpthread
 
 HEADERS = $(wildcard $(SRC_DIR)/*.hpp)
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
