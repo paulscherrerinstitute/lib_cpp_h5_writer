@@ -11,7 +11,7 @@ HEADERS = $(wildcard $(SRC_DIR)/*.hpp)
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-bernina_h5_writer: export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}
+bernina_h5_writer: export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib
 bernina_h5_writer: lib build_dirs $(OBJS)
 	$(CC) $(LDFLAGS) -o $(BIN_DIR)/bernina_h5_writer $(OBJS) $(LDFLAGS)
 
