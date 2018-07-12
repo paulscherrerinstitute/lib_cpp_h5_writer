@@ -65,7 +65,7 @@ int main (int argc, char *argv[])
     
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
 
-    ProcessManager::run_writer(manager, format, receiver, rest_port);
+    ProcessManager::run_writer(manager, format, receiver, rest_port, bsread_rest_address);
 
     return 0;
 }
