@@ -21,8 +21,8 @@ HEADERS = $(wildcard $(SRC_DIR)/*.hpp)
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-lib: build_dirs libcpp_h5_writer
-test: build_dirs build_test
+libcpp_h5_writer: build_dirs $(OBJS)
+	$(CPP) $(LDFLAGS) -o $(BIN_DIR)/libcpp_h5_writer.so $(OBJS) $(LDLIBS)
 
 debug: CPPFLAGS += -DDEBUG_OUTPUT
 debug: lib
@@ -30,14 +30,11 @@ debug: lib
 perf: CPPFLAGS += -DPERF_OUTPUT
 perf: lib
 
-deploy: lib
+deploy: libcpp_h5_writer
 	cp bin/* ${CONDA_PREFIX}/lib
 	mkdir -p ${CONDA_PREFIX}/include/cpp_h5_writer
 	cp src/*.hpp ${CONDA_PREFIX}/include/cpp_h5_writer
 	cp include/date.h ${CONDA_PREFIX}/include/cpp_h5_writer
-
-libcpp_h5_writer: $(OBJS)
-	$(CPP) $(LDFLAGS) -o $(BIN_DIR)/libcpp_h5_writer.so $(OBJS) $(LDLIBS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CPP) $(CPPFLAGS) $(LDLIBS) -c -o $@ $<
@@ -48,5 +45,5 @@ build_dirs:
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
 
-build_test: $(OBJS)
+test: build_dirs $(OBJS)
 	$(CPP) $(CPPFLAGS) test/test_main.cpp $(OBJS) $(LDLIBS) $(LDLIBS_TEST) -o $(BIN_DIR)/execute_tests
