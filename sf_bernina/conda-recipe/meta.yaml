@@ -1,5 +1,5 @@
 package:
-    name: bernina_cpp_h5_writer
+    name: bernina_h5_writer
     version: 0.0.1
 
 build:

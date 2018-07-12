@@ -1,5 +1,5 @@
 package:
-    name: alvra_cpp_h5_writer
+    name: alvra_h5_writer
     version: 0.0.1
 
 build:
