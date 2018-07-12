@@ -3,18 +3,16 @@ OBJ_DIR = ./obj
 BIN_DIR = ./bin
 MKDIR = mkdir -p
 
-CPP = g++
-CPPFLAGS = -Wall -Wfatal-errors -fPIC -pthread -std=c++11 -I./include -I${CONDA_PREFIX}/include
-LDLIBS = -L${CONDA_PREFIX}/lib -L/usr/lib64 -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex -lboost_thread -lpthread
-LDLIBS_TEST = -lgtest_main -lgtest
-LDFLAGS = -shared
+CC = g++
+CFLAGS = -Wall -Wfatal-errors -fPIC -pthread -std=c++11 -I./include -I${CONDA_PREFIX}/include
+LDFLAGS = -L${CONDA_PREFIX}/lib -L/usr/lib64 -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex -lboost_thread -lpthread
 
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
-	LDFLAGS += -Wl,-soname,libcpp_h5_writer.so
+	SOFLAGS += -shared -Wl,-soname,libcpp_h5_writer.so
 endif
 ifeq ($(UNAME), Darwin)
-	LDFLAGS += -Wl,-install_name,libcpp_h5_writer.so
+	SOFLAGS += -shared -Wl,-install_name,libcpp_h5_writer.so
 endif
 
 HEADERS = $(wildcard $(SRC_DIR)/*.hpp)
@@ -22,12 +20,12 @@ SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
 libcpp_h5_writer: build_dirs $(OBJS)
-	$(CPP) $(LDFLAGS) -o $(BIN_DIR)/libcpp_h5_writer.so $(OBJS) $(LDLIBS)
+	$(CC) $(SOFLAGS) -o $(BIN_DIR)/libcpp_h5_writer.so $(OBJS) $(LDFLAGS)
 
-debug: CPPFLAGS += -DDEBUG_OUTPUT
+debug: CFLAGS += -DDEBUG_OUTPUT
 debug: libcpp_h5_writer
 
-perf: CPPFLAGS += -DPERF_OUTPUT
+perf: CFLAGS += -DPERF_OUTPUT
 perf: libcpp_h5_writer
 
 deploy: libcpp_h5_writer
@@ -37,7 +35,7 @@ deploy: libcpp_h5_writer
 	cp include/date.h ${CONDA_PREFIX}/include/cpp_h5_writer
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CPP) $(CPPFLAGS) $(LDLIBS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(LDFLAGS) -c -o $@ $<
 
 build_dirs:
 	$(MKDIR) $(OBJ_DIR) $(BIN_DIR)
@@ -46,4 +44,4 @@ clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
 
 test: build_dirs $(OBJS)
-	$(CPP) $(CPPFLAGS) test/test_main.cpp $(OBJS) $(LDLIBS) $(LDLIBS_TEST) -o $(BIN_DIR)/execute_tests
+	$(CC) $(CFLAGS) test/test_main.cpp $(OBJS) $(LDFLAGS) -lgtest_main -lgtest -o $(BIN_DIR)/execute_tests
