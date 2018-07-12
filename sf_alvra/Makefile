@@ -11,21 +11,17 @@ HEADERS = $(wildcard $(SRC_DIR)/*.hpp)
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-alvra: lib all
+alvra_h5_writer: lib build_dirs $(OBJS)
+	$(CC) $(LDFLAGS) -o $(BIN_DIR)/alvra_h5_writer $(OBJS) $(LDFLAGS)
 
 lib:
 	$(MAKE) -C ../lib deploy
 
-all: build_dirs alvra_h5_writer
-
 debug: CFLAGS += -DDEBUG_OUTPUT -g
-debug: alvra
+debug: alvra_h5_writer
 
-deploy: alvra
+deploy: alvra_h5_writer
 	cp bin/* ${CONDA_PREFIX}/bin
-
-alvra_h5_writer: $(OBJS)
-	$(CC) $(LDFLAGS) -o $(BIN_DIR)/alvra_h5_writer $(OBJS) $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CFLAGS) $(LDFLAGS) -c -o $@ $<

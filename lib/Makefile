@@ -25,10 +25,10 @@ libcpp_h5_writer: build_dirs $(OBJS)
 	$(CPP) $(LDFLAGS) -o $(BIN_DIR)/libcpp_h5_writer.so $(OBJS) $(LDLIBS)
 
 debug: CPPFLAGS += -DDEBUG_OUTPUT
-debug: lib
+debug: libcpp_h5_writer
 
 perf: CPPFLAGS += -DPERF_OUTPUT
-perf: lib
+perf: libcpp_h5_writer
 
 deploy: libcpp_h5_writer
 	cp bin/* ${CONDA_PREFIX}/lib

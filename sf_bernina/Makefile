@@ -11,21 +11,17 @@ HEADERS = $(wildcard $(SRC_DIR)/*.hpp)
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-bernina: lib all
+bernina_h5_writer: lib build_dirs $(OBJS)
+	$(CC) $(LDFLAGS) -o $(BIN_DIR)/bernina_h5_writer $(OBJS) $(LDFLAGS)
 
 lib:
 	$(MAKE) -C ../lib deploy
 
-all: build_dirs bernina_h5_writer
-
 debug: CFLAGS += -DDEBUG_OUTPUT -g
-debug: bernina
+debug: bernina_h5_writer
 
-deploy: bernina
+deploy: bernina_h5_writer
 	cp bin/* ${CONDA_PREFIX}/bin
-
-bernina_h5_writer: $(OBJS)
-	$(CC) $(LDFLAGS) -o $(BIN_DIR)/bernina_h5_writer $(OBJS) $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CFLAGS) $(LDFLAGS) -c -o $@ $<
