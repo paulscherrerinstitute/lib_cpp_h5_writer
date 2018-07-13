@@ -47,10 +47,6 @@ class ZmqReceiver
 
     std::shared_ptr<std::unordered_map<std::string, HeaderDataType>> header_values_type = NULL;
 
-    
-    
-    
-
     public:
         ZmqReceiver(const std::string& connect_address, const int n_io_threads, const int receive_timeout,
             std::shared_ptr<std::unordered_map<std::string, HeaderDataType>> header_values_type=NULL);
