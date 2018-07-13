@@ -11,10 +11,10 @@
 
 int main (int argc, char *argv[])
 {
-    if (argc != 8) {
+    if (argc != 9) {
         cout << endl;
         cout << "Usage: bernina_h5_writer [connection_address] [output_file] [n_frames]";
-        cout << " [rest_port] [user_id] [bsread_address] [n_modules]" << endl;
+        cout << " [rest_port] [user_id] [bsread_address] [n_modules] [dataset_name]" << endl;
         cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\toutput_file: Name of the output file." << endl;
         cout << "\tn_frames: Number of images to acquire. 0 for infinity (until /stop is called)." << endl;
@@ -22,6 +22,7 @@ int main (int argc, char *argv[])
         cout << "\tuser_id: uid under which to run the writer. -1 to leave it as it is." << endl;
         cout << "\tbsread_address: HTTP address of the bsread REST api." << endl;
         cout << "\tn_modules: Number of detector modules to be written." << endl;
+        cout << "\tdataset_name: Name of the detector data dataset in the file format." << endl;
         cout << endl;
 
         exit(-1);
@@ -34,6 +35,7 @@ int main (int argc, char *argv[])
     int user_id = atoi(argv[5]);
     string bsread_rest_address = string(argv[6]);
     int n_modules = atoi(argv[7]);
+    string dataset_name = string(argv[8]);
 
     if (user_id != -1) {
         writer_utils::set_process_id(user_id);
@@ -41,7 +43,7 @@ int main (int argc, char *argv[])
 
     writer_utils::create_destination_folder(output_file);
 
-    BerninaFormat format;    
+    BerninaFormat format(dataset_name);    
     WriterManager manager(format.get_input_value_type(), output_file, n_frames);
 
     auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>(new unordered_map<string, HeaderDataType> {

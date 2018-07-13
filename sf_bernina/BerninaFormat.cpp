@@ -17,7 +17,7 @@ class BerninaFormat : public H5Format
     public:
         ~BerninaFormat(){};
 
-        BerninaFormat()
+        BerninaFormat(const string& dataset_name)
         {
             // Input values definition type.
             // Which type should be the parameters you receive over the REST api.
@@ -35,19 +35,19 @@ class BerninaFormat : public H5Format
             // After format has been writen, where to move the raw datasets.
             dataset_move_mapping.reset(new std::unordered_map<string, string>(
             {
-                {config::raw_image_dataset_name, "data/JF_3.0M/data"},
-                {"pulse_id", "data/JF_3.0M/pulse_id"},
-                {"frame", "data/JF_3.0M/frame"},
-                {"is_good_frame", "data/JF_3.0M/is_good_frame"},
-                {"missing_packets_1", "data/JF_3.0M/missing_packets_1"},
-                {"missing_packets_2", "data/JF_3.0M/missing_packets_2"},
-                {"daq_recs", "data/JF_3.0M/daq_recs"},
-                {"daq_rec", "data/JF_3.0M/daq_rec"},
-                {"framenum_diff", "data/JF_3.0M/framenum_diff"},
-                {"pulse_ids", "data/JF_3.0M/pulse_ids"},
-                {"framenums", "data/JF_3.0M/framenums"},
-                {"pulse_id_diff", "data/JF_3.0M/pulse_id_diff"},
-                {"module_number", "data/JF_3.0M/module_number"},
+                {config::raw_image_dataset_name, "data/" + dataset_name + "/data"},
+                {"pulse_id", "data/" + dataset_name + "/pulse_id"},
+                {"frame", "data/" + dataset_name + "/frame"},
+                {"is_good_frame", "data/" + dataset_name + "/is_good_frame"},
+                {"missing_packets_1", "data/" + dataset_name + "/missing_packets_1"},
+                {"missing_packets_2", "data/" + dataset_name + "/missing_packets_2"},
+                {"daq_recs", "data/" + dataset_name + "/daq_recs"},
+                {"daq_rec", "data/" + dataset_name + "/daq_rec"},
+                {"framenum_diff", "data/" + dataset_name + "/framenum_diff"},
+                {"pulse_ids", "data/" + dataset_name + "/pulse_ids"},
+                {"framenums", "data/" + dataset_name + "/framenums"},
+                {"pulse_id_diff", "data/" + dataset_name + "/pulse_id_diff"},
+                {"module_number", "data/" + dataset_name + "/module_number"},
             }));
 
             // Definition of the file format.
@@ -61,7 +61,7 @@ class BerninaFormat : public H5Format
                 })),
 
                 s_ptr(new h5_group("data", {
-                    s_ptr(new h5_group("JF_3.0M", {}))
+                    s_ptr(new h5_group(dataset_name, {}))
                 }))
             }));
         }
