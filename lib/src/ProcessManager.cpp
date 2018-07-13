@@ -46,7 +46,7 @@ void ProcessManager::notify_last_pulse_id(const string& bsread_rest_address, uin
 
     try {
         stringstream request;
-        request << "curl -X PUT " << bsread_rest_address << "stop_pulse_id/" << pulse_id;
+        request << "curl -X PUT " << bsread_rest_address << "/stop_pulse_id/" << pulse_id;
 
         cout << "Request: " << request.str() << endl;
 
