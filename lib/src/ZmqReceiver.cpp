@@ -9,7 +9,12 @@ using namespace std;
 namespace pt = boost::property_tree;
 
 HeaderDataType::HeaderDataType(const std::string& type, size_t shape) : 
-    type(type), value_shape(shape), endianness("little") {
+    type(type), value_shape(shape), endianness("little"), is_array(true) {
+        value_bytes_size = get_type_byte_size(type);
+}
+
+HeaderDataType::HeaderDataType(const std::string& type) : 
+    type(type), value_shape(1), endianness("little"), is_array(false) {
         value_bytes_size = get_type_byte_size(type);
 }
 
@@ -220,10 +225,7 @@ shared_ptr<char> get_value_from_json(const pt::ptree& json_header, const string&
 {
     char* buffer = new char[header_data_type.value_bytes_size * header_data_type.value_shape];
 
-    if (header_data_type.value_shape == 1) {
-        copy_value_to_buffer(buffer, 0, json_header.get_child(name), header_data_type);
-
-    } else {
+    if (header_data_type.is_array) {
         size_t index = 0;
 
         for (const auto& item : json_header.get_child(name)) {
@@ -233,6 +235,8 @@ shared_ptr<char> get_value_from_json(const pt::ptree& json_header, const string&
             ++index;
         }
 
+    } else {
+        copy_value_to_buffer(buffer, 0, json_header.get_child(name), header_data_type);
     }
 
     return shared_ptr<char>(buffer, default_delete<char[]>());

@@ -20,8 +20,10 @@ struct HeaderDataType
     size_t value_shape;
     std::string endianness;
     size_t value_bytes_size;
+    bool is_array;
 
-    HeaderDataType(const std::string& type, size_t shape=1);
+    HeaderDataType(const std::string& type);
+    HeaderDataType(const std::string& type, size_t shape);
 };
 
 size_t get_type_byte_size(const std::string& type);
@@ -45,7 +47,7 @@ class ZmqReceiver
 
     std::shared_ptr<std::unordered_map<std::string, HeaderDataType>> header_values_type = NULL;
 
-    std::shared_ptr<FrameMetadata> read_json_header(const std::string& header);
+    
     
     
 
@@ -56,6 +58,8 @@ class ZmqReceiver
         virtual ~ZmqReceiver(){};
 
         void connect();
+
+        std::shared_ptr<FrameMetadata> read_json_header(const std::string& header);
 
         std::pair<std::shared_ptr<FrameMetadata>, char*> receive();
 
