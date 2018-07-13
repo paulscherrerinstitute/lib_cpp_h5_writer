@@ -19,10 +19,11 @@ void ProcessManager::notify_first_pulse_id(const string& bsread_rest_address, ui
     // First pulse_id should be an async operation - we do not want to make the writer wait.
     async(launch::async, [pulse_id, &bsread_rest_address]{
         try {
+
             cout << "Sending first received pulse_id " << pulse_id << " to bsread_rest_address " << bsread_rest_address << endl;
 
             stringstream request;
-            request << "curl -X PUT " << bsread_rest_address << "start_pulse_id/" << pulse_id;
+            request << "curl -X PUT " << bsread_rest_address << "/start_pulse_id/" << pulse_id;
 
             string request_call(request.str());
 
