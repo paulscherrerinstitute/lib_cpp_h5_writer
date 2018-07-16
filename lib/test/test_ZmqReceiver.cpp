@@ -87,7 +87,63 @@ TEST(ZmqReceiver, read_json_header)
 
   ZmqReceiver receiver("something", 1, 1, header_values);
 
-  auto header_string = "{\"missing_packets_2\":[0],\"missing_packets_1\":[0],\"frame\":0,\"daq_recs\":[3840],\"module_number\":[0],\"shape\":[512,1024],\"pulse_id\":6021771850,\"framenum_diff\":[0],\"pulse_ids\":[6021771850],\"is_good_frame\":1,\"framenums\":[193],\"pulse_id_diff\":[0],\"daq_rec\":3840,\"type\":\"uint16\",\"htype\":\"array-1.0\"}";
+  auto header_string = "{\"missing_packets_2\":[2],"
+                        "\"missing_packets_1\":[1],"
+                        "\"frame\":0,"
+                        "\"daq_recs\":[3840],"
+                        "\"module_number\":[0],"
+                        "\"shape\":[512,1024],"
+                        "\"pulse_id\":6021771850,"
+                        "\"framenum_diff\":[-2],"
+                        "\"pulse_ids\":[6021771850],"
+                        "\"is_good_frame\":1,"
+                        "\"framenums\":[193],"
+                        "\"pulse_id_diff\":[-1],"
+                        "\"daq_rec\":-1,"
+                        "\"type\":\"uint16\","
+                        "\"htype\":\"array-1.0\"}";
 
-  auto frame_metadata = receiver.read_json_header(header_string);
+  auto metadata = receiver.read_json_header(header_string);
+
+  ASSERT_TRUE(metadata->frame_index == 0);
+  ASSERT_TRUE(metadata->endianness == "little");
+  ASSERT_TRUE(metadata->type == "uint16");
+  ASSERT_TRUE(metadata->frame_shape[0] == 512);
+  ASSERT_TRUE(metadata->frame_shape[1] == 1024);
+
+  auto pulse_id = reinterpret_cast<uint64_t*>(metadata->header_values.at("pulse_id").get());
+  ASSERT_TRUE(pulse_id[0] == 6021771850);
+
+  auto frame = reinterpret_cast<uint64_t*>(metadata->header_values.at("frame").get());
+  ASSERT_TRUE(frame[0] == 0);
+
+  auto is_good_frame = reinterpret_cast<uint64_t*>(metadata->header_values.at("is_good_frame").get());
+  ASSERT_TRUE(is_good_frame[0] == 1);
+
+  auto daq_rec = reinterpret_cast<int64_t*>(metadata->header_values.at("daq_rec").get());
+  ASSERT_TRUE(daq_rec[0] == -1);
+
+  auto pulse_id_diff = reinterpret_cast<int64_t*>(metadata->header_values.at("pulse_id_diff").get());
+  ASSERT_TRUE(pulse_id_diff[0] == -1);
+
+  auto framenum_diff = reinterpret_cast<int64_t*>(metadata->header_values.at("framenum_diff").get());
+  ASSERT_TRUE(framenum_diff[0] == -2);
+
+  auto missing_packets_1 = reinterpret_cast<uint64_t*>(metadata->header_values.at("missing_packets_1").get());
+  ASSERT_TRUE(missing_packets_1[0] == 1);
+
+  auto missing_packets_2 = reinterpret_cast<uint64_t*>(metadata->header_values.at("missing_packets_2").get());
+  ASSERT_TRUE(missing_packets_2[0] == 2);
+
+  auto daq_recs = reinterpret_cast<uint64_t*>(metadata->header_values.at("daq_recs").get());
+  ASSERT_TRUE(daq_recs[0] == 3840);
+
+  auto pulse_ids = reinterpret_cast<uint64_t*>(metadata->header_values.at("pulse_ids").get());
+  ASSERT_TRUE(pulse_ids[0] == 6021771850);
+
+  auto framenums = reinterpret_cast<uint64_t*>(metadata->header_values.at("framenums").get());
+  ASSERT_TRUE(framenums[0] == 193);
+
+  auto module_number = reinterpret_cast<uint64_t*>(metadata->header_values.at("module_number").get());
+  ASSERT_TRUE(module_number[0] == 0);
 }
