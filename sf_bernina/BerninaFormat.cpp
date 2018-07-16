@@ -17,7 +17,7 @@ class BerninaFormat : public H5Format
     public:
         ~BerninaFormat(){};
 
-        BerninaFormat(const string& dataset_name)
+        BerninaFormat(const string& dataset_name, int n_bad_modules)
         {
             // Input values definition type.
             // Which type should be the parameters you receive over the REST api.
@@ -30,7 +30,11 @@ class BerninaFormat : public H5Format
             }));
 
             // Default values used in the file format.
-            default_values.reset(new std::unordered_map<string, boost::any>({}));
+            default_values.reset(new std::unordered_map<string, boost::any>(
+            {
+                {"general/n_bad_modules", n_bad_modules},
+                {"general/detector_name", dataset_name}
+            }));
 
             // After format has been writen, where to move the raw datasets.
             dataset_move_mapping.reset(new std::unordered_map<string, string>(
@@ -58,6 +62,8 @@ class BerninaFormat : public H5Format
                     s_ptr(new h5_dataset("user", "general/user", NX_CHAR)),
                     s_ptr(new h5_dataset("process", "general/process", NX_CHAR)),
                     s_ptr(new h5_dataset("instrument", "general/instrument", NX_CHAR)),
+                    s_ptr(new h5_dataset("detector_name", "general/detector_name", NX_CHAR)),
+                    s_ptr(new h5_dataset("n_bad_modules", "general/n_bad_modules", NX_INT)),
                 })),
 
                 s_ptr(new h5_group("data", {

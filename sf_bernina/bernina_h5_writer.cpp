@@ -45,7 +45,7 @@ int main (int argc, char *argv[])
 
     writer_utils::create_destination_folder(output_file);
 
-    BerninaFormat format(detector_name,n_bad_modules);    
+    BerninaFormat format(detector_name, n_bad_modules);    
     WriterManager manager(format.get_input_value_type(), output_file, n_frames);
 
     auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>(new unordered_map<string, HeaderDataType> {
