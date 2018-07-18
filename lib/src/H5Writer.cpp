@@ -12,6 +12,16 @@ extern "C"
 
 using namespace std;
 
+std::unique_ptr<H5Writer> get_h5_writer(const string& filename, hsize_t frames_per_file, 
+    hsize_t initial_dataset_size, hsize_t dataset_increase_step)
+{
+    if (filename == "/dev/null") {
+        return unique_ptr<H5Writer>(new DummyH5Writer());
+    } else {
+        return unique_ptr<H5Writer>(new H5Writer(filename, frames_per_file, initial_dataset_size, dataset_increase_step));
+    }
+}
+
 H5Writer::H5Writer(const std::string& filename, hsize_t frames_per_file, hsize_t initial_dataset_size, hsize_t dataset_increase_step) :
     filename(filename), frames_per_file(frames_per_file), 
     initial_dataset_size(initial_dataset_size), dataset_increase_step(dataset_increase_step)
@@ -273,3 +283,24 @@ H5::H5File& H5Writer::get_h5_file()
 {
     return file;
 }
+
+DummyH5Writer::DummyH5Writer() : H5Writer("/dev/null", 0, 0, 0){}
+
+void DummyH5Writer::close_file(){}
+
+void DummyH5Writer::write_data(const string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
+    const size_t data_bytes_size, const string& data_type, const string& endianness){};
+
+bool DummyH5Writer::is_file_open() const
+{
+    return false;
+}
+
+H5::H5File& DummyH5Writer::get_h5_file(){
+    stringstream error_message;
+    using namespace date;
+    error_message << "[" << std::chrono::system_clock::now() << "]";
+    error_message << "Cannot get the H5 file with the dummy writer." << endl;
+
+    throw runtime_error(error_message.str());
+};

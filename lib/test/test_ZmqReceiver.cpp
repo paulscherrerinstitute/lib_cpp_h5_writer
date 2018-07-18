@@ -1,5 +1,4 @@
 #include "../src/ZmqReceiver.hpp"
-#include "../src/ZmqReceiver.hpp"
 
 using namespace std;
 namespace pt = boost::property_tree;

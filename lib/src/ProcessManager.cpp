@@ -148,7 +148,7 @@ void ProcessManager::receive_zmq(WriterManager& manager, RingBuffer& ring_buffer
 void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, RingBuffer& ring_buffer,
     const shared_ptr<unordered_map<string, HeaderDataType>> header_values_type, const string& bsread_rest_address)
 {
-    H5Writer writer(manager.get_output_file(), 0, config::initial_dataset_size, config::dataset_increase_step);
+    auto writer = get_h5_writer(manager.get_output_file(), 0, config::initial_dataset_size, config::dataset_increase_step);
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
 
     uint64_t last_pulse_id = 0;
@@ -174,13 +174,13 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
         #endif
 
         // Write image data.
-        writer.write_data(raw_frames_dataset_name,
-                          received_data.first->frame_index, 
-                          received_data.second,
-                          received_data.first->frame_shape,
-                          received_data.first->frame_bytes_size, 
-                          received_data.first->type,
-                          received_data.first->endianness);
+        writer->write_data(raw_frames_dataset_name,
+                           received_data.first->frame_index, 
+                           received_data.second,
+                           received_data.first->frame_shape,
+                           received_data.first->frame_bytes_size, 
+                           received_data.first->type,
+                           received_data.first->endianness);
 
         #ifdef PERF_OUTPUT
             using namespace date;
@@ -224,7 +224,7 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
                 // Header data are fixed to scalars in little endian.
                 vector<size_t> value_shape = {header_data_type.value_shape};
 
-                writer.write_data(name,
+                writer->write_data(name,
                                   received_data.first->frame_index,
                                   value.get(),
                                   value_shape,
@@ -254,7 +254,7 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
         notify_last_pulse_id(bsread_rest_address, last_pulse_id);
     }
 
-    if (writer.is_file_open()) {
+    if (writer->is_file_open()) {
         #ifdef DEBUG_OUTPUT
             using namespace date;
             cout << "[" << std::chrono::system_clock::now() << "]";
@@ -272,7 +272,7 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
             
             // Even if we can't write the format, lets try to preserve the data.
             try {
-                H5FormatUtils::write_format(writer.get_h5_file(), format, parameters);
+                H5FormatUtils::write_format(writer->get_h5_file(), format, parameters);
             } catch (const runtime_error& ex) {
                 using namespace date;
                 std::cout << "[" << std::chrono::system_clock::now() << "]";
@@ -287,7 +287,7 @@ void ProcessManager::write_h5(WriterManager& manager, const H5Format& format, Ri
         cout << "[ProcessManager::write] Closing file " << manager.get_output_file() << endl;
     #endif
     
-    writer.close_file();
+    writer->close_file();
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
