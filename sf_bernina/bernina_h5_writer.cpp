@@ -43,10 +43,7 @@ int main (int argc, char *argv[])
         writer_utils::set_process_id(user_id);
     }
 
-    writer_utils::create_destination_folder(output_file);
-
-    BerninaFormat format(detector_name, n_bad_modules);    
-    WriterManager manager(format.get_input_value_type(), output_file, n_frames);
+    writer_utils::create_destination_folder(output_file);   
 
     auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>(new unordered_map<string, HeaderDataType> {
         {"pulse_id", HeaderDataType("uint64")},
@@ -66,10 +63,15 @@ int main (int argc, char *argv[])
         
         {"module_number", HeaderDataType("uint64", n_modules)}
     });
-    
-    ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
 
-    ProcessManager::run_writer(manager, format, receiver, rest_port, bsread_rest_address);
+    BerninaFormat format(detector_name, n_bad_modules);   
+
+    WriterManager writer_manager(format.get_input_value_type(), output_file, n_frames);
+    ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
+    RingBuffer ring_buffer(config::ring_buffer_n_slots);
+
+    ProcessManager process_manager(writer_manager, receiver, ring_buffer, format, rest_port, bsread_rest_address);
+    process_manager.run_writer();
 
     return 0;
 }
