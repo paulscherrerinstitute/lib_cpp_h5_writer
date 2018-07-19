@@ -11,17 +11,17 @@ HEADERS = $(wildcard $(SRC_DIR)/*.hpp)
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-bernina_h5_writer: export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib
-bernina_h5_writer: lib build_dirs $(OBJS)
-	$(CC) $(LDFLAGS) -o $(BIN_DIR)/bernina_h5_writer $(OBJS) $(LDFLAGS)
+sf_h5_writer: export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib
+sf_h5_writer: lib build_dirs $(OBJS)
+	$(CC) $(LDFLAGS) -o $(BIN_DIR)/sf_h5_writer $(OBJS) $(LDFLAGS)
 
 lib:
 	$(MAKE) -C ../lib deploy
 
 debug: CFLAGS += -DDEBUG_OUTPUT -g
-debug: bernina_h5_writer
+debug: sf_h5_writer
 
-deploy: bernina_h5_writer
+deploy: sf_h5_writer
 	cp bin/* ${CONDA_PREFIX}/bin
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
