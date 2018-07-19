@@ -1,6 +1,6 @@
 package:
-    name: bernina_h5_writer
-    version: 0.0.1
+    name: sf_h5_writer
+    version: 0.1.0
 
 build:
   number: 0
@@ -23,4 +23,4 @@ requirements:
 
 
 about:
-    summary: "Bernina ZMQ to H5 writer."
+    summary: "SF ZMQ to H5 writer."

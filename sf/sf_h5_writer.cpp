@@ -7,13 +7,13 @@
 #include "ZmqReceiver.hpp"
 #include "ProcessManager.hpp"
 
-#include "BerninaFormat.cpp"
+#include "SfFormat.cpp"
 
 int main (int argc, char *argv[])
 {
     if (argc != 10) {
         cout << endl;
-        cout << "Usage: bernina_h5_writer [connection_address] [output_file] [n_frames]";
+        cout << "Usage: sf_h5_writer [connection_address] [output_file] [n_frames]";
         cout << " [rest_port] [user_id] [bsread_address] [n_modules] [n_bad_modules] [detector_name]" << endl;
         cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\toutput_file: Name of the output file." << endl;
@@ -64,7 +64,7 @@ int main (int argc, char *argv[])
         {"module_number", HeaderDataType("uint64", n_modules)}
     });
 
-    BerninaFormat format(detector_name, n_bad_modules);   
+    SfFormat format(detector_name, n_bad_modules);   
 
     WriterManager writer_manager(format.get_input_value_type(), output_file, n_frames);
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
