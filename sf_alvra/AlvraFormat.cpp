@@ -17,7 +17,7 @@ class AlvraFormat : public H5Format
     public:
         ~AlvraFormat(){};
 
-        AlvraFormat()
+        AlvraFormat(const string& dataset_name, int n_bad_modules)
         {
             // Input values definition type.
             // Which type should be the parameters you receive over the REST api.
@@ -30,24 +30,28 @@ class AlvraFormat : public H5Format
             }));
 
             // Default values used in the file format.
-            default_values.reset(new std::unordered_map<string, boost::any>({}));
+            default_values.reset(new std::unordered_map<string, boost::any>(
+            {
+                {"general/n_bad_modules", n_bad_modules},
+                {"general/detector_name", dataset_name}
+            }));
 
             // After format has been writen, where to move the raw datasets.
             dataset_move_mapping.reset(new std::unordered_map<string, string>(
             {
-                {config::raw_image_dataset_name, "data/JF4.5M/data"},
-                {"pulse_id", "data/JF4.5M/pulse_id"},
-                {"frame", "data/JF4.5M/frame"},
-                {"is_good_frame", "data/JF4.5M/is_good_frame"},
-                {"missing_packets_1", "data/JF4.5M/missing_packets_1"},
-                {"missing_packets_2", "data/JF4.5M/missing_packets_2"},
-                {"daq_recs", "data/JF4.5M/daq_recs"},
-                {"daq_rec", "data/JF4.5M/daq_rec"},
-                {"framenum_diff", "data/JF4.5M/framenum_diff"},
-                {"pulse_ids", "data/JF4.5M/pulse_ids"},
-                {"framenums", "data/JF4.5M/framenums"},
-                {"pulse_id_diff", "data/JF4.5M/pulse_id_diff"},
-                {"module_number", "data/JF4.5M/module_number"},
+                {config::raw_image_dataset_name, "data/" + dataset_name + "/data"},
+                {"pulse_id", "data/" + dataset_name + "/pulse_id"},
+                {"frame", "data/" + dataset_name + "/frame"},
+                {"is_good_frame", "data/" + dataset_name + "/is_good_frame"},
+                {"missing_packets_1", "data/" + dataset_name + "/missing_packets_1"},
+                {"missing_packets_2", "data/" + dataset_name + "/missing_packets_2"},
+                {"daq_recs", "data/" + dataset_name + "/daq_recs"},
+                {"daq_rec", "data/" + dataset_name + "/daq_rec"},
+                {"framenum_diff", "data/" + dataset_name + "/framenum_diff"},
+                {"pulse_ids", "data/" + dataset_name + "/pulse_ids"},
+                {"framenums", "data/" + dataset_name + "/framenums"},
+                {"pulse_id_diff", "data/" + dataset_name + "/pulse_id_diff"},
+                {"module_number", "data/" + dataset_name + "/module_number"},
             }));
 
             // Definition of the file format.
@@ -61,7 +65,7 @@ class AlvraFormat : public H5Format
                 })),
 
                 s_ptr(new h5_group("data", {
-                    s_ptr(new h5_group("JF4.5M", {}))
+                    s_ptr(new h5_group(dataset_name, {}))
                 }))
             }));
         }

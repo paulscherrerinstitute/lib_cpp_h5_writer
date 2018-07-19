@@ -11,10 +11,10 @@
 
 int main (int argc, char *argv[])
 {
-    if (argc != 8) {
+    if (argc != 10) {
         cout << endl;
         cout << "Usage: alvra_h5_writer [connection_address] [output_file] [n_frames]";
-        cout << " [rest_port] [user_id] [bsread_address] [n_modules]" << endl;
+        cout << " [rest_port] [user_id] [bsread_address] [n_modules] [n_bad_modules] [detector_name]" << endl;
         cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\toutput_file: Name of the output file." << endl;
         cout << "\tn_frames: Number of images to acquire. 0 for infinity (until /stop is called)." << endl;
@@ -22,6 +22,8 @@ int main (int argc, char *argv[])
         cout << "\tuser_id: uid under which to run the writer. -1 to leave it as it is." << endl;
         cout << "\tbsread_address: HTTP address of the bsread REST api." << endl;
         cout << "\tn_modules: Number of detector modules to be written." << endl;
+        cout << "\tn_bad_modules: Number of detector modules which has more then half bad pixels" << endl;
+        cout << "\tdetector_name: Name of the detector, data will be written as data/detector_name/ " << endl;
         cout << endl;
 
         exit(-1);
@@ -34,6 +36,8 @@ int main (int argc, char *argv[])
     int user_id = atoi(argv[5]);
     string bsread_rest_address = string(argv[6]);
     int n_modules = atoi(argv[7]);
+    int n_bad_modules = atoi(argv[8]);
+    string detector_name = string(argv[9]);
 
     if (user_id != -1) {
         writer_utils::set_process_id(user_id);
@@ -60,7 +64,7 @@ int main (int argc, char *argv[])
         {"module_number", HeaderDataType("uint64", n_modules)}
     });
 
-    AlvraFormat format;    
+    AlvraFormat format(detector_name, n_bad_modules);   
 
     WriterManager writer_manager(format.get_input_value_type(), output_file, n_frames);
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
