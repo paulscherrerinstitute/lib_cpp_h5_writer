@@ -17,16 +17,24 @@ class CsaxsFormat : public H5Format
     public:
         ~CsaxsFormat(){};
 
-        CsaxsFormat()
+        CsaxsFormat(const string& dataset_name)
         {
            
             // After format has been writen, where to move the raw datasets.
-            dataset_move_mapping.reset(new std::unordered_map<string, string>());
+            dataset_move_mapping.reset(new std::unordered_map<string, string>(
+            {
+                {config::raw_image_dataset_name, "data/" + dataset_name + "/data"},
+            }));
 
             input_value_type.reset(new unordered_map<string, DATA_TYPE>());
+
             // Definition of the file format.
             file_format.reset(
-            new h5_parent("", EMPTY_ROOT, {}));
+            new h5_parent("", EMPTY_ROOT, {
+                s_ptr(new h5_group("data", {
+                    s_ptr(new h5_group(dataset_name, {}))
+                }))
+            }));
         }
 
         const h5_parent& get_format_definition() const override
