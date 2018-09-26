@@ -24,7 +24,7 @@ int main (int argc, char *argv[])
         cout << "\tn_modules: Number of detector modules to be written." << endl;
         cout << "\tn_bad_modules: Number of detector modules which has more then half bad pixels" << endl;
         cout << "\tdetector_name: Name of the detector, data will be written as data/detector_name/ " << endl;
-        cout << "\frames_per_file: Default = 0. How many frames to write to one file. " << endl;
+        cout << "\tframes_per_file: Default = 0. How many frames to write to one file. " << endl;
         cout << endl;
 
         exit(-1);
