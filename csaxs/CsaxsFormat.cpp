@@ -17,7 +17,7 @@ class CsaxsFormat : public H5Format
     public:
         ~CsaxsFormat(){};
 
-        CsaxsFormat(const string& dataset_name, int n_bad_modules)
+        CsaxsFormat(const string& dataset_name)
         {
            
             // After format has been writen, where to move the raw datasets.
