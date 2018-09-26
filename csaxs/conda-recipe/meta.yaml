@@ -1,0 +1,26 @@
+package:
+    name: csaxs_h5_writer
+    version: 0.0.1
+
+build:
+  number: 0
+
+source:
+    path: ..
+
+requirements:
+    build:
+        - make
+        - gcc
+        - cppzmq ==4.2.1
+        - hdf5 ==1.10.1
+        - boost ==1.61.0
+
+    run:
+        - cppzmq ==4.2.1
+        - hdf5 ==1.10.1
+        - boost ==1.61.0
+
+
+about:
+    summary: "cSAXS ZMQ to H5 writer."
