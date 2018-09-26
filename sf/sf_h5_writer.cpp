@@ -11,7 +11,7 @@
 
 int main (int argc, char *argv[])
 {
-    if (argc != 10) {
+    if (argc != 10 && argc != 11) {
         cout << endl;
         cout << "Usage: sf_h5_writer [connection_address] [output_file] [n_frames]";
         cout << " [rest_port] [user_id] [bsread_address] [n_modules] [n_bad_modules] [detector_name]" << endl;
@@ -24,6 +24,7 @@ int main (int argc, char *argv[])
         cout << "\tn_modules: Number of detector modules to be written." << endl;
         cout << "\tn_bad_modules: Number of detector modules which has more then half bad pixels" << endl;
         cout << "\tdetector_name: Name of the detector, data will be written as data/detector_name/ " << endl;
+        cout << "\frames_per_file: Default = 0. How many frames to write to one file. " << endl;
         cout << endl;
 
         exit(-1);
@@ -38,6 +39,11 @@ int main (int argc, char *argv[])
     int n_modules = atoi(argv[7]);
     int n_bad_modules = atoi(argv[8]);
     string detector_name = string(argv[9]);
+
+    int frames_per_file = 0;
+    if (argc == 11) {
+        frames_per_file = atoi(argv[10]);
+    }
 
     if (user_id != -1) {
         writer_utils::set_process_id(user_id);
@@ -70,7 +76,7 @@ int main (int argc, char *argv[])
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
     RingBuffer ring_buffer(config::ring_buffer_n_slots);
 
-    ProcessManager process_manager(writer_manager, receiver, ring_buffer, format, rest_port, bsread_rest_address);
+    ProcessManager process_manager(writer_manager, receiver, ring_buffer, format, rest_port, bsread_rest_address, frames_per_file);
     process_manager.run_writer();
 
     return 0;
