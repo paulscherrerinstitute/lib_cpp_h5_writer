@@ -15,9 +15,9 @@
 using namespace std;
 
 ProcessManager::ProcessManager(WriterManager& writer_manager, ZmqReceiver& receiver, RingBuffer& ring_buffer, 
-    const H5Format& format, uint16_t rest_port, const string& bsread_rest_address) :
+    const H5Format& format, uint16_t rest_port, const string& bsread_rest_address, hsize_t frames_per_file) :
         writer_manager(writer_manager), receiver(receiver), ring_buffer(ring_buffer), format(format), rest_port(rest_port), 
-        bsread_rest_address(bsread_rest_address)
+        bsread_rest_address(bsread_rest_address), frames_per_file(frames_per_file)
 {
 }
 
@@ -152,7 +152,7 @@ void ProcessManager::receive_zmq()
 
 void ProcessManager::write_h5()
 {
-    auto writer = get_h5_writer(writer_manager.get_output_file(), 0, config::initial_dataset_size, config::dataset_increase_step);
+    auto writer = get_h5_writer(writer_manager.get_output_file(), frames_per_file, config::initial_dataset_size, config::dataset_increase_step);
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
 
     uint64_t last_pulse_id = 0;
