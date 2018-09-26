@@ -40,7 +40,7 @@ int main (int argc, char *argv[])
 
     auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>();
 
-    CsaxsFormat format(detector_name, n_bad_modules);
+    CsaxsFormat format();
 
     WriterManager writer_manager(format.get_input_value_type(), output_file, n_frames);
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
