@@ -1,5 +1,6 @@
 #include <memory>
 #include <unordered_map>
+#include <iostream>
 
 #include "config.hpp"
 #include "H5Format.hpp"
@@ -19,14 +20,15 @@ class CsaxsFormat : public H5Format
 
         CsaxsFormat(const string& dataset_name)
         {
-           
+            input_value_type.reset(new unordered_map<string, DATA_TYPE>());
+            default_values.reset(new unordered_map<string, boost::any>());
+
             // After format has been writen, where to move the raw datasets.
             dataset_move_mapping.reset(new std::unordered_map<string, string>(
             {
                 {config::raw_image_dataset_name, "data/" + dataset_name + "/data"},
             }));
 
-            input_value_type.reset(new unordered_map<string, DATA_TYPE>());
 
             // Definition of the file format.
             file_format.reset(
