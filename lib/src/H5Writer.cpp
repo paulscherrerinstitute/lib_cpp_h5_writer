@@ -223,6 +223,15 @@ void H5Writer::create_file(hsize_t frame_chunk)
     #endif
 
     file = H5::H5File(target_filename.c_str(), H5F_ACC_TRUNC);
+
+    if (file.getId() == -1) {
+       stringstream error_message;
+       using namespace date;
+       error_message << "[" << std::chrono::system_clock::now() << "]";
+       error_message << "Cannot create new file with filename " << target_filename << endl;
+
+       throw runtime_error(error_message.str());
+    }
     
     // New file created - set this files chunk number.
     current_frame_chunk = frame_chunk;
@@ -304,3 +313,4 @@ H5::H5File& DummyH5Writer::get_h5_file(){
 
     throw runtime_error(error_message.str());
 };
+
