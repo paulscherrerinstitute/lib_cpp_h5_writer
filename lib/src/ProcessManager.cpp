@@ -73,15 +73,12 @@ void ProcessManager::notify_last_pulse_id(uint64_t pulse_id)
 
 void ProcessManager::run_writer()
 {
-    size_t n_slots = config::ring_buffer_n_slots;
-    RingBuffer ring_buffer(n_slots);
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::run_writer] Running writer";
         cout << " and output_file " << writer_manager.get_output_file();
-        cout << " and n_slots " << n_slots;
         cout << endl;
     #endif
 
@@ -303,3 +300,4 @@ void ProcessManager::write_h5()
     // Exit when writer thread has closed the file.
     exit(0);
 }
+
