@@ -41,19 +41,16 @@ int main (int argc, char *argv[])
     writer_utils::create_destination_folder(output_file);   
 
     auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>(new unordered_map<string, HeaderDataType> {
-        {"pulse_id", HeaderDataType("uint64")},
         {"frame", HeaderDataType("uint64")},
         {"is_good_frame", HeaderDataType("uint64")},
         {"daq_rec", HeaderDataType("int64")},
 
-        {"pulse_id_diff", HeaderDataType("int64", n_modules)},
         {"framenum_diff", HeaderDataType("int64", n_modules)},
 
         {"missing_packets_1", HeaderDataType("uint64", n_modules)},
         {"missing_packets_2", HeaderDataType("uint64", n_modules)},
         {"daq_recs", HeaderDataType("uint64", n_modules)},
         
-        {"pulse_ids", HeaderDataType("uint64", n_modules)},
         {"framenums", HeaderDataType("uint64", n_modules)},
         
         {"module_number", HeaderDataType("uint64", n_modules)}
