@@ -27,15 +27,15 @@ class CsaxsFormat : public H5Format
             dataset_move_mapping.reset(new std::unordered_map<string, string>(
             {
                 {config::raw_image_dataset_name, "detector/" + dataset_name},
-                {"frame", "detector/" + "/frame"},
-                {"is_good_frame", "detector/" + "/is_good_frame"},
-                {"missing_packets_1", "detector/" + "/missing_packets_1"},
-                {"missing_packets_2", "detector/" + "/missing_packets_2"},
-                {"daq_recs", "detector/" + "/daq_recs"},
-                {"daq_rec", "detector/" + "/daq_rec"},
-                {"framenum_diff", "detector/" + "/framenum_diff"},
-                {"framenums", "detector/" + "/framenums"},
-                {"module_number", "detector/" + "/module_number"},
+                {"frame", "detector/frame"},
+                {"is_good_frame", "detector/is_good_frame"},
+                {"missing_packets_1", "detector/missing_packets_1"},
+                {"missing_packets_2", "detector/missing_packets_2"},
+                {"daq_recs", "detector/daq_recs"},
+                {"daq_rec", "detector/daq_rec"},
+                {"framenum_diff", "detector/framenum_diff"},
+                {"framenums", "detector/framenums"},
+                {"module_number", "detector/module_number"},
             }));
 
 
