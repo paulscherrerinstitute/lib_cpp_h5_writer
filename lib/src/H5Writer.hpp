@@ -12,7 +12,6 @@ class H5Writer
 {
     // Initialized in constructor.
     const std::string filename;
-    hsize_t total_frames;
     hsize_t frames_per_file;
     hsize_t initial_dataset_size;
     hsize_t dataset_increase_step = 0;
@@ -34,7 +33,7 @@ class H5Writer
         const std::string& data_type, const std::string& endianness);
 
     public:
-        H5Writer(const std::string& filename, hsize_t total_frames, hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
+        H5Writer(const std::string& filename hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
         virtual ~H5Writer();
         virtual bool is_file_open() const;
         virtual void close_file();
