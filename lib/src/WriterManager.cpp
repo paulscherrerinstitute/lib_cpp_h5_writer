@@ -203,3 +203,8 @@ bool WriterManager::are_all_parameters_set()
 
     return true;
 }
+
+size_t WriterManager::get_n_frames()
+{
+    return n_frames;
+}

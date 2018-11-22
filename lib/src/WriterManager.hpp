@@ -53,6 +53,8 @@ class WriterManager
         void received_frame(size_t frame_index);
         void written_frame(size_t frame_index);
         void lost_frame(size_t frame_index);
+
+        size_t get_n_frames();
 };
 
 #endif
