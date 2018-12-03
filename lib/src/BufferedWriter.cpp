@@ -2,10 +2,10 @@
 
 using namespace std;
 
-BufferedWriter::BufferedWriter(const std::string& filename, size_t total_frames, hsize_t frames_per_file, 
-    hsize_t initial_dataset_size, hsize_t dataset_increase_step) : 
+BufferedWriter::BufferedWriter(const std::string& filename, size_t total_frames, unique_ptr<MetadataBuffer>&& metadata_buffer, 
+    hsize_t frames_per_file, hsize_t initial_dataset_size, hsize_t dataset_increase_step) : 
         H5Writer(filename, frames_per_file, initial_dataset_size, dataset_increase_step), 
-        total_frames(total_frames)
+        total_frames(total_frames), metadata_buffer(move(metadata_buffer))
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
@@ -22,12 +22,13 @@ BufferedWriter::BufferedWriter(const std::string& filename, size_t total_frames,
 DummyBufferedWriter::DummyBufferedWriter() : BufferedWriter("/dev/null", 0, 0, 0, 0){}
 
 std::unique_ptr<BufferedWriter> get_buffered_writer(const string& filename, size_t total_frames, 
-    hsize_t frames_per_file, hsize_t initial_dataset_size, hsize_t dataset_increase_step)
+    std::unique_ptr<MetadataBuffer> metadata_buffer, hsize_t frames_per_file, 
+    hsize_t initial_dataset_size, hsize_t dataset_increase_step)
 {
     if (filename == "/dev/null") {
         return unique_ptr<BufferedWriter>(new DummyBufferedWriter());
     } else {
-        return unique_ptr<BufferedWriter>(new BufferedWriter(filename, total_frames, 
+        return unique_ptr<BufferedWriter>(new BufferedWriter(filename, total_frames, move(metadata_buffer),
             frames_per_file, initial_dataset_size, dataset_increase_step));
     }
 }
