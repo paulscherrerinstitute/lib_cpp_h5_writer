@@ -272,19 +272,8 @@ void ProcessManager::write_h5()
             boost::this_thread::sleep_for(boost::chrono::milliseconds(config::parameters_read_retry_interval));
         }
 
-        // Need to check again if we have all parameters to write down the format.
-        if (writer_manager.are_all_parameters_set()) {
-            const auto parameters = writer_manager.get_parameters();
-            
-            // Even if we can't write the format, lets try to preserve the data.
-            try {
-                H5FormatUtils::write_format(writer->get_h5_file(), format, parameters);
-            } catch (const runtime_error& ex) {
-                using namespace date;
-                std::cout << "[" << std::chrono::system_clock::now() << "]";
-                std::cout << "[ProcessManager::write] Error while trying to write file format: "<< ex.what() << endl;
-            }
-        }
+        write_h5_format(writer->get_h5_file());
+
     }
     
     #ifdef DEBUG_OUTPUT
@@ -305,3 +294,23 @@ void ProcessManager::write_h5()
     exit(0);
 }
 
+void ProcessManager::write_h5_format(H5::H5File& file) {
+
+    if (!writer_manager.are_all_parameters_set()) {
+        using namespace date;
+        std::cout << "[" << std::chrono::system_clock::now() << "]";
+        std::cout << "[ProcessManager::write_h5_format] Cannot write file format - REST parameters not set."<< endl;
+
+        return;
+    }
+
+    const auto parameters = writer_manager.get_parameters();
+    
+    try {
+        H5FormatUtils::write_format(file, format, parameters);
+    } catch (const runtime_error& ex) {
+        using namespace date;
+        std::cout << "[" << std::chrono::system_clock::now() << "]";
+        std::cout << "[ProcessManager::write_h5_format] Error while trying to write file format: "<< ex.what() << endl;
+    }
+}

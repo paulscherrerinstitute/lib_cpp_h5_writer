@@ -32,6 +32,7 @@ class ProcessManager
 
         void write_h5();
 
+        void write_h5_format(H5::H5File& file);
 };
 
 #endif
