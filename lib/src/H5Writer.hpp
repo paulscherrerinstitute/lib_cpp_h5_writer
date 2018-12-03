@@ -30,6 +30,8 @@ class H5Writer
 
         void create_dataset(const std::string& dataset_name, const std::vector<size_t>& data_shape, 
             const std::string& data_type, const std::string& endianness);
+        
+        size_t get_relative_data_index(const size_t data_index);
 
     public:
         H5Writer(const std::string& filename, hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
@@ -41,6 +43,7 @@ class H5Writer
             const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
         virtual H5::H5File& get_h5_file();
         virtual bool is_data_for_current_file(const size_t data_index);
+        
 };
 
 class DummyH5Writer : public H5Writer

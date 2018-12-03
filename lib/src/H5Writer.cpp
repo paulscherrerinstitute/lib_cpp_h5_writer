@@ -243,6 +243,19 @@ bool H5Writer::is_file_open() const
     return (file.getId() != -1);
 }
 
+inline size_t H5Writer::get_relative_data_index(const size_t data_index) 
+{
+    // No file roll over.
+    if (frames_per_file == 0) {
+        return data_index;
+    }
+
+    size_t destination_file_index = data_index / frames_per_file;
+    size_t relative_data_index =  data_index - (destination_file_index * frames_per_file);
+
+    return relative_data_index;
+}
+
 inline bool H5Writer::is_data_for_current_file(const size_t data_index)
 {
     if (frames_per_file) {
@@ -260,15 +273,11 @@ inline bool H5Writer::is_data_for_current_file(const size_t data_index)
 hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const size_t data_index, const std::vector<size_t>& data_shape,
      const string& data_type, const string& endianness) 
 {
-    hsize_t relative_data_index = data_index;
-
     // Check if we have to create a new file.
     if (!is_data_for_current_file(data_index)) {
+        // Calculate to which file (1 based) the data_index belongs.
         hsize_t frame_chunk = (data_index / frames_per_file) + 1;
         create_file(frame_chunk);
-
-        // Make the data_index relative to this chunk (file).
-        relative_data_index = data_index - ((frame_chunk - 1) * frames_per_file);
     }
 
     // Open the file if needed.
@@ -282,6 +291,8 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
     }
 
     hsize_t current_dataset_size = datasets_current_size.at(dataset_name);
+
+    hsize_t relative_data_index = get_relative_data_index(data_index);
 
     // Expand the dataset if needed.
     if (relative_data_index > current_dataset_size) {
