@@ -151,6 +151,8 @@ void ProcessManager::write_h5()
 {
     auto writer = get_buffered_writer(writer_manager.get_output_file(), writer_manager.get_n_frames(), frames_per_file, 
         config::initial_dataset_size, config::dataset_increase_step);
+
+    writer->create_file();
         
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
 

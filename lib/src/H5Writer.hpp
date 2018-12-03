@@ -28,7 +28,7 @@ class H5Writer
         hsize_t prepare_storage_for_data(const std::string& dataset_name, const size_t data_index, const std::vector<size_t>& data_shape, 
             const std::string& data_type, const std::string& endianness);
 
-        void create_file(const hsize_t frame_chunk=0);
+        
 
         void create_dataset(const std::string& dataset_name, const std::vector<size_t>& data_shape, 
             const std::string& data_type, const std::string& endianness);
@@ -37,6 +37,7 @@ class H5Writer
         H5Writer(const std::string& filename, hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
         virtual ~H5Writer();
         virtual bool is_file_open() const;
+        void create_file(const hsize_t frame_chunk=0);
         virtual void close_file();
         virtual void write_data(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
             const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
