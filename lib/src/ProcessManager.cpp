@@ -10,7 +10,7 @@
 #include "RestApi.hpp"
 #include "ProcessManager.hpp"
 #include "config.hpp"
-#include "H5Writer.hpp"
+#include "BufferedWriter.hpp"
 
 using namespace std;
 
@@ -149,7 +149,8 @@ void ProcessManager::receive_zmq()
 
 void ProcessManager::write_h5()
 {
-    auto writer = get_h5_writer(writer_manager.get_output_file(), frames_per_file, config::initial_dataset_size, config::dataset_increase_step);
+    auto writer = get_buffered_writer(writer_manager.get_output_file(), writer_manager.get_n_frames(), frames_per_file, 
+        config::initial_dataset_size, config::dataset_increase_step);
         
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
 
