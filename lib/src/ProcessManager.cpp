@@ -220,8 +220,6 @@ void ProcessManager::write_h5()
             for (const auto& header_type : *header_values_type) {
 
                 auto& name = header_type.first;
-                auto& header_data_type = header_type.second;
-
                 auto value = received_data.first->header_values.at(name);
 
                 // TODO: Ugly hack until we get the start sequence in the bsread stream itself.
@@ -234,16 +232,7 @@ void ProcessManager::write_h5()
                     }
                 }
 
-                // Header data are fixed to scalars in little endian.
-                vector<size_t> value_shape = {header_data_type.value_shape};
-
-                writer->write_data(name,
-                                  received_data.first->frame_index,
-                                  value.get(),
-                                  value_shape,
-                                  header_data_type.value_bytes_size,
-                                  header_data_type.type,
-                                  header_data_type.endianness);
+                writer->write_metadata(name, received_data.first->frame_index, value.get());
             }
         }
 
