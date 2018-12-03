@@ -243,19 +243,29 @@ bool H5Writer::is_file_open() const
     return (file.getId() != -1);
 }
 
+inline bool H5Writer::is_data_for_current_file(const size_t data_index)
+{
+    if (frames_per_file) {
+        hsize_t frame_chunk = (data_index / frames_per_file) + 1;
+
+        // This frames does not go into this file.
+        if (frame_chunk != current_frame_chunk) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const size_t data_index, const std::vector<size_t>& data_shape,
      const string& data_type, const string& endianness) 
 {
     hsize_t relative_data_index = data_index;
 
     // Check if we have to create a new file.
-    if (frames_per_file) {
+    if (!is_data_for_current_file(data_index)) {
         hsize_t frame_chunk = (data_index / frames_per_file) + 1;
-
-        // This frames does not go into this file.
-        if (frame_chunk != current_frame_chunk) {
-            create_file(frame_chunk);
-        }
+        create_file(frame_chunk);
 
         // Make the data_index relative to this chunk (file).
         relative_data_index = data_index - ((frame_chunk - 1) * frames_per_file);

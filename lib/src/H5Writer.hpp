@@ -41,6 +41,7 @@ class H5Writer
         virtual void write_data(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
             const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
         virtual H5::H5File& get_h5_file();
+        virtual bool is_data_for_current_file(const size_t data_index);
 };
 
 class DummyH5Writer : public H5Writer
