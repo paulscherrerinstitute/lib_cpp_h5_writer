@@ -173,6 +173,11 @@ void ProcessManager::write_h5()
             continue;
         }
 
+        // When using file roll over, write the file format before switching to the next file.
+        if (!writer->is_data_for_current_file(received_data.first->frame_index)) {
+            write_h5_format(writer->get_h5_file());
+        }
+
         #ifdef PERF_OUTPUT
             using namespace date;
             auto start_time_frame = std::chrono::system_clock::now();
@@ -273,7 +278,6 @@ void ProcessManager::write_h5()
         }
 
         write_h5_format(writer->get_h5_file());
-
     }
     
     #ifdef DEBUG_OUTPUT
