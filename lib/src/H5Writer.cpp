@@ -12,7 +12,7 @@ extern "C"
 
 using namespace std;
 
-std::unique_ptr<H5Writer> get_h5_writer(const string& filename, hsize_t total_frames, hsize_t frames_per_file, 
+std::unique_ptr<H5Writer> get_h5_writer(const string& filename, hsize_t frames_per_file, 
     hsize_t initial_dataset_size, hsize_t dataset_increase_step)
 {
     if (filename == "/dev/null") {
@@ -24,7 +24,7 @@ std::unique_ptr<H5Writer> get_h5_writer(const string& filename, hsize_t total_fr
 
 H5Writer::H5Writer(const std::string& filename, hsize_t frames_per_file, hsize_t initial_dataset_size, 
     hsize_t dataset_increase_step) :
-        filename(filename), total_frames(total_frames), frames_per_file(frames_per_file), 
+        filename(filename), frames_per_file(frames_per_file), 
         initial_dataset_size(initial_dataset_size), dataset_increase_step(dataset_increase_step)
 {
     #ifdef DEBUG_OUTPUT
