@@ -140,8 +140,8 @@ void H5Writer::write_data(const string& dataset_name, const size_t data_index, c
     }
 }
 
-void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& data_shape, 
-    const string& data_type, const string& endianness)
+void H5Writer::create_chunked_dataset(const string& dataset_name, const vector<size_t>& data_shape, 
+    const string& data_type, const string& endianness, hize_t max_dataset_size)
 {
     // Number of dimensions in each data point.
     const size_t data_rank = data_shape.size();
@@ -169,7 +169,7 @@ void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& 
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[H5Writer::create_dataset] Creating dataspace of size (";
+        cout << "[H5Writer::create_chunked_dataset] Creating dataspace of size (";
         for (hsize_t i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
         }
@@ -287,7 +287,7 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
 
     // Create the dataset if we don't have it yet.
     if (datasets.find(dataset_name) == datasets.end()) {
-        create_dataset(dataset_name, data_shape, data_type, endianness);
+        create_chunked_dataset(dataset_name, data_shape, data_type, endianness);
     }
 
     hsize_t current_dataset_size = datasets_current_size.at(dataset_name);
