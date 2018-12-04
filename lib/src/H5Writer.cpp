@@ -140,8 +140,8 @@ void H5Writer::write_data(const string& dataset_name, const size_t data_index, c
     }
 }
 
-void H5Writer::create_chunked_dataset(const string& dataset_name, const vector<size_t>& data_shape, 
-    const string& data_type, const string& endianness, hize_t max_dataset_size)
+void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& data_shape, 
+    const string& data_type, const string& endianness, bool chunked)
 {
     // Number of dimensions in each data point.
     const size_t data_rank = data_shape.size();
@@ -152,6 +152,7 @@ void H5Writer::create_chunked_dataset(const string& dataset_name, const vector<s
     hsize_t max_dataset_dimension[dataset_rank];
     hsize_t dataset_chunking[dataset_rank];
     
+    // This should be equivalent to the total number of frames in this file.
     dataset_dimension[0] = initial_dataset_size;
     // This dataset can be resized without limits. 
     max_dataset_dimension[0] = H5S_UNLIMITED;
@@ -169,15 +170,18 @@ void H5Writer::create_chunked_dataset(const string& dataset_name, const vector<s
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[H5Writer::create_chunked_dataset] Creating dataspace of size (";
+        cout << "[H5Writer::create_dataset] Creating dataspace of size (";
         for (hsize_t i=0; i<dataset_rank; ++i) {
             cout << dataset_dimension[i] << ",";
         }
         cout << ")" << endl;
     #endif
 
+    // Create a chunked dataset if needed.
     H5::DSetCreatPropList dataset_properties;
-    dataset_properties.setChunk(dataset_rank, dataset_chunking);
+    if (chunked) {
+        dataset_properties.setChunk(dataset_rank, dataset_chunking);
+    }
     
     H5::AtomType dataset_data_type(H5FormatUtils::get_dataset_data_type(data_type));
 
@@ -287,7 +291,7 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
 
     // Create the dataset if we don't have it yet.
     if (datasets.find(dataset_name) == datasets.end()) {
-        create_chunked_dataset(dataset_name, data_shape, data_type, endianness);
+        create_dataset(dataset_name, data_shape, data_type, endianness, true);
     }
 
     hsize_t current_dataset_size = datasets_current_size.at(dataset_name);

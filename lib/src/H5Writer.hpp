@@ -28,8 +28,8 @@ class H5Writer
         hsize_t prepare_storage_for_data(const std::string& dataset_name, const size_t data_index, const std::vector<size_t>& data_shape, 
             const std::string& data_type, const std::string& endianness);
 
-        void create_chunked_dataset(const std::string& dataset_name, const std::vector<size_t>& data_shape, 
-            const std::string& data_type, const std::string& endianness);
+        void create_dataset(const std::string& dataset_name, const std::vector<size_t>& data_shape, 
+            const std::string& data_type, const std::string& endianness, bool chunked);
         
         size_t get_relative_data_index(const size_t data_index);
 
@@ -41,8 +41,8 @@ class H5Writer
         virtual void close_file();
         virtual void write_data(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
             const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
-        virtual void write_dataset(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
-            const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
+        // virtual void write_dataset(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
+        //     const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
         virtual H5::H5File& get_h5_file();
         virtual bool is_data_for_current_file(const size_t data_index);
         
