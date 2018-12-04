@@ -232,7 +232,7 @@ void ProcessManager::write_h5()
                     }
                 }
 
-                writer->write_metadata(name, received_data.first->frame_index, value.get());
+                writer->cache_metadata(name, received_data.first->frame_index, value.get());
             }
         }
 

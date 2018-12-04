@@ -19,7 +19,7 @@ BufferedWriter::BufferedWriter(const std::string& filename, size_t total_frames,
     #endif
 }
 
-void BufferedWriter::write_metadata(string name, uint64_t frame_index, const char* data)
+void BufferedWriter::cache_metadata(string name, uint64_t frame_index, const char* data)
 {
     auto relative_frame_index = get_relative_data_index(frame_index);
     metadata_buffer->add_metadata_to_buffer(name, relative_frame_index, data);
