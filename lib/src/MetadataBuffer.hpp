@@ -19,6 +19,7 @@ class MetadataBuffer
 		MetadataBuffer(uint64_t n_images, std::shared_ptr<std::unordered_map<std::string, HeaderDataType>> header_values_type);
 		void add_metadata_to_buffer(std::string name, uint64_t frame_index, const char* data);
 		std::shared_ptr<char> get_metadata_values(std::string name);
+		std::shared_ptr<std::unordered_map<std::string, HeaderDataType>> get_header_values_type();
 };
 
 #endif

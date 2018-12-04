@@ -72,3 +72,8 @@ shared_ptr<char> MetadataBuffer::get_metadata_values(string name)
 
     return metadata->second;
 }
+
+shared_ptr<unordered_map<string, HeaderDataType>> MetadataBuffer::get_header_values_type()
+{
+    return header_values_type;
+}
