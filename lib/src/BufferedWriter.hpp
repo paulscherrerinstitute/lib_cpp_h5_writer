@@ -25,7 +25,6 @@ class DummyBufferedWriter : public BufferedWriter
 };
 
 std::unique_ptr<BufferedWriter> get_buffered_writer(const std::string& filename, size_t total_frames, 
-    std::unique_ptr<MetadataBuffer> metadata_buffer, hsize_t frames_per_file=0, 
-    hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
+    std::unique_ptr<MetadataBuffer> metadata_buffer, hsize_t frames_per_file=0, hsize_t dataset_increase_step=1000);
 
 #endif

@@ -27,7 +27,12 @@ void BufferedWriter::write_metadata(string name, uint64_t frame_index, const cha
 
 void BufferedWriter::write_metadata_to_file()
 {
-
+     if (header_values_type) {
+        for (const auto& header_type : *header_values_type) {
+            auto& name = header_type.first;
+            auto& header_data_type = header_type.second;
+        }
+    }
 }
 
 void BufferedWriter::close_file() 
@@ -39,9 +44,10 @@ void BufferedWriter::close_file()
 DummyBufferedWriter::DummyBufferedWriter() : BufferedWriter("/dev/null", 0, 0, 0, 0){}
 
 std::unique_ptr<BufferedWriter> get_buffered_writer(const string& filename, size_t total_frames, 
-    std::unique_ptr<MetadataBuffer> metadata_buffer, hsize_t frames_per_file, 
-    hsize_t initial_dataset_size, hsize_t dataset_increase_step)
+    std::unique_ptr<MetadataBuffer> metadata_buffer, hsize_t frames_per_file, hsize_t dataset_increase_step)
 {
+    size_t initial_dataset_size = frames_per_file != 0 ? frames_per_file : total_frames;
+
     if (filename == "/dev/null") {
         return unique_ptr<BufferedWriter>(new DummyBufferedWriter());
     } else {

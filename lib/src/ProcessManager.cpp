@@ -152,7 +152,7 @@ void ProcessManager::write_h5()
     auto metadata_buffer = unique_ptr<MetadataBuffer>(new MetadataBuffer(writer_manager.get_n_frames(), receiver.get_header_values_type()));
 
     auto writer = get_buffered_writer(writer_manager.get_output_file(), writer_manager.get_n_frames(), move(metadata_buffer), 
-        frames_per_file, config::initial_dataset_size, config::dataset_increase_step);
+        frames_per_file, config::dataset_increase_step);
 
     writer->create_file();
         
