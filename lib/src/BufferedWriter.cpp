@@ -27,7 +27,9 @@ void BufferedWriter::write_metadata(string name, uint64_t frame_index, const cha
 
 void BufferedWriter::write_metadata_to_file()
 {
-     if (header_values_type) {
+    auto header_values_type = metadata_buffer->get_header_values_type();
+
+    if (header_values_type) {
         for (const auto& header_type : *header_values_type) {
             auto& name = header_type.first;
             auto& header_data_type = header_type.second;
