@@ -12,7 +12,7 @@ MetadataBuffer::MetadataBuffer(uint64_t n_images, shared_ptr<unordered_map<strin
     if (header_values_type) {
         for (const auto& header_type : *header_values_type) {
             auto& name = header_type.first;
-                auto& header_data_type = header_type.second;
+            auto& header_data_type = header_type.second;
 
             size_t bytes_size_per_frame = header_data_type.value_shape * header_data_type.value_bytes_size;
             size_t buffer_size_bytes = n_images * bytes_size_per_frame;
