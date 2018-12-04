@@ -25,6 +25,17 @@ void BufferedWriter::write_metadata(string name, uint64_t frame_index, const cha
     metadata_buffer->add_metadata_to_buffer(name, relative_frame_index, data);
 }
 
+void BufferedWriter::write_metadata_to_file()
+{
+
+}
+
+void BufferedWriter::close_file() 
+{
+    write_metadata_to_file();
+    H5Writer::close_file();
+}
+
 DummyBufferedWriter::DummyBufferedWriter() : BufferedWriter("/dev/null", 0, 0, 0, 0){}
 
 std::unique_ptr<BufferedWriter> get_buffered_writer(const string& filename, size_t total_frames, 
