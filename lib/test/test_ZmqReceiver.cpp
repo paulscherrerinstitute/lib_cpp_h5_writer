@@ -1,3 +1,4 @@
+#include "gtest/gtest.h"
 #include "../src/ZmqReceiver.hpp"
 
 using namespace std;

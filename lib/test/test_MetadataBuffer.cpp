@@ -1,3 +1,4 @@
+#include "gtest/gtest.h"
 #include "../src/MetadataBuffer.hpp"
 
 using namespace std;
