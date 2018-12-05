@@ -38,7 +38,8 @@ void BufferedWriter::write_metadata_to_file()
 
             vector<size_t> data_shape = {header_data_type.value_shape};
 
-            create_dataset(dataset_name, data_shape, header_data_type.type, header_data_type.endianness, false);
+            create_dataset(dataset_name, data_shape, header_data_type.type, header_data_type.endianness, false, 
+                metadata_buffer->get_n_images());
 
             H5::AtomType dataset_data_type(H5FormatUtils::get_dataset_data_type(header_data_type.type));
             dataset_data_type.setOrder(H5T_ORDER_LE);

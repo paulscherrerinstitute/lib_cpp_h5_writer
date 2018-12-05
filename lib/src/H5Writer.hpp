@@ -29,7 +29,7 @@ class H5Writer
             const std::string& data_type, const std::string& endianness);
 
         void create_dataset(const std::string& dataset_name, const std::vector<size_t>& data_shape, 
-            const std::string& data_type, const std::string& endianness, bool chunked);
+            const std::string& data_type, const std::string& endianness, bool chunked, hsize_t dataset_size);
         
         size_t get_relative_data_index(const size_t data_index);
 

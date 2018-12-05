@@ -141,7 +141,7 @@ void H5Writer::write_data(const string& dataset_name, const size_t data_index, c
 }
 
 void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& data_shape, 
-    const string& data_type, const string& endianness, bool chunked)
+    const string& data_type, const string& endianness, bool chunked, hsize_t dataset_size)
 {
     // Number of dimensions in each data point.
     const size_t data_rank = data_shape.size();
@@ -153,7 +153,7 @@ void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& 
     hsize_t dataset_chunking[dataset_rank];
     
     // This should be equivalent to the total number of frames in this file.
-    dataset_dimension[0] = initial_dataset_size;
+    dataset_dimension[0] = dataset_size;
     // This dataset can be resized without limits. 
     max_dataset_dimension[0] = H5S_UNLIMITED;
     // Chunking is always set to a single data point.
@@ -291,7 +291,7 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
 
     // Create the dataset if we don't have it yet.
     if (datasets.find(dataset_name) == datasets.end()) {
-        create_dataset(dataset_name, data_shape, data_type, endianness, true);
+        create_dataset(dataset_name, data_shape, data_type, endianness, true, initial_dataset_size);
     }
 
     hsize_t current_dataset_size = datasets_current_size.at(dataset_name);
