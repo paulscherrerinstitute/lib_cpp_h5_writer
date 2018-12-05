@@ -77,3 +77,8 @@ shared_ptr<unordered_map<string, HeaderDataType>> MetadataBuffer::get_header_val
 {
     return header_values_type;
 }
+
+uint64_t MetadataBuffer::get_n_images()
+{
+    return n_images;
+}
