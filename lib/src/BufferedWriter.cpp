@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "H5Format.hpp"
 #include "BufferedWriter.hpp"
 
