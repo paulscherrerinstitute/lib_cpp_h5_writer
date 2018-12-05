@@ -177,6 +177,13 @@ void ProcessManager::write_h5()
 
         // When using file roll over, write the file format before switching to the next file.
         if (!writer->is_data_for_current_file(received_data.first->frame_index)) {
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
+                cout << "[ProcessManager::write_h5] Frame index " << received_data.first->frame_index;
+                cout << " does not belong to current file. Write format before the file will be closed." << endl;
+            #endif
+
             write_h5_format(writer->get_h5_file());
         }
 
