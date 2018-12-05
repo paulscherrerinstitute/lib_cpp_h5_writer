@@ -154,8 +154,8 @@ void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& 
     
     // This should be equivalent to the total number of frames in this file.
     dataset_dimension[0] = dataset_size;
-    // This dataset can be resized without limits. 
-    max_dataset_dimension[0] = H5S_UNLIMITED;
+    // The maximum dataset size is the same as the number of images.
+    max_dataset_dimension[0] = dataset_size;
     // Chunking is always set to a single data point.
     dataset_chunking[0] = 1;
 
@@ -163,6 +163,15 @@ void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& 
         dataset_dimension[index+1] = data_shape[index];
         max_dataset_dimension[index+1] = data_shape[index];
         dataset_chunking[index+1] = data_shape[index];
+    }
+
+    // Create a chunked dataset if needed.
+    H5::DSetCreatPropList dataset_properties;
+    if (chunked) {
+        dataset_properties.setChunk(dataset_rank, dataset_chunking);
+        
+        // Chunked datasets can be resized without limits. 
+        max_dataset_dimension[0] = H5S_UNLIMITED;
     }
 
     H5::DataSpace dataspace(dataset_rank, dataset_dimension, max_dataset_dimension);
@@ -176,12 +185,6 @@ void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& 
         }
         cout << ")" << endl;
     #endif
-
-    // Create a chunked dataset if needed.
-    H5::DSetCreatPropList dataset_properties;
-    if (chunked) {
-        dataset_properties.setChunk(dataset_rank, dataset_chunking);
-    }
     
     H5::AtomType dataset_data_type(H5FormatUtils::get_dataset_data_type(data_type));
 
