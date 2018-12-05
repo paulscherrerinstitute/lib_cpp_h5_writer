@@ -36,6 +36,17 @@ hsize_t H5FormatUtils::expand_dataset(H5::DataSet& dataset, hsize_t frame_index,
 
 void H5FormatUtils::compact_dataset(H5::DataSet& dataset, hsize_t max_frame_index)
 {
+    // Only chunked datasets can be resized.
+    if (H5D_CHUNKED != dataset.getCreatePlist().getLayout()) {
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
+            cout << "[H5FormatUtils::compact_dataset] Not compact a contiguous dataset." << endl;
+        #endif
+
+        return;
+    }
+
     const auto& data_space = dataset.getSpace();
 
     int dataset_rank = data_space.getSimpleExtentNdims();
