@@ -54,7 +54,6 @@ void BufferedWriter::write_metadata_to_file()
 
 void BufferedWriter::close_file() 
 {
-    write_metadata_to_file();
     H5Writer::close_file();
 }
 
