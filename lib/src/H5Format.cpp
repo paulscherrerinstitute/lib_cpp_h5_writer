@@ -245,7 +245,8 @@ H5::DataSet H5FormatUtils::write_dataset(H5::Group& target, const string& name, 
     H5::DataType data_type = H5::StrType(0, H5T_VARIABLE);
 
     H5::DataSet dataset = target.createDataSet(name.c_str(), data_type ,att_space);
-    dataset.write(&value, data_type);
+    
+    dataset.write(value, data_type);
 
     return dataset;
 }
@@ -256,7 +257,7 @@ void H5FormatUtils::write_attribute(H5::H5Object& target, const string& name, co
     H5::DataType data_type = H5::StrType(H5::PredType::C_S1, H5T_VARIABLE);
 
     auto h5_attribute = target.createAttribute(name.c_str(), data_type, att_space);
-    h5_attribute.write(data_type, &value);
+    h5_attribute.write(data_type, value.c_str());
 }
 
 void H5FormatUtils::write_attribute(H5::H5Object& target, const string& name, int value)
@@ -324,6 +325,7 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
 {
     auto process_items = [&format_node, &values](H5::Group& node_group){
         for (const auto item_ptr : format_node.items) {
+
             const h5_base& item = *item_ptr;
 
             if (item.node_type == GROUP) {
@@ -384,6 +386,7 @@ void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format,
     write_format_data(file, format_definition, format_values);
 
     for (const auto& mapping : format.get_dataset_move_mapping()) {
-        file.move(mapping.first.c_str(), mapping.second.c_str());
+        cout << mapping.first.c_str() << " moved to " << mapping.second.c_str() << endl;
+        file.move(mapping.first, mapping.second;
     }
 }
