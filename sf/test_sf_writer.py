@@ -20,7 +20,7 @@ def main():
     dtype = "uint16"
 
     print("Use writer start command:")
-    print("\t./sf_h5_writer tcp://127.0.0.1:8888 test%d.h5 100 12000 -1 localhost 5 0 test_sf_writer.py 10")
+    print("\t./sf_h5_writer tcp://127.0.0.1:8888 test%d.h5 100 12000 -1 localhost 5 0 test_sf_writer 10")
 
     writer_parameters_url = "http://localhost:12000/parameters"
     writer_parameters = {
