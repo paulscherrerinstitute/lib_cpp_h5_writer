@@ -185,6 +185,8 @@ void ProcessManager::write_h5()
                 cout << " does not belong to current file. Write format before the file will be closed." << endl;
             #endif
 
+            writer->write_metadata_to_file();
+
             write_h5_format(writer->get_h5_file());
         }
 
@@ -276,6 +278,8 @@ void ProcessManager::write_h5()
             boost::this_thread::sleep_for(boost::chrono::milliseconds(config::parameters_read_retry_interval));
         }
 
+        writer->write_metadata_to_file();
+        
         write_h5_format(writer->get_h5_file());
     }
     

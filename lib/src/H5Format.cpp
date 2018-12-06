@@ -386,7 +386,6 @@ void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format,
     write_format_data(file, format_definition, format_values);
 
     for (const auto& mapping : format.get_dataset_move_mapping()) {
-        cout << mapping.first.c_str() << " moved to " << mapping.second.c_str() << endl;
-        file.move(mapping.first, mapping.second;
+        file.move(mapping.first, mapping.second);
     }
 }
