@@ -17,7 +17,7 @@ MetadataBuffer::MetadataBuffer(uint64_t n_images, shared_ptr<unordered_map<strin
             size_t bytes_size_per_frame = header_data_type.value_shape * header_data_type.value_bytes_size;
             size_t buffer_size_bytes = n_images * bytes_size_per_frame;
 
-            shared_ptr<char> buffer(new char[buffer_size_bytes], std::default_delete<char[]>());
+            shared_ptr<char> buffer(new char[buffer_size_bytes](), std::default_delete<char[]>());
             metadata_buffer.insert({name, buffer});
             metadata_length_bytes.insert({name, bytes_size_per_frame});
         }
