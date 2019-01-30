@@ -128,6 +128,7 @@ export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib
 ```
 
 <a id="local_build"></a>
+## Local build
 
 If you decide not to use Anaconda, you will have to install the following libraries in your system:
 
