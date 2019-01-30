@@ -324,6 +324,8 @@ H5::H5File& H5Writer::get_h5_file()
 
 DummyH5Writer::DummyH5Writer() : H5Writer("/dev/null", 0, 0, 0){}
 
+void DummyH5Writer::create_file(hsize_t frame_chunk){}
+
 void DummyH5Writer::close_file(){}
 
 void DummyH5Writer::write_data(const string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
@@ -332,6 +334,11 @@ void DummyH5Writer::write_data(const string& dataset_name, const size_t data_ind
 bool DummyH5Writer::is_file_open() const
 {
     return false;
+}
+
+bool DummyH5Writer::is_data_for_current_file(const size_t data_index)
+{
+    return true;
 }
 
 H5::H5File& DummyH5Writer::get_h5_file(){

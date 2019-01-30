@@ -37,12 +37,10 @@ class H5Writer
         H5Writer(const std::string& filename, hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
         virtual ~H5Writer();
         virtual bool is_file_open() const;
-        void create_file(const hsize_t frame_chunk=1);
+        virtual void create_file(const hsize_t frame_chunk=1);
         virtual void close_file();
         virtual void write_data(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
             const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
-        // virtual void write_dataset(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
-        //     const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
         virtual H5::H5File& get_h5_file();
         virtual bool is_data_for_current_file(const size_t data_index);
         
@@ -52,11 +50,13 @@ class DummyH5Writer : public H5Writer
 {
     public:
         DummyH5Writer();
-        bool is_file_open() const;
-        void close_file();
+        bool is_file_open() const override;
+        void create_file(const hsize_t frame_chunk=1) override;
+        void close_file() override;
         void write_data(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
-            const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
-        H5::H5File& get_h5_file();
+            const size_t data_bytes_size, const std::string& data_type, const std::string& endianness) override;
+        H5::H5File& get_h5_file() override;
+        bool is_data_for_current_file(const size_t data_index) override;
 };
 
 std::unique_ptr<H5Writer> get_h5_writer(const std::string& filename, hsize_t frames_per_file=0, 
