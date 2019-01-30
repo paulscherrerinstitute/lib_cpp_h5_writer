@@ -21,6 +21,8 @@ Key features:
     2. [ZmqReceiver](#zmq_receiver)
     3. [H5Writer](#h5_writer)
     4. [H5Format](#h5_format)
+    5. [WriterManager](#writer_manager)
+    5. [RingBuffer](#ring_buffer)
 4. [REST interface](#rest_interface)
 5. [Examples](#examples)
 
@@ -157,8 +159,8 @@ The writer has 3 threads:
     - [REST interface](#rest_interface) describes how the REST interface works. 
 
 The communication bridges between threads are:
-- REST to H5 thread: WriterManager (WriterManager.cpp).
-- ZMQ to H5 thread: WriterManager (WriterManager.cpp) for process control and RingBuffer (RingBuffer.cpp) for data transfer.
+- REST to H5 thread: [WriterManager](#writer_manager).
+- ZMQ to H5 thread: [WriterManager](#writer_manager) for process control and [RingBuffer](#ring_buffer) for data transfer.
 
 In order to have a central place where to set fine tunning parameters, the **config.cpp** file is used.
 
@@ -173,6 +175,8 @@ remain in the temporary datasets and the user will need to fix the file manually
 
 <a id="process_manager"></a>
 ## ProcessManager
+
+Not yet here :(
 
 <a id="zmq_receiver"></a>
 ## ZmqReceiver
@@ -249,6 +253,16 @@ Not yet here :(
 Not yet here :(
 
 ### file\_format
+
+Not yet here :(
+
+<a id="writer_manager"></a>
+## WriterManager
+
+Not yet here :(
+
+<a id="RingBuffer"></a>
+## RingBuffer
 
 Not yet here :(
 
