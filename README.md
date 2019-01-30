@@ -17,8 +17,8 @@ Key features:
     1. [Conda build](#conda_build)
     2. [Local build](#local_build)
 3. [Basic concepts](#basic_concepts)
-    1. [ZmqReceiver](#zmq_receiver)
-    2. [Stream header values](#stream_header_values)
+    1. [ProcessManager](#process_manager)
+    2. [ZmqReceiver](#zmq_receiver)
     3. [H5Writer](#h5_writer)
     4. [H5Format](#h5_format)
 4. [REST interface](#rest_interface)
@@ -145,19 +145,25 @@ are discussed in subchapters below.
 
 **General overview**
 
-The writer has 3 processes:
-- REST process (listens to incoming REST requests).
-- ZMQ process (listens for incoming ZMQ stream messages).
-- H5 process (writes the received data to disk).
+The process and thread management is taken care by the [ProcessManager](#process_manager). The process manager initializes, 
+starts and stops the 3 threads discussed below.
 
-The communication bridges between processes are:
-- REST to H5 process: WriterManager (WriterManager.cpp).
-- ZMQ to H5 process: WriterManager for process control (WriterManager.cpp) and RingBuffer (RingBuffer.cpp) for data transfer.
+The writer has 3 threads:
+- ZMQ receiving thread (listens for incoming ZMQ stream messages).
+    - [ZmqReceiver](#zmq_receiver) is the only class really used here.
+- H5 writer thread (writes the received data to disk).
+    - [H5Writer](#h5_writer) is the base writer implementation that can be extended at will.
+- REST thread (listens to incoming REST requests).
+    - [REST interface](#rest_interface) describes how the REST interface works. 
+
+The communication bridges between threads are:
+- REST to H5 thread: WriterManager (WriterManager.cpp).
+- ZMQ to H5 thread: WriterManager (WriterManager.cpp) for process control and RingBuffer (RingBuffer.cpp) for data transfer.
 
 In order to have a central place where to set fine tunning parameters, the **config.cpp** file is used.
 
-The ZMQ process receives data from the stream, it extracts it and packs it (with additional metadata) into the ring buffer. 
-Meanwhile, the H5 process is listening for data in the ring buffer. When new data arrives, it writes this data down into 
+The ZMQ thread receives data from the stream, it extracts it and packs it (with additional metadata) into the ring buffer. 
+Meanwhile, the H5 thread is listening for data in the ring buffer. When new data arrives, it writes this data down into 
 temporary datasets (for performance reasons we write the file format in the end).
 
 When the end of the writing is triggered (via the REST api, when the desired number of frames are received, or when the user 
@@ -165,9 +171,13 @@ terminates the process), an attempt to write the file format is performed. If th
 datasets are moved to their final place in the file format. If the format writing step fails for any reason, the data will 
 remain in the temporary datasets and the user will need to fix the file manually (the goal is to preserve the data as much as possible).
 
+<a id="process_manager">
+## ProcessManager
+
 <a id="zmq_receiver"></a>
 ## ZmqReceiver
 The stream receiver that gets your data from the stream. This is PSI specific, and currently supports only the **Array-1.0** protocol.
+You pass the ZmqReceiver you would like to use in your writer runner, so it should be easy to implement your own if needed.
 
 The protocol specification can be found here: [htypes specification](https://github.com/datastreaming/htypes)
 
@@ -179,7 +189,9 @@ In addition to the image in the stream, the receiver can pass to the writer also
 - source (source of the currect image)
 - etc.
 
-This fields are specific to your input stream. The only constrain is that values should be scalars (one value per message). 
+This fields are specific to your input stream, and you specify them in your writer runner. You can define both scalars and arrays 
+(see **csaxs/sf\_h5\_writer.cpp**, variable **header\_values** for an example).
+
 The allowed data types for this values are:
 
 - "uint8"
@@ -195,9 +207,9 @@ The allowed data types for this values are:
 
 This stream header parameters need to be specified when constructing your ZmqReceiver instance:
 ```cpp
-// Extract the "pulse_id" value from the header, and convert it into uint64 type.
-auto header_values = shared_ptr<unordered_map<string, string>>(new unordered_map<string, string> {
-    {"pulse_id", "uint64"},
+auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>(new unordered_map<string, HeaderDataType> {
+    {"frame", HeaderDataType("uint64")}, // Scalar for frame number
+    {"module_number", HeaderDataType("int64", n_modules)} // Array of n_modules elements for module_number.
 });
 
 // Pass the header_values to the ZmqReceiver constructor.
@@ -211,11 +223,41 @@ in the file format. See chapter [H5Format](#h5_format) for more info.
 <a id="h5_writer"></a>
 ## H5Writer
 
+Not yet here :(
+
 <a id="h5_format"></a>
 ## H5Format
+
+The H5Format is the base class you need to extend to implement your file format. It specifies that the following variables need to be set:
+- input\_value\_type (REST API value name to type mapping)
+- default\_values (Fields in the file format that have default values)
+- dataset\_move\_mapping (Move datasets to another place in the file if needed)
+- file_format (The hierarchical structure of your H5 format)
+
+We will discuss each one in details in this chapter.
+
+### input\_value\_type
+
+Not yet here :(
+
+### default\_values
+
+Not yet here :(
+
+### dataset\_move\_mapping
+
+Not yet here :(
+
+### file\_format
+
+Not yet here :(
 
 <a id="rest_interface"></a>
 # REST interface
 
+Not yet here :(
+
 <a id="examples"></a>
 # Examples
+
+Not yet here :(
