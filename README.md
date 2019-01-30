@@ -14,7 +14,7 @@ Key features:
 # Table of content
 1. [Quick start using the library](#quick_start)
 2. [Build](#build)
-    1. [Conda setup](#conda_setup)
+    1. [Conda build](#conda_build)
     2. [Local build](#local_build)
 3. [Basic concepts](#basic_concepts)
     1. [ZmqReceiver](#zmq_receiver)
@@ -35,243 +35,106 @@ To create your own stream writer you need to specify:
 - The mapping between the stream header metadata and your H5 file format.
 - Additional metadata that is transfer in the stream message header.
 
-The complete repository of the example below can be found here: [sf_cpp_h5_writer](https://github.com/paulscherrerinstitute/sf_cpp_h5_writer)
+Under **sf/** and **csaxs/** you can see examples of this. Feel free to use any of this folders as a template.
 
-For example, lets see the SF file format. You will need to extend the abstract class H5Format. Lets 
-save this file into **SfFormat.cpp**.
-```cpp
-#include <memory>
-#include <unordered_map>
+**IMPORTANT**: We are using a monorepo for this project (all implementations should live in this git repository).
+To create a new implementation, please add a folder to the root of the proejct (like sf/ and csaxs/).
 
-#include "cpp_h5_writer/config.hpp"
-#include "cpp_h5_writer/H5Format.hpp"
+The minimum you need to implement your own writer is:
+- Writer runner (example: csaxs/csaxs\_h5\_writer.cpp)
+- File format (example: csaxs/CsaxsFormat.cpp)
+- Build file (example: csaxs/Makefile)
 
-using namespace std;
-using s_ptr = shared_ptr<h5_base>;
+## Writer runner
+Example: **csaxs/csaxs\_h5\_writer.cpp**
 
-class SfFormat: public H5Format
-{
-    shared_ptr<unordered_map<string, DATA_TYPE>> input_value_type = NULL;
-    shared_ptr<unordered_map<string, boost::any>> default_values = NULL;
-    shared_ptr<unordered_map<string, std::string>> dataset_move_mapping = NULL;
-    shared_ptr<h5_parent> file_format = NULL;
+The runner is the actual executable you will run to create files. In the writer runner you:
+- Specify and parse input parameters.
+- Prepare your system for writing (creating folders, switch process user etc.)
+- Instantiate the file format object.
+- Define the parameters that come in the stream header.
+- Start the writer (mostly boilerplate code, if you do not need any special implementations).
 
-    public:
-        SfFormat(){
+## File format
+Example: **csaxs/CsaxsFormat.cpp**
 
-            // Defines the input variables the user can set via the REST api.
-            // {"variable_name", [NEXUS_VARIABLE_TYPE]}
-            input_value_type.reset(
-            new unordered_map<string, DATA_TYPE>({
-                {"file_info/date", NX_CHAR},
-                {"file_info/owner", NX_CHAR},
-                {"file_info/instrument", NX_CHAR},
-                {"experiment_info/Pgroup", NX_CHAR},
-            }));
+This is a class that extends the **H5Format** class. You need to specify:
+- input\_value\_type (REST API value name to type mapping)
+- default\_values (Fields in the file format that have default values)
+- dataset\_move\_mapping (Move datasets to another place in the file if needed)
+- file_format (The hierarchical structure of your H5 format)
+It is best to specify all the values above in the class constructor. Some values (all except file_format) can be empty, 
+but they should not be null.
 
-            // Specify the values of default parameters, for example the file format.
-            // {"variable_name", [value]}
-            default_values.reset(new std::unordered_map<string, boost::any>({
-                {"file_info/version", "1.0.0"},
-            }));
+The current cSAXS and SF formats are quite simple. As a reference, you can check the old cSAXS file format implementation: 
+[csaxs_cpp_h5_writer](https://github.com/paulscherrerinstitute/csaxs_cpp_h5_writer/blob/master/CsaxsFormat.cpp)
 
-            // Specify how to map datasets the H5Writer produces and 
-            // incorporate them into your file format. See H5Format chapter for more info.
-            // {"source_dataset_path", "destination_dataset_path"}
-            dataset_move_mapping.reset(new std::unordered_map<string, string>(
-            {
-                {config::raw_image_dataset_name, "data/image"},
-                {"pulse_id", "data/pulse_id"},
-            }));
+## Build file
+Example: **csaxs/Makefile**
 
-            // The H5 file format specification.
-            // See H5Format chapter for more info.
-            file_format.reset(
-            new h5_parent("", EMPTY_ROOT, {
-                s_ptr(new h5_group("file_info", {
-                    s_ptr(new h5_dataset("Date", "file_info/date", NX_DATE_TIME)),
-                    s_ptr(new h5_dataset("Version", "file_info/version", NX_CHAR)),
-                    s_ptr(new h5_dataset("Owner", "file_info/owner", NX_CHAR)),
-                    s_ptr(new h5_dataset("Instrument", "file_info/instrument", NX_CHAR)),
-                })),
+If you want to use Makefiles, you can basically copy one from an existing implementation (csaxs/) and rename the executable. In 
+case you want something more sophisticated you will have to provide it yourself.
 
-                s_ptr(new h5_group("experiment_info", {
-                    s_ptr(new h5_dataset("Pgroup", "experiment_info/Pgroup", NX_CHAR)),
-                })),
-
-                s_ptr(new h5_group("data")),
-            }));
-        }
-
-        // Just return the format definition. Needed when writing the format.
-        const h5_parent& get_format_definition() const override 
-        {
-            return *file_format;
-        }
-
-        // Just return the default values. Needed when writing the format.
-        const unordered_map<string, boost::any>& get_default_values() const override 
-        {
-            return *default_values;
-        }
-
-        // Add any calculated fields to the values map. 
-        // The input values are in the values map as well.
-        void add_calculated_values(unordered_map<string, boost::any>& values) const override 
-        {
-            // No calculated values.
-        }
-
-        // This functions adds REST parameters to your H5 variables - might not be 1:1.
-        // If you need to rename of modify your input variables, do it here.
-        void add_input_values(unordered_map<string, boost::any>& values, 
-            const unordered_map<string, boost::any>& input_values) const override 
-        {
-            // Input value mapping is 1:1.
-            for (const auto& input_value : input_values) {
-                const auto& name = input_value.first;
-                const auto& value = input_value.second;
-
-                values[name] = value;
-            }
-        }
-
-        // Just return the input value types - neede by the REST interface.
-        const std::unordered_map<string, DATA_TYPE>& get_input_value_type() const override 
-        {
-            return *input_value_type;
-        }
-
-        const unordered_map<string, string>& get_dataset_move_mapping() const override {
-            return *dataset_move_mapping;
-        }
-};
-```
-
-In addition, you need to write a starter script for your writer. Lets again see the SF example.
-This file is called **sf\_cpp\_h5\_writer.cpp**.
-```cpp
-#include <iostream>
-#include <sstream>
-#include <stdexcept>
-
-#include "cpp_h5_writer/config.hpp"
-#include "cpp_h5_writer/ProcessManager.hpp"
-#include "cpp_h5_writer/WriterManager.hpp"
-#include "cpp_h5_writer/ZmqReceiver.hpp"
-
-#include "SfFormat.cpp"
-
-int main (int argc, char *argv[])
-{
-    if (argc != 6) {
-        cout << endl;
-        cout << "Usage: sf_h5_zmq_writer [connection_address] [output_file] [n_frames] [rest_port] [user_id]" << endl;
-        cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
-        cout << "\toutput_file: Name of the output file." << endl;
-        cout << "\tn_frames: Number of images to acquire. 0 for infinity (untill /stop is called)." << endl;
-        cout << "\trest_port: Port to start the REST Api on." << endl;
-        cout << "\tuser_id: uid under which to run the writer. -1 to leave it as it is." << endl;
-        cout << endl;
-
-        exit(-1);
-    }
-
-    // This process can be set to run under a different user.
-    auto user_id = atoi(argv[5]);
-    if (user_id != -1) {
-
-        #ifdef DEBUG_OUTPUT
-            cout << "[sf_h5_zmq_writer::main] Setting process uid to " << user_id << endl;
-        #endif
-
-        if (setuid(user_id)) {
-            stringstream error_message;
-            error_message << "[sf_h5_zmq_writer::main] Cannot set user_id to " << user_id << endl;
-
-            throw runtime_error(error_message.str());
-        }
-    }
-
-    int n_frames =  atoi(argv[3]);
-    string output_file = string(argv[2]);
-
-    // Instantiate the file format you defined above.
-    SfFormat format;
-
-    // Create a writer manager with the input value types. This will be passed to the REST api.
-    WriterManager manager(format.get_input_value_type(), output_file, n_frames);
-
-    string connect_address = string(argv[1]);
-    int n_io_threads = config::zmq_n_io_threads;
-    int receive_timeout = config::zmq_receive_timeout;
-    
-    // Define additional stream header fields to be written in the H5 file - pulse_id, in this case.
-    // For more info consult the ZmqReceiver chapter.
-    // {"field_name", "protocol value type"}
-    auto header_values = shared_ptr<unordered_map<string, string>>(new unordered_map<string, string> {
-        {"pulse_id", "uint64"},
-    });
-    ZmqReceiver receiver(connect_address, n_io_threads, receive_timeout, header_values);
-
-    int rest_port = atoi(argv[4]);
-
-    // Start the writer. This is a blocking call.
-    ProcessManager::run_writer(manager, format, receiver, rest_port);
-
-    return 0;
-}
-
-```
+In addition, you can deploy your writer also as an anaconda package - you will need to include the conda-recipe folder in this case 
+as well (see csaxs/conda-recipe).
 
 <a id="build"></a>
 # Build
 
-The easiest way to build the library is via Anaconda. If you are not familiar with Anaconda (and do not want to learn), 
-please see the [Local build](#local_build) chapter.
+**You need your compiler to support C++11.**
 
-<a id="conda_setup"></a>
-## Conda setup
-If you use conda, you can create an environment with the lib_cpp_h5_writer library by running:
+The easiest way to build the library is via Anaconda. If you are not familiar with Anaconda (and do not want to learn), 
+you can also install all the dependencies directly in your os.
+
+The base library is located in **lib/**. Change you current directory to lib/ and:
+- make (build the library for production)
+- make clean (clean the previous build)
+- make deploy (deploy library to your local conda environemnt)
+- make debug (build library with debug prints in the standard output)
+- make perf (build the library with performance measurements in the standard output)
+- make test (create tests)
+
+The usual procedure would be:
+- make test (build the tests)
+- ./bin/execute_tests (execute the tests)
+- make deploy (deploy the library)
+
+You can then start building your executable. It is also a good idea to automate the base library build from your executable build system 
+(see csaxs/Makefile, lib target for example).
+
+<a id="conda_build"></a>
+## Conda build
+If you use conda, you can create an environment with the needed library by running:
 
 ```bash
-conda create -c paulscherrerinstitute --name <env_name> lib_cpp_h5_writer
+conda create -c paulscherrerinstitute --name <env_name> make cppzmq==4.3.0 hdf5==1.10.4 boost==1.61.0 gtest==1.8.1
 ```
 
-After that you can just source you newly created environment and start linking your builds against the library.
+After that you can just source you newly created environment:
+
+```base
+conda activate <env_name> 
+```
+
+and start linking your builds against the libraries. To do that you can use the environament variables Anaconda sets:
+
+```bash
+-L${CONDA_PREFIX}/lib (for linking libraries you have installed with Anaconda)
+```
+
+To run you executables inside the Anaconda environment, you will need also to export the lib/ path in your env variables:
+```bash
+export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib
+```
 
 <a id="local_build"></a>
-## Local build
-You can build the library by running make in the root folder of the project:
 
-```bash
-make clean all
-```
-
-or by using the conda also from the root folder of the project:
-
-```bash
-conda build conda-recipe
-```
-
-Both methods require you to have a sourced conda environament with the below specified requirements installed.
-
-### Requirements
-The library relies on the following packages:
+If you decide not to use Anaconda, you will have to install the following libraries in your system:
 
 - make
-- gcc
-- cppzmq ==4.2.1
-- hdf5 ==1.10.1
+- cppzmq ==4.3.0
+- hdf5 ==1.10.4
 - boost ==1.61.0
-
-When you are using conda to install the packages, you might need to add the **conda-forge** and **paulscherrerinstitute** channels to
-your conda config:
-
-```
-conda config --add channels conda-forge
-conda config --add channels paulscherrerinstitute
-```
 
 <a id="basic_concepts"></a>
 # Basic concepts
