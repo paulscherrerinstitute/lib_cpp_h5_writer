@@ -52,12 +52,10 @@ void BufferedWriter::write_metadata_to_file()
     }
 }
 
-void BufferedWriter::close_file() 
-{
-    H5Writer::close_file();
-}
-
 DummyBufferedWriter::DummyBufferedWriter() : BufferedWriter("/dev/null", 0, 0, 0, 0){}
+
+void DummyBufferedWriter::cache_metadata(string name, uint64_t frame_index, const char* data){}
+void DummyBufferedWriter::write_metadata_to_file() {}
 
 std::unique_ptr<BufferedWriter> get_buffered_writer(const string& filename, size_t total_frames, 
     std::unique_ptr<MetadataBuffer> metadata_buffer, hsize_t frames_per_file, hsize_t dataset_increase_step)
