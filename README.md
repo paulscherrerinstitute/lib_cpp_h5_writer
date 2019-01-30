@@ -171,7 +171,7 @@ terminates the process), an attempt to write the file format is performed. If th
 datasets are moved to their final place in the file format. If the format writing step fails for any reason, the data will 
 remain in the temporary datasets and the user will need to fix the file manually (the goal is to preserve the data as much as possible).
 
-<a id="process_manager">
+<a id="process_manager"></a>
 ## ProcessManager
 
 <a id="zmq_receiver"></a>
