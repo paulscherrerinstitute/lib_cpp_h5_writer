@@ -48,15 +48,14 @@ void writer_utils::create_destination_folder(const string& output_file)
     }
 }
 
-WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type, 
-    const string& output_file, uint64_t n_frames):
-        parameters_type(parameters_type), output_file(output_file), n_frames(n_frames), 
-        running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0), n_lost_frames(0)
+WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type):
+        parameters_type(parameters_type), running_flag(true), killed_flag(false), 
+        n_received_frames(0), n_written_frames(0), n_lost_frames(0)
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[WriterManager::WriterManager] Writer manager for n_frames " << n_frames << endl;
+        cout << "[WriterManager::WriterManager] Writer manager initialized." << endl;
     #endif
 }
 
@@ -97,11 +96,6 @@ string WriterManager::get_status()
     } else {
         return "finished";
     }
-}
-
-string WriterManager::get_output_file() const
-{
-    return output_file;
 }
 
 unordered_map<string, uint64_t> WriterManager::get_statistics() const
