@@ -17,10 +17,7 @@ void RestApi::start_rest_api(crow::SimpleApp app, WriterManager& writer_manager,
         writer_manager.kill();
 
         crow::json::wvalue result;
-
-        result["status"] = "killed";
-        
-        app.stop();
+        result["status"] = writer_manager.get_status();
 
         return result;
     });
@@ -29,7 +26,6 @@ void RestApi::start_rest_api(crow::SimpleApp app, WriterManager& writer_manager,
         writer_manager.stop();
 
         crow::json::wvalue result;
-
         result["status"] = writer_manager.get_status();
 
         return result;
@@ -37,7 +33,6 @@ void RestApi::start_rest_api(crow::SimpleApp app, WriterManager& writer_manager,
 
     CROW_ROUTE (app, "/status") ([&](){
         crow::json::wvalue result;
-
         result["status"] = writer_manager.get_status();
 
         return result;
