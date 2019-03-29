@@ -210,24 +210,24 @@ void RingBuffer::release(size_t buffer_slot_index)
     }
 
     // Release the buffer slot.
-    ringbuffer_slots_mutex.lock();
+    {
+        lock_guard<mutex> lock(ringbuffer_slots_mutex);
 
-    if (ringbuffer_slots[buffer_slot_index]) {
-        ringbuffer_slots[buffer_slot_index] = 0;
+        if (ringbuffer_slots[buffer_slot_index]) {
+            ringbuffer_slots[buffer_slot_index] = 0;
 
-        // Keep track of the number of used slots.
-        buffer_used_slots--;
+            // Keep track of the number of used slots.
+            buffer_used_slots--;
 
-    } else {
-        stringstream error_message;
-        using namespace date;
-        error_message << "[" << std::chrono::system_clock::now() << "]";
-        error_message << "[RingBuffer::release] Cannot release empty ring buffer slot " << buffer_slot_index << endl;
+        } else {
+            stringstream error_message;
+            using namespace date;
+            error_message << "[" << std::chrono::system_clock::now() << "]";
+            error_message << "[RingBuffer::release] Cannot release empty ring buffer slot " << buffer_slot_index << endl;
 
-        throw runtime_error(error_message.str());
+            throw runtime_error(error_message.str());
+        }
     }
-
-    ringbuffer_slots_mutex.unlock();
 }
 
 bool RingBuffer::is_empty()
