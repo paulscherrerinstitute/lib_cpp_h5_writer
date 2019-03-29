@@ -7,7 +7,7 @@
 
 namespace RestApi
 {
-    void start_rest_api(WriterManager& writer_manager, uint16_t port);
+    void start_rest_api(crow::SimpleApp app, WriterManager& writer_manager, uint16_t port);
 }
 
 #endif

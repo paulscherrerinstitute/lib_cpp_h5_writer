@@ -6,14 +6,12 @@
 
 using namespace std;
 
-void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
+void RestApi::start_rest_api(crow::SimpleApp app, WriterManager& writer_manager, uint16_t port)
 {
 
     #ifdef DEBUG_OUTPUT
         cout << "[rest_interface::start_rest_api] Starting rest interface on port " << port << endl;
     #endif
-
-    crow::SimpleApp app;
 
     CROW_ROUTE(app, "/kill")([&](){
         writer_manager.kill();
