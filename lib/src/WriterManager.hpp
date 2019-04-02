@@ -60,10 +60,8 @@ class WriterManager
         bool write_frame();
         // True if the writing should continue.
         bool is_writing() const;
-
-        bool is_killed() const;
-        bool are_all_parameters_set();
-        std::string get_output_file() const;
+        // Signal that the writing has completed.
+        void writing_completed();
 };
 
 #endif

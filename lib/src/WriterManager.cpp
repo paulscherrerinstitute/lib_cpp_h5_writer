@@ -130,6 +130,7 @@ void WriterManager::start(const unordered_map<string, boost::any>& new_parameter
         cout << output_message.str() << endl;
     #endif
 
+    writing_flag = true;
     boost::thread writer_thread(&ProcessManager::write_h5, this, "output_file", 123);
 }
 
@@ -143,28 +144,9 @@ bool WriterManager::is_running()
     return running_flag.load();
 }
 
-bool WriterManager::is_killed() const
+bool WriterManager::is_writing() const
 {
-    return killed_flag.load();
-}
-
-bool WriterManager::are_all_parameters_set()
-{
-    for (const auto& parameter : parameters_type) {
-        const auto& parameter_name = parameter.first;
-
-        if (parameters.count(parameter_name) == 0) {
-            #ifdef DEBUG_OUTPUT
-                using namespace date;
-                cout << "[" << std::chrono::system_clock::now() << "]";
-                cout << "[WriterManager::are_all_parameters_set] Parameter " << parameter_name << " not set." << endl;
-            #endif
-
-            return false;
-        }
-    }
-
-    return true;
+    return writing_flag.load();
 }
 
 bool WriterManager::receive_frame() {
@@ -183,3 +165,6 @@ bool WriterManager::write_frame() {
     return false;
 }
 
+void WriterManager::writing_completed() {
+    writing_flag = false;    
+}

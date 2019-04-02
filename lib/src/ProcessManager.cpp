@@ -297,6 +297,8 @@ void ProcessManager::write_h5 (string output_file, uint64_t n_frames)
         cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::write] Writer thread stopped." << endl;
     #endif
+
+    writer_manager.writing_completed();
 }
 
 void ProcessManager::write_h5_format(H5::H5File& file) {
@@ -319,3 +321,4 @@ void ProcessManager::write_h5_format(H5::H5File& file) {
         std::cout << "[ProcessManager::write_h5_format] Error while trying to write file format: "<< ex.what() << endl;
     }
 }
+
