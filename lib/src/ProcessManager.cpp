@@ -90,7 +90,7 @@ void ProcessManager::run_writer(uint8_t n_receiving_threads)
 
     RestApi::start_rest_api(writer_manager, rest_port);
 
-    #ifdef DEBUG_OUTPUT
+    #ifdef DEBUG_OUTPU
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::run_writer] Rest API stopped." << endl;
@@ -149,12 +149,12 @@ void ProcessManager::receive_zmq()
     #endif
 }
 
-void ProcessManager::write_h5()
+void ProcessManager::write_h5 (string output_file, uint64_t n_frames)
 {
-    size_t metadata_buffer_size = frames_per_file != 0 ? frames_per_file : writer_manager.get_n_frames();
+    size_t metadata_buffer_size = frames_per_file != 0 ? frames_per_file : n_frames;
     auto metadata_buffer = unique_ptr<MetadataBuffer>(new MetadataBuffer(metadata_buffer_size, receiver.get_header_values_type()));
 
-    auto writer = get_buffered_writer(writer_manager.get_output_file(), writer_manager.get_n_frames(), move(metadata_buffer), 
+    auto writer = get_buffered_writer(writer_manager.get_output_file(), n_frames, move(metadata_buffer), 
         frames_per_file, config::dataset_increase_step);
 
     writer->create_file();
@@ -163,8 +163,7 @@ void ProcessManager::write_h5()
 
     uint64_t last_pulse_id = 0;
     
-    // Run until the running flag is set or the ring_buffer is empty.  
-    while(writer_manager.is_running() || !ring_buffer.is_empty()) {
+    while(writer_manager.is_writing() || !ring_buffer.is_empty()) {
         
         if (ring_buffer.is_empty()) {
             boost::this_thread::sleep_for(boost::chrono::milliseconds(config::ring_buffer_read_retry_interval));
@@ -176,6 +175,11 @@ void ProcessManager::write_h5()
         // NULL pointer means that the ringbuffer->read() timeouted. Faster than rising an exception.
         if(!received_data.first) {
             continue;
+        }
+
+        // The acquisition stops when there are no more frames to write.
+        if (!writer_manager.write_frame()) {
+            break;
         }
 
         // When using file roll over, write the file format before switching to the next file.
@@ -275,11 +279,6 @@ void ProcessManager::write_h5()
             cout << "[ProcessManager::write] Writing file format." << endl;
         #endif
 
-        // Wait until all parameters are set or writer is killed.
-        while (!writer_manager.are_all_parameters_set() && !writer_manager.is_killed()) {
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(config::parameters_read_retry_interval));
-        }
-
         writer->write_metadata_to_file();
         
         write_h5_format(writer->get_h5_file());
@@ -291,8 +290,7 @@ void ProcessManager::write_h5()
         cout << "[ProcessManager::write] Closing file " << writer_manager.get_output_file() << endl;
     #endif
     
-    writer->close_file();
-
+    writer->close_file(); 
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
