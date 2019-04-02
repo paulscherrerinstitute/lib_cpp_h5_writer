@@ -118,23 +118,19 @@ void WriterManager::start(const unordered_map<string, boost::any>& new_parameter
         stringstream output_message;
         using namespace date;
         output_message << "[" << std::chrono::system_clock::now() << "]";
-        output_message << "[WriterManager::set_parameters] Setting parameters: ";
-    #endif
+        output_message << "[WriterManager::sttart] Starting with parameters: ";
 
-    for (const auto& parameter : new_parameters) {
-        auto& parameter_name = parameter.first;
-        auto& parameter_value = parameter.second;
+        for (const auto& parameter : new_parameters) {
+            auto& parameter_name = parameter.first;
+            auto& parameter_value = parameter.second;
 
-        parameters[parameter_name] = parameter_value;
+            output_message << parameter_name << ": " << parameter_value << ", ";
+        }
 
-        #ifdef DEBUG_OUTPUT
-            output_message << parameter_name << ", ";
-        #endif
-    }
-
-    #ifdef DEBUG_OUTPUT
         cout << output_message.str() << endl;
     #endif
+
+    boost::thread writer_thread(&ProcessManager::write_h5, this, "output_file", 123);
 }
 
 const unordered_map<string, DATA_TYPE>& WriterManager::get_parameters_type() const
@@ -178,3 +174,12 @@ bool WriterManager::receive_frame() {
 
     return false;
 }
+
+bool WriterManager::write_frame() {
+    if (n_frames_to_write > 0) {
+        return (n_frames_to_write.fetch_sub(1) >= 0);
+    }
+
+    return false;
+}
+

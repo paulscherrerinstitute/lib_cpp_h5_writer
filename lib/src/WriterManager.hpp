@@ -53,8 +53,13 @@ class WriterManager
 
         // Return True if the frame is to be received, False if is to be dropped.
         bool receive_frame();
-        // True if the writer process should conitnue.
+        // True if the process should conitnue.
         bool is_running() const;
+
+        // Return True if the frame is to be written, False otherwise.
+        bool write_frame();
+        // True if the writing should continue.
+        bool is_writing() const;
 
         bool is_killed() const;
         bool are_all_parameters_set();
