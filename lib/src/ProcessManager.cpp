@@ -6,6 +6,7 @@
 #include <memory>
 #include <boost/thread.hpp>
 #include <future>
+#include <vector>
 
 #include "RestApi.hpp"
 #include "ProcessManager.hpp"
@@ -71,19 +72,21 @@ void ProcessManager::notify_last_pulse_id(uint64_t pulse_id)
     } catch (...){}
 }
 
-void ProcessManager::run_writer()
+void ProcessManager::run_writer(uint8_t n_receiving_threads)
 {
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::run_writer] Running writer";
-        cout << " and output_file " << writer_manager.get_output_file();
+        cout << " with n_receiving_threads " << n_receiving_threads;
         cout << endl;
     #endif
 
-    boost::thread receiver_thread(&ProcessManager::receive_zmq, this);
-    boost::thread writer_thread(&ProcessManager::write_h5, this);
+    boost::thread_group receivers;
+    for (uint8_t i=0; i<n_receiving_threads; i++) {
+        receivers.add_thread(new boost::thread(&ProcessManager::receive_zmq, this));
+    }
 
     RestApi::start_rest_api(writer_manager, rest_port);
 
@@ -95,9 +98,9 @@ void ProcessManager::run_writer()
 
     // In case SIGINT stopped the rest_api.
     writer_manager.stop();
+    writer_manager.kill();
 
-    receiver_thread.join();
-    writer_thread.join();
+    receivers.join_all();
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
