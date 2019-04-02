@@ -115,7 +115,7 @@ void ProcessManager::receive_zmq()
         auto frame = receiver.receive();
         
         // In case no message is available before the timeout, both pointers are NULL.
-        if (!frame.first){
+        if (!frame.first || !writer_manager.receive_frame()){
             continue;
         }
 
@@ -134,7 +134,6 @@ void ProcessManager::receive_zmq()
             cout << "." << endl;
         #endif
 
-        // Commit the frame to the buffer.
         ring_buffer.write(frame_metadata, frame_data);
 
         writer_manager.received_frame(frame_metadata->frame_index);
