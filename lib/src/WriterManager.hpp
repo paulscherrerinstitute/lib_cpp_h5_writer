@@ -32,13 +32,11 @@ class WriterManager
     const std::unordered_map<std::string, DATA_TYPE>& parameters_type;
     const std::deque<WriterManagerLog> logs;
 
-    std::atomic<bool> receiving_flag;
     std::atomic<bool> writing_flag;
     std::atomic<bool> killed_flag;
 
-    std::atomic<uint64_t> n_received_frames;
-    std::atomic<uint64_t> n_written_frames;
-    std::atomic<int64_t> n_expected_frames;
+    std::atomic<int64_t> n_frames_to_receive;
+    std::atomic<int64_t> n_frames_to_write;
 
     public:
         WriterManager(const std::unordered_map<std::string, DATA_TYPE>& parameters_type);
@@ -53,15 +51,14 @@ class WriterManager
         std::unordered_map<std::string, boost::any> get_parameters();
         const std::unordered_map<std::string, DATA_TYPE>& get_parameters_type() const;
 
-        bool is_running();
+        // Return True if the frame is to be received, False if is to be dropped.
+        bool receive_frame();
+        // True if the writer process should conitnue.
+        bool is_running() const;
+
         bool is_killed() const;
         bool are_all_parameters_set();
         std::string get_output_file() const;
-
-
-        void received_frame(size_t frame_index);
-        void written_frame(size_t frame_index);
-        void lost_frame(size_t frame_index);
 };
 
 #endif

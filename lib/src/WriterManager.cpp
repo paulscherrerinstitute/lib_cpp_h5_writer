@@ -50,8 +50,8 @@ void writer_utils::create_destination_folder(const string& output_file)
 
 WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type):
         parameters_type(parameters_type), logs(10), 
-        receiving_flag(false), writing_flag(false), killed_flag(false), 
-        n_received_frames(0), n_written_frames(0), n_expected_frames(0)
+        writing_flag(false), killed_flag(false), 
+        n_frames_to_receive(0), n_frames_to_write(0)
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
@@ -152,21 +152,6 @@ bool WriterManager::is_killed() const
     return killed_flag.load();
 }
 
-void WriterManager::received_frame(size_t frame_index)
-{
-    n_received_frames++;
-}
-
-void WriterManager::written_frame(size_t frame_index)
-{
-    n_written_frames++;
-}
-
-void WriterManager::lost_frame(size_t frame_index)
-{
-    n_lost_frames++;
-}
-
 bool WriterManager::are_all_parameters_set()
 {
     for (const auto& parameter : parameters_type) {
@@ -186,3 +171,10 @@ bool WriterManager::are_all_parameters_set()
     return true;
 }
 
+bool WriterManager::receive_frame() {
+    if (n_frames_to_receive > 0) {
+        return (n_frames_to_receive.fetch_sub(1) >= 0);
+    }
+
+    return false;
+}
