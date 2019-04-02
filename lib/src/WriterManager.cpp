@@ -49,12 +49,13 @@ void writer_utils::create_destination_folder(const string& output_file)
 }
 
 WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type):
-        parameters_type(parameters_type), running_flag(true), killed_flag(false), 
-        n_received_frames(0), n_written_frames(0), n_lost_frames(0)
+        parameters_type(parameters_type), logs(10), 
+        receiving_flag(false), writing_flag(false), killed_flag(false), 
+        n_received_frames(0), n_written_frames(0), n_expected_frames(0)
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[" << std::chrono::system_clock::now() << 
         cout << "[WriterManager::WriterManager] Writer manager initialized." << endl;
     #endif
 }
@@ -87,14 +88,12 @@ void WriterManager::kill()
 
 string WriterManager::get_status()
 {
-    if (running_flag) {
-        return "receiving";
-    } else if (n_received_frames.load() > n_written_frames) {
-        return "writing";
-    } else if (!are_all_parameters_set()) {
-        return "waiting for parameters";
+    if (writing_flag) {
+        return "writing"
+    } else if (receiving_flag) {
+        return "receiving"
     } else {
-        return "finished";
+        return "ready";
     }
 }
 
@@ -102,22 +101,18 @@ unordered_map<string, uint64_t> WriterManager::get_statistics() const
 {
     unordered_map<string, uint64_t> result = {{"n_received_frames", n_received_frames.load()},
                                     {"n_written_frames", n_written_frames.load()},
-                                    {"n_lost_frames", n_lost_frames.load()},
-                                    {"total_expected_frames", n_frames}};
+                                    {"n_lost_frames", n_lost_frames.load()}};
 
     return result;
 }
 
 unordered_map<string, boost::any> WriterManager::get_parameters()
 {
-    lock_guard<mutex> lock(parameters_mutex);
-
     return parameters;
 }
 
-void WriterManager::set_parameters(const unordered_map<string, boost::any>& new_parameters)
+void WriterManager::start(const unordered_map<string, boost::any>& new_parameters)
 {
-    lock_guard<mutex> lock(parameters_mutex);
 
     #ifdef DEBUG_OUTPUT
         stringstream output_message;
@@ -149,11 +144,6 @@ const unordered_map<string, DATA_TYPE>& WriterManager::get_parameters_type() con
 
 bool WriterManager::is_running()
 {
-    // Take into account n_frames only if it is <> 0.
-    if (n_frames && n_received_frames.load() >= n_frames) {
-        running_flag = false;
-    }
-
     return running_flag.load();
 }
 
@@ -179,8 +169,6 @@ void WriterManager::lost_frame(size_t frame_index)
 
 bool WriterManager::are_all_parameters_set()
 {
-    lock_guard<mutex> lock(parameters_mutex);
-
     for (const auto& parameter : parameters_type) {
         const auto& parameter_name = parameter.first;
 
@@ -198,7 +186,3 @@ bool WriterManager::are_all_parameters_set()
     return true;
 }
 
-size_t WriterManager::get_n_frames()
-{
-    return n_frames;
-}
