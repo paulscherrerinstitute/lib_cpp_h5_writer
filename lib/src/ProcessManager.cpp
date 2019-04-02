@@ -291,14 +291,12 @@ void ProcessManager::write_h5 (string output_file, uint64_t n_frames)
     #endif
     
     writer->close_file(); 
+
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::write] Writer thread stopped." << endl;
     #endif
-
-    // Exit when writer thread has closed the file.
-    exit(0);
 }
 
 void ProcessManager::write_h5_format(H5::H5File& file) {
