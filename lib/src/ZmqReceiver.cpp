@@ -64,22 +64,8 @@ ZmqReceiver::ZmqReceiver(const std::string& connect_address, const int n_io_thre
 
 
 ZmqReceiver::ZmqReceiver(const ZmqReceiver& other) :
-    connect_address(other.connect_address), n_io_threads(other.n_io_threads), 
-    receive_timeout(other.receive_timeout), receiver(NULL), header_values_type(other.header_values_type)
+    ZmqReceiver(other.connect_address, other.n_io_threads, other.receive_timeout, other.header_values_type)
 {
-    
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[ZmqReceiver::ZmqReceiver] Creating ZMQ receiver with";
-        cout << " connect_address " << connect_address;
-        cout << " n_io_threads " << n_io_threads;
-        cout << " receive_timeout " << receive_timeout;
-        cout << endl;
-    #endif
-
-    message_header = zmq::message_t(config::zmq_buffer_size_header);
-    message_data = zmq::message_t(config::zmq_buffer_size_data);
 }
 
 
