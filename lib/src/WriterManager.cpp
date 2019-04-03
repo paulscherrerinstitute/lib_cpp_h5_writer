@@ -50,7 +50,7 @@ void writer_utils::create_destination_folder(const string& output_file)
 
 WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type):
         parameters_type(parameters_type), logs(10), 
-        writing_flag(false), killed_flag(false), 
+        writing_flag(false), running_flag(true), 
         n_frames_to_receive(0), n_frames_to_write(0)
 {
     #ifdef DEBUG_OUTPUT
@@ -73,27 +73,14 @@ void WriterManager::stop()
     running_flag = false;
 }
 
-void WriterManager::kill()
-{
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[WriterManager::kills] Killing writer manager." << endl;
-    #endif
-
-    killed_flag = true;
-
-    stop();
-}
-
 string WriterManager::get_status()
 {
     if (writing_flag) {
-        return "writing"
-    } else if (receiving_flag) {
-        return "receiving"
-    } else {
+        return "writing";
+    } else if (running_flag) {
         return "ready";
+    } else {
+        return "Error.. I guess. This shouldn't be possible? Are you sure you are using it correctly?";
     }
 }
 

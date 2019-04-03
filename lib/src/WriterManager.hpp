@@ -33,7 +33,7 @@ class WriterManager
     const std::deque<WriterManagerLog> logs;
 
     std::atomic<bool> writing_flag;
-    std::atomic<bool> killed_flag;
+    std::atomic<bool> running_flag;
 
     std::atomic<int64_t> n_frames_to_receive;
     std::atomic<int64_t> n_frames_to_write;
@@ -44,7 +44,6 @@ class WriterManager
 
         void start(const std::unordered_map<std::string, boost::any>& new_parameters);
         void stop();
-        void kill();
         std::string get_status();
         std::unordered_map<std::string, uint64_t> get_statistics() const;
 
