@@ -26,11 +26,11 @@ class ProcessManager
         ProcessManager(WriterManager& writer_manager, ZmqReceiver& receiver, 
             RingBuffer& ring_buffer, const H5Format& format, uint16_t rest_port, const std::string& bsread_rest_address, hsize_t frames_per_file=0);
 
-        void run_writer();
+        void run_writer(uint8_t n_receiving_threads);
 
         void receive_zmq();
 
-        void write_h5();
+        void write_h5(std::string output_file, uint64_t n_frames);
 
         void write_h5_format(H5::H5File& file);
 };

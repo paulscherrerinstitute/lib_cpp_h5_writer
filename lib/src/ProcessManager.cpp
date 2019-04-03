@@ -138,8 +138,6 @@ void ProcessManager::receive_zmq()
         #endif
 
         ring_buffer.write(frame_metadata, frame_data);
-
-        writer_manager.received_frame(frame_metadata->frame_index);
    }
 
     #ifdef DEBUG_OUTPUT
@@ -154,7 +152,7 @@ void ProcessManager::write_h5 (string output_file, uint64_t n_frames)
     size_t metadata_buffer_size = frames_per_file != 0 ? frames_per_file : n_frames;
     auto metadata_buffer = unique_ptr<MetadataBuffer>(new MetadataBuffer(metadata_buffer_size, receiver.get_header_values_type()));
 
-    auto writer = get_buffered_writer(writer_manager.get_output_file(), n_frames, move(metadata_buffer), 
+    auto writer = get_buffered_writer(output_file, n_frames, move(metadata_buffer), 
         frames_per_file, config::dataset_increase_step);
 
     writer->create_file();
@@ -263,8 +261,6 @@ void ProcessManager::write_h5 (string output_file, uint64_t n_frames)
             cout << "[ProcessManager::write_h5] Frame metadata index "; 
             cout << received_data.first->frame_index << " written in " << metadata_diff_ms << " ms." << endl;
         #endif
-        
-        writer_manager.written_frame(received_data.first->frame_index);
     }
 
     // Send the last_pulse_id only if it was set.
@@ -303,14 +299,6 @@ void ProcessManager::write_h5 (string output_file, uint64_t n_frames)
 
 void ProcessManager::write_h5_format(H5::H5File& file) {
 
-    if (!writer_manager.are_all_parameters_set()) {
-        using namespace date;
-        std::cout << "[" << std::chrono::system_clock::now() << "]";
-        std::cout << "[ProcessManager::write_h5_format] Cannot write file format - REST parameters not set."<< endl;
-
-        return;
-    }
-
     const auto parameters = writer_manager.get_parameters();
     
     try {
@@ -321,4 +309,3 @@ void ProcessManager::write_h5_format(H5::H5File& file) {
         std::cout << "[ProcessManager::write_h5_format] Error while trying to write file format: "<< ex.what() << endl;
     }
 }
-
