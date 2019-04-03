@@ -105,7 +105,7 @@ void WriterManager::start(const unordered_map<string, boost::any>& new_parameter
         stringstream output_message;
         using namespace date;
         output_message << "[" << std::chrono::system_clock::now() << "]";
-        output_message << "[WriterManager::sttart] Starting with parameters: ";
+        output_message << "[WriterManager::start] Starting with parameters: ";
 
         for (const auto& parameter : new_parameters) {
             auto& parameter_name = parameter.first;
@@ -154,4 +154,29 @@ bool WriterManager::write_frame() {
 
 void WriterManager::writing_completed() {
     writing_flag = false;    
+
+    #ifdef DEBUG_OUTPUT
+        stringstream output_message;
+        using namespace date;
+        output_message << "[" << std::chrono::system_clock::now() << "]";
+        output_message << "[WriterManager::writing_completed] Writing has finished.";
+        output_message << endl;
+    #endif
+
+    //TODO: Send this event somewhere somehow?
+}
+
+void WriterManager::writing_error(string error_message) {
+    writing_flag = false;
+
+
+    #ifdef DEBUG_OUTPUT
+        stringstream output_message;
+        using namespace date;
+        output_message << "[" << std::chrono::system_clock::now() << "]";
+        output_message << "[WriterManager::writing_error] Error while writing: ";
+        output_message << error_message << endl;
+    #endif
+
+    // TODO: Send this error somewhere?
 }
