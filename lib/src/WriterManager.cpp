@@ -119,6 +119,8 @@ void WriterManager::start(const unordered_map<string, boost::any>& new_parameter
 
     writing_flag = true;
     boost::thread writer_thread(&ProcessManager::write_h5, this, "output_file", 123);
+
+    //TODO: Sent this event somewhere?
 }
 
 const unordered_map<string, DATA_TYPE>& WriterManager::get_parameters_type() const
