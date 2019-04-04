@@ -117,8 +117,12 @@ void WriterManager::start(const unordered_map<string, boost::any>& new_parameter
         cout << output_message.str() << endl;
     #endif
 
+    uint64_t n_frames = 100;
+    string output_file = "output_file";
+
+
     writing_flag = true;
-    boost::thread writer_thread(&ProcessManager::write_h5, this, "output_file", 123);
+    boost::thread writer_thread(&ProcessManager::write_h5, this, output_file, n_frames);
 
     //TODO: Sent this event somewhere?
 }
