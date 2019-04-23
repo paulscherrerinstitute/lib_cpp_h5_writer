@@ -6,14 +6,6 @@
 
 using namespace std;
 
-const unordered_map<string, DATA_TYPE> RestApi::rest_start_parameters = 
-{
-    {"n_frames", NX_INT},
-    {"user_id", NX_INT},
-    {"output_file", NX_CHAR}
-};
-
-
 void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
 {
 
@@ -60,58 +52,15 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
         return result;
     });
 
-    CROW_ROUTE (app, "/start").methods("POST"_method) ([&](const crow::request& req){
-        auto parameters_type = writer_manager.get_parameters_type();
-
+    CROW_ROUTE (app, "/start").methods("POST"_method) ([&](const crow::request& req)
+    {
         auto request_parameters = crow::json::load(req.body);
-        std::unordered_map<std::string, boost::any> parameters;
 
-        for (const auto& item : request_parameters) {
-            string parameter_name = item.key();
-            
-            try{
-                auto parameter_type = parameters_type.at(parameter_name);
+        int n_frames = request_parameters["n_frames"].i();
+        string output_file = request_parameters["output_file"].s();
+        int user_id = request_parameters["user_id"].i();
 
-                if (parameter_type == NX_FLOAT || parameter_type == NX_NUMBER) {
-                    parameters[parameter_name] = double(item.d());
-                } else if (parameter_type == NX_INT) {
-                    parameters[parameter_name] = int(item.i());
-                } else if (parameter_type == NX_CHAR) {
-                    parameters[parameter_name] = string(item.s());
-                } else if (parameter_type == NX_DATE_TIME) {
-                    parameters[parameter_name] = string(item.s());
-                } else {
-                    stringstream error_message;
-                    using namespace date;
-                    error_message << "[" << std::chrono::system_clock::now() << "]";
-                    error_message << "[RestApi::start(post)] No NX type mapping ";
-                    error_message << "for parameter " << parameter_name << endl;
-
-                    throw runtime_error(error_message.str());
-                }
-                
-            } catch (const out_of_range& exception){
-                stringstream error_message;
-                using namespace date;
-                error_message << "[" << std::chrono::system_clock::now() << "]";
-                error_message << "[RestApi::start(post)] No type mapping ";
-                error_message << "for received parameter " << parameter_name << endl;
-                
-                throw runtime_error(error_message.str());
-
-            } catch (const boost::bad_any_cast& exception) {
-                stringstream error_message;
-                using namespace date;
-                error_message << "[" << std::chrono::system_clock::now() << "]";
-                error_message << "[RestApi::start(post)] Cannot cast parameter ";
-                error_message << parameter_name << " into specified type." << endl;
-
-                throw runtime_error(error_message.str());
-
-            }
-        }
-        
-        writer_manager.start(parameters);
+        writer_manager.start(output_file, n_frames, user_id);
 
         crow::json::wvalue result;
         result["message"] = "Writer started.";
