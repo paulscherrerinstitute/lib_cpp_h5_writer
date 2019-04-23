@@ -72,7 +72,7 @@ void ProcessManager::notify_last_pulse_id(uint64_t pulse_id)
     } catch (...){}
 }
 
-void ProcessManager::run_writer(uint8_t n_receiving_threads)
+void ProcessManager::run_receivers(uint8_t n_receiving_threads)
 {
 
     #ifdef DEBUG_OUTPUT
