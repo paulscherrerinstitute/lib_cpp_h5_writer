@@ -6,26 +6,34 @@
 
 using namespace std;
 
-void RestApi::start_rest_api(crow::SimpleApp app, WriterManager& writer_manager, uint16_t port)
+const unordered_map<string, DATA_TYPE> RestApi::rest_start_parameters = 
+{
+    {"n_frames", NX_INT},
+    {"user_id", NX_INT},
+    {"output_file", NX_CHAR}
+};
+
+
+void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
 {
 
     #ifdef DEBUG_OUTPUT
-        cout << "[rest_interface::start_rest_api] Starting rest interface on port " << port << endl;
+        cout << "[rest_interface::start_rest_api] Starting rest interface on port ";
+        cout << port << endl;
+
+        cout << "[rest_interface::start_rest_api] Accepting start parameters:" << endl;
+        for (const auto& item : rest_start_parameters) {
+            cout << "\t " << item.key() << endl;
+        }
     #endif
 
-    CROW_ROUTE(app, "/kill")([&](){
-        writer_manager.kill();
-
-        crow::json::wvalue result;
-        result["status"] = writer_manager.get_status();
-
-        return result;
-    });
+    crow::SimpleApp app;
 
     CROW_ROUTE(app, "/stop")([&](){
         writer_manager.stop();
 
         crow::json::wvalue result;
+        result["state"] = "ok";
         result["status"] = writer_manager.get_status();
 
         return result;
@@ -33,6 +41,7 @@ void RestApi::start_rest_api(crow::SimpleApp app, WriterManager& writer_manager,
 
     CROW_ROUTE (app, "/status") ([&](){
         crow::json::wvalue result;
+        result["state"] = "ok";
         result["status"] = writer_manager.get_status();
 
         return result;
@@ -45,6 +54,7 @@ void RestApi::start_rest_api(crow::SimpleApp app, WriterManager& writer_manager,
             result[item.first] = item.second;
         }
 
+        result["state"] = "ok";
         result["status"] = writer_manager.get_status();
 
         return result;
@@ -74,7 +84,8 @@ void RestApi::start_rest_api(crow::SimpleApp app, WriterManager& writer_manager,
                     stringstream error_message;
                     using namespace date;
                     error_message << "[" << std::chrono::system_clock::now() << "]";
-                    error_message << "[RestApi::start(post)] No NX type mapping for parameter " << parameter_name << endl;
+                    error_message << "[RestApi::start(post)] No NX type mapping ";
+                    error_message << "for parameter " << parameter_name << endl;
 
                     throw runtime_error(error_message.str());
                 }
@@ -83,7 +94,8 @@ void RestApi::start_rest_api(crow::SimpleApp app, WriterManager& writer_manager,
                 stringstream error_message;
                 using namespace date;
                 error_message << "[" << std::chrono::system_clock::now() << "]";
-                error_message << "[RestApi::start(post)] No type mapping for received parameter " << parameter_name << " in file format."<< endl;
+                error_message << "[RestApi::start(post)] No type mapping ";
+                error_message << "for received parameter " << parameter_name << endl;
                 
                 throw runtime_error(error_message.str());
 
@@ -91,7 +103,8 @@ void RestApi::start_rest_api(crow::SimpleApp app, WriterManager& writer_manager,
                 stringstream error_message;
                 using namespace date;
                 error_message << "[" << std::chrono::system_clock::now() << "]";
-                error_message << "[RestApi::start(post)] Cannot cast parameter " << parameter_name << " into specified type." << endl;
+                error_message << "[RestApi::start(post)] Cannot cast parameter ";
+                error_message << parameter_name << " into specified type." << endl;
 
                 throw runtime_error(error_message.str());
 
