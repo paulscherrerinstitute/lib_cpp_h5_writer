@@ -19,6 +19,7 @@ namespace writer_utils {
 struct WriterManagerLog
 {
     std::string filename;
+    std::string status;
 
     uint64_t n_requested_frames;
     uint64_t n_received_frames;
@@ -29,7 +30,6 @@ struct WriterManagerLog
 class WriterManager
 {
     // Initialize in constructor.
-    const std::unordered_map<std::string, DATA_TYPE>& parameters_type;
     const std::deque<WriterManagerLog> logs;
 
     std::atomic<bool> writing_flag;
@@ -39,11 +39,12 @@ class WriterManager
     std::atomic<int64_t> n_frames_to_write;
 
     public:
-        WriterManager(const std::unordered_map<std::string, DATA_TYPE>& parameters_type);
+        WriterManager();
         virtual ~WriterManager();
 
-        void start(const std::unordered_map<std::string, boost::any>& new_parameters);
+        void start(std::string output_file, int n_frames, int user_id);
         void stop();
+
         std::string get_status();
         std::unordered_map<std::string, uint64_t> get_statistics() const;
 

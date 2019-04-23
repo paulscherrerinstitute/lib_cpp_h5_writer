@@ -48,8 +48,8 @@ void writer_utils::create_destination_folder(const string& output_file)
     }
 }
 
-WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type):
-        parameters_type(parameters_type), logs(10), 
+WriterManager::WriterManager():
+        logs(10), 
         writing_flag(false), running_flag(true), 
         n_frames_to_receive(0), n_frames_to_write(0)
 {
@@ -98,7 +98,9 @@ unordered_map<string, boost::any> WriterManager::get_parameters()
     return parameters;
 }
 
-void WriterManager::start(const unordered_map<string, boost::any>& new_parameters)
+void WriterManager::start(const string output_file,
+                          const int n_frames, 
+                          const int user_id)
 {
 
     #ifdef DEBUG_OUTPUT
