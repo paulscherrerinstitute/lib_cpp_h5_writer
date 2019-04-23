@@ -72,6 +72,12 @@ void ProcessManager::notify_last_pulse_id(uint64_t pulse_id)
     } catch (...){}
 }
 
+void ProcessManager::run_writer(std::string output_file, uint64_t n_frames)
+{
+    
+
+}
+
 void ProcessManager::run_receivers(uint8_t n_receiving_threads)
 {
 
@@ -98,7 +104,6 @@ void ProcessManager::run_receivers(uint8_t n_receiving_threads)
 
     // In case SIGINT stopped the rest_api.
     writer_manager.stop();
-    writer_manager.kill();
 
     receivers.join_all();
 
