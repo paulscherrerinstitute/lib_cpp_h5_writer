@@ -28,6 +28,7 @@ class ProcessManager
                        const std::string& bsread_rest_address, 
                        hsize_t frames_per_file=0);
 
+        void receive_zmq();
         void run_receivers(uint8_t n_receiving_threads);
 
 };
