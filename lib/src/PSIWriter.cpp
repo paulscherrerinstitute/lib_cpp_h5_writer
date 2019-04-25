@@ -1,10 +1,9 @@
 #include "PSIWriter.hpp"
+#include "config.hpp"
+#include "BufferedWriter.hpp"
 
 using namespace std;
 
-void PSIWriter::join_writer(){
-    writing_thread.join();
-}
 
 void PSIWriter::run_writer(WriterManager& writer_manager, 
                            string output_file, 
@@ -12,9 +11,13 @@ void PSIWriter::run_writer(WriterManager& writer_manager,
 {
     writing_thread = boost::thread(&PSIWriter::write_h5, 
                                    this, 
-                                   &writer_manager, 
+                                   boost::ref(writer_manager),
                                    output_file, 
                                    n_frames);
+}
+
+void PSIWriter::join_writer(){
+    writing_thread.join();
 }
 
 void PSIWriter::write_h5(WriterManager& writer_manager,
@@ -28,7 +31,7 @@ void PSIWriter::write_h5(WriterManager& writer_manager,
 
         auto metadata_buffer = unique_ptr<MetadataBuffer>(
             new MetadataBuffer(metadata_buffer_size, 
-                               receiver.get_header_values_type()));
+                               header_values_type));
     
         auto writer = get_buffered_writer(
             output_file, 
@@ -71,7 +74,9 @@ void PSIWriter::write_h5(WriterManager& writer_manager,
                 
                 #ifdef DEBUG_OUTPUT
                     using namespace date;
-                    cout << "[" << chrono::system_clock::now() << "]";
+                    using namespace chrono;
+
+                    cout << "[" << system_clock::now() << "]";
                     cout << "[PSIWriter::write_h5] Frame index ";
                     cout << received_data.first->frame_index;
                     cout << " does not belong to current file. ";
@@ -85,7 +90,9 @@ void PSIWriter::write_h5(WriterManager& writer_manager,
     
             #ifdef PERF_OUTPUT
                 using namespace date;
-                auto start_time_frame = chrono::system_clock::now();
+                using namespace chrono;
+
+                auto start_time_frame = system_clock::now();
             #endif
     
             // Write image data.
@@ -101,13 +108,12 @@ void PSIWriter::write_h5(WriterManager& writer_manager,
                 using namespace date;
                 using namespace chrono;
     
-                auto frame_time_difference = 
-                    chrono::system_clock::now() - start_time_frame;
+                auto frame_time_difference = system_clock::now() - start_time_frame;
 
                 auto frame_diff_ms = 
                     duration<float, milli>(frame_time_difference).count();
     
-                cout << "[" << chrono::system_clock::now() << "]";
+                cout << "[" << system_clock::now() << "]";
                 cout << "[PSIWriter::write_h5] Frame index "; 
                 cout << received_data.first->frame_index;
                 cout << " written in " << frame_diff_ms << " ms." << endl;
@@ -117,11 +123,12 @@ void PSIWriter::write_h5(WriterManager& writer_manager,
     
             #ifdef PERF_OUTPUT
                 using namespace date;
-                auto start_time_metadata = chrono::system_clock::now();
+                using namespace chrono;
+
+                auto start_time_metadata = system_clock::now();
             #endif
     
             // Write image metadata if mapping specified.
-            auto header_values_type = receiver.get_header_values_type();
             if (header_values_type) {
     
                 for (const auto& header_type : *header_values_type) {
@@ -147,10 +154,10 @@ void PSIWriter::write_h5(WriterManager& writer_manager,
                 using namespace date;
                 using namespace chrono;
     
-                auto metadata_time_difference = chrono::system_clock::now() - start_time_metadata;
+                auto metadata_time_difference = system_clock::now() - start_time_metadata;
                 auto metadata_diff_ms = duration<float, milli>(metadata_time_difference).count();
     
-                cout << "[" << chrono::system_clock::now() << "]";
+                cout << "[" << system_clock::now() << "]";
                 cout << "[ProcessManager::write_h5] Frame metadata index "; 
                 cout << received_data.first->frame_index << " written in " << metadata_diff_ms << " ms." << endl;
             #endif
@@ -164,7 +171,9 @@ void PSIWriter::write_h5(WriterManager& writer_manager,
         if (writer->is_file_open()) {
             #ifdef DEBUG_OUTPUT
                 using namespace date;
-                cout << "[" << chrono::system_clock::now() << "]";
+                using namespace chrono;
+
+                cout << "[" << system_clock::now() << "]";
                 cout << "[ProcessManager::write] Writing file format." << endl;
             #endif
     
@@ -175,7 +184,9 @@ void PSIWriter::write_h5(WriterManager& writer_manager,
         
         #ifdef DEBUG_OUTPUT
             using namespace date;
-            cout << "[" << chrono::system_clock::now() << "]";
+            using namespace chrono;
+
+            cout << "[" << system_clock::now() << "]";
             cout << "[ProcessManager::write] Closing file " << writer_manager.get_output_file() << endl;
         #endif
         
@@ -183,7 +194,9 @@ void PSIWriter::write_h5(WriterManager& writer_manager,
     
         #ifdef DEBUG_OUTPUT
             using namespace date;
-            cout << "[" << chrono::system_clock::now() << "]";
+            using namespace chrono;
+            
+            cout << "[" << system_clock::now() << "]";
             cout << "[ProcessManager::write] Writer thread stopped." << endl;
         #endif
     
@@ -196,13 +209,13 @@ void PSIWriter::write_h5(WriterManager& writer_manager,
 
 void PSIWriter::write_h5_format(H5::H5File& file) {
 
-    const auto parameters = writer_manager.get_parameters();
-    
     try {
-        H5FormatUtils::write_format(file, format, parameters);
+        H5FormatUtils::write_format(file, format, {});
     } catch (const runtime_error& ex) {
         using namespace date;
-        cout << "[" << chrono::system_clock::now() << "]";
+        using namespace chrono;
+
+        cout << "[" << system_clock::now() << "]";
         cout << "[ProcessManager::write_h5_format] Error while";
         cout << " trying to write file format: "<< ex.what() << endl;
     }
