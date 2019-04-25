@@ -2,6 +2,7 @@
 #include <sstream>
 
 #include "WriterManager.hpp"
+#include <boost/thread.hpp>
 
 using namespace std;
 
@@ -86,17 +87,14 @@ string WriterManager::get_status()
 
 unordered_map<string, uint64_t> WriterManager::get_statistics() const
 {
-    unordered_map<string, uint64_t> result = {{"n_received_frames", n_received_frames.load()},
-                                    {"n_written_frames", n_written_frames.load()},
-                                    {"n_lost_frames", n_lost_frames.load()}};
+    unordered_map<string, uint64_t> result = {
+        {"n_frames_receive", n_frames_to_receive.load()},
+        {"n_frames_to_write", n_frames_to_write.load()}
+    };
 
     return result;
 }
 
-unordered_map<string, boost::any> WriterManager::get_parameters()
-{
-    return parameters;
-}
 
 void WriterManager::start(const string output_file,
                           const int n_frames, 
@@ -119,19 +117,15 @@ void WriterManager::start(const string output_file,
         cout << output_message.str() << endl;
     #endif
 
-    uint64_t n_frames = 100;
-    string output_file = "output_file";
-
-
+    n_frames_to_write = n_frames;
     writing_flag = true;
+
+    n_frames_to_receive = n_frames;
+    receiving_flag = true;
+
     boost::thread writer_thread(&ProcessManager::write_h5, this, output_file, n_frames);
 
     //TODO: Sent this event somewhere?
-}
-
-const unordered_map<string, DATA_TYPE>& WriterManager::get_parameters_type() const
-{
-    return parameters_type;
 }
 
 bool WriterManager::is_running()

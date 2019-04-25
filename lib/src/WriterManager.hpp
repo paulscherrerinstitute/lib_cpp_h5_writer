@@ -32,8 +32,10 @@ class WriterManager
     // Initialize in constructor.
     const std::deque<WriterManagerLog> logs;
 
-    std::atomic<bool> writing_flag;
     std::atomic<bool> running_flag;
+
+    std::atomic<bool> writing_flag;
+    std::atomic<bool> receiving_flag;
 
     std::atomic<int64_t> n_frames_to_receive;
     std::atomic<int64_t> n_frames_to_write;
@@ -47,9 +49,6 @@ class WriterManager
 
         std::string get_status();
         std::unordered_map<std::string, uint64_t> get_statistics() const;
-
-        std::unordered_map<std::string, boost::any> get_parameters();
-        const std::unordered_map<std::string, DATA_TYPE>& get_parameters_type() const;
 
         // Return True if the frame is to be received, False if is to be dropped.
         bool receive_frame();
