@@ -15,7 +15,7 @@ void writer_utils::set_process_id(int user_id)
         cout << "[writer_utils::set_process_id] Setting process uid to " << user_id << endl;
     #endif
 
-    if (setgid(user_id)) {
+    if (setegid(user_id)) {
         stringstream error_message;
         using namespace date;
         error_message << "[" << std::chrono::system_clock::now() << "]";
@@ -24,7 +24,7 @@ void writer_utils::set_process_id(int user_id)
         throw runtime_error(error_message.str());
     }
 
-    if (setuid(user_id)) {
+    if (seteuid(user_id)) {
         stringstream error_message;
         using namespace date;
         error_message << "[" << std::chrono::system_clock::now() << "]";
