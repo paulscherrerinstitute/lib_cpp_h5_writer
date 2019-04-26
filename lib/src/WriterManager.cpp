@@ -15,7 +15,7 @@ void writer_utils::set_process_id(int user_id)
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono; 
-        error_message << "[" << system_clock::now() << "]";
+        cout << "[" << system_clock::now() << "]";
         cout << "[writer_utils::set_process_id] Setting process user to ";
         cout << user_id << endl;
     #endif
@@ -34,6 +34,7 @@ void writer_utils::set_process_id(int user_id)
 
     if (seteuid(user_id)) {
         stringstream error_message;
+
         using namespace date;
         using namespace chrono; 
         error_message << "[" << system_clock::now() << "]";
@@ -83,7 +84,8 @@ WriterManager::WriterManager(
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono; 
-        error_message << "[" << system_clock::now() << "]";
+
+        cout << "[" << system_clock::now() << "]";
         cout << "[WriterManager::WriterManager] Writer manager initialized." << endl;
     #endif
 }
@@ -131,19 +133,14 @@ void WriterManager::start(const string output_file,
 {
 
     #ifdef DEBUG_OUTPUT
-        stringstream output_message;
         using namespace date;
-        output_message << "[" << std::chrono::system_clock::now() << "]";
-        output_message << "[WriterManager::start] Starting with parameters: ";
-
-        for (const auto& parameter : new_parameters) {
-            auto& parameter_name = parameter.first;
-            auto& parameter_value = parameter.second;
-
-            output_message << parameter_name << ": " << parameter_value << ", ";
-        }
-
-        cout << output_message.str() << endl;
+        using namespace chrono; 
+        cout << "[" << system_clock::now() << "]";
+        cout << "[WriterManager::start] Starting with parameters: ";
+        cout << "\toutput_file: " << output_file;
+        cout << "\tn_frames: " << n_frames;
+        cout << "\tuser_id: " << user_id;
+        cout << endl;
     #endif
 
     n_frames_to_write = n_frames;
@@ -191,11 +188,10 @@ void WriterManager::writing_completed() {
     writing_flag = false;    
 
     #ifdef DEBUG_OUTPUT
-        stringstream output_message;
         using namespace date;
-        output_message << "[" << std::chrono::system_clock::now() << "]";
-        output_message << "[WriterManager::writing_completed] Writing has finished.";
-        output_message << endl;
+        using namespace chrono; 
+        cout << "[" << system_clock::now() << "]";
+        cout << "[WriterManager::writing_completed] Writing has finished." << endl;
     #endif
 
     //TODO: Send this event somewhere somehow?
@@ -219,7 +215,7 @@ void WriterManager::write_h5_format(H5::H5File& file) {
     }
 }
 
-void WriterManager::write_h5(string output_file, uint64_t n_frames)
+void WriterManager::write_h5(const string output_file, const uint64_t n_frames)
 {
     try {
 
@@ -274,7 +270,7 @@ void WriterManager::write_h5(string output_file, uint64_t n_frames)
                     using namespace chrono;
 
                     cout << "[" << system_clock::now() << "]";
-                    cout << "[PSIWriter::write_h5] Frame index ";
+                    cout << "[WriterManager::write_h5] Frame index ";
                     cout << received_data.first->frame_index;
                     cout << " does not belong to current file. ";
                     cout << " Write format before switching file." << endl;
@@ -311,7 +307,7 @@ void WriterManager::write_h5(string output_file, uint64_t n_frames)
                     duration<float, milli>(frame_time_difference).count();
     
                 cout << "[" << system_clock::now() << "]";
-                cout << "[PSIWriter::write_h5] Frame index "; 
+                cout << "[WriterManager::write_h5] Frame index "; 
                 cout << received_data.first->frame_index;
                 cout << " written in " << frame_diff_ms << " ms." << endl;
             #endif
@@ -384,7 +380,7 @@ void WriterManager::write_h5(string output_file, uint64_t n_frames)
             using namespace chrono;
 
             cout << "[" << system_clock::now() << "]";
-            cout << "[ProcessManager::write] Closing file " << get_output_file() << endl;
+            cout << "[ProcessManager::write] Closing file " << output_file << endl;
         #endif
         
         writer->close_file(); 

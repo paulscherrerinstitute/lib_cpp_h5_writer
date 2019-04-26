@@ -12,11 +12,6 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
     #ifdef DEBUG_OUTPUT
         cout << "[rest_interface::start_rest_api] Starting rest interface on port ";
         cout << port << endl;
-
-        cout << "[rest_interface::start_rest_api] Accepting start parameters:" << endl;
-        for (const auto& item : rest_start_parameters) {
-            cout << "\t " << item.key() << endl;
-        }
     #endif
 
     crow::SimpleApp app;

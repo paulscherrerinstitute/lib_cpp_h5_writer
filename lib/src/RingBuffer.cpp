@@ -13,7 +13,7 @@ RingBuffer::RingBuffer(size_t n_slots) : n_slots(n_slots), ringbuffer_slots(n_sl
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono; 
-        error_message << "[" << system_clock::now() << "]";
+        cout << "[" << system_clock::now() << "]";
         cout << "[RingBuffer::RingBuffer] Creating ring buffer";
         cout << " with n_slots " << n_slots << endl;
     #endif
@@ -44,7 +44,7 @@ void RingBuffer::initialize(size_t slot_size)
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono; 
-        error_message << "[" << system_clock::now() << "]";
+        cout << "[" << system_clock::now() << "]";
         cout << "[RingBuffer::initialize] Initializing ring buffer";
         cout << " with slot_size " << slot_size << endl;
     #endif
@@ -59,7 +59,7 @@ void RingBuffer::initialize(size_t slot_size)
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono; 
-        error_message << "[" << system_clock::now() << "]";
+        cout << "[" << system_clock::now() << "]";
         cout << "[RingBuffer::initialize] Total buffer_size " << buffer_size << endl;
     #endif
 }
@@ -98,7 +98,7 @@ void RingBuffer::write(shared_ptr<FrameMetadata> frame_metadata, const char* dat
             #ifdef DEBUG_OUTPUT
                 using namespace date;
                 using namespace chrono; 
-                error_message << "[" << system_clock::now() << "]";
+                cout << "[" << system_clock::now() << "]";
                 cout << "[RingBuafer::write] Ring buffer slot ";
                 cout << frame_metadata->buffer_slot_index;
                 cout << " reserved for frame_index ";
@@ -128,7 +128,7 @@ void RingBuffer::write(shared_ptr<FrameMetadata> frame_metadata, const char* dat
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono; 
-        error_message << "[" << system_clock::now() << "]";
+        cout << "[" << system_clock::now() << "]";
         cout << "[RingBuffer::write] Copied " << frame_metadata->frame_bytes_size;
         cout << " frame bytes to buffer_slot_index ";
         cout << frame_metadata->buffer_slot_index << endl;
@@ -189,7 +189,7 @@ pair<shared_ptr<FrameMetadata>, char*> RingBuffer::read()
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono; 
-        error_message << "[" << system_clock::now() << "]";
+        cout << "[" << system_clock::now() << "]";
         cout << "[RingBuffer::read] Received metadata for frame_index ";
         cout << frame_metadata->frame_index << endl;
     #endif
