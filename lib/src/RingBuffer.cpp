@@ -36,7 +36,7 @@ void RingBuffer::initialize(size_t slot_size)
         using namespace chrono; 
         error_message << "[" << system_clock::now() << "]";
         error_message << "[RingBuffer::initialize] Ring buffer";
-        error_message << already initialized." << endl;
+        error_message << " already initialized." << endl;
 
         throw runtime_error(error_message.str());
     }
@@ -262,13 +262,13 @@ bool RingBuffer::is_empty()
     return buffer_used_slots == 0;
 }
 
-bool RingBuffer::clear()
+void RingBuffer::clear()
 {
-    lock_guard<mutex> lock(ringbuffer_slots_mutex);
-    lock_guard<mutex> lock(frame_metadata_queue_mutex);
+    lock_guard<mutex> lock_slots(ringbuffer_slots_mutex);
+    lock_guard<mutex> lock_metadata(frame_metadata_queue_mutex);
 
     write_index = 0;
-    buffer_used_slots == 0;
+    buffer_used_slots = 0;
     ringbuffer_slots = vector<bool>(n_slots, 0);
     frame_metadata_queue.clear();
 }
