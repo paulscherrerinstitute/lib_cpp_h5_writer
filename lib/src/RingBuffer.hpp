@@ -56,6 +56,7 @@ class RingBuffer
         std::pair<std::shared_ptr<FrameMetadata>, char*> read();
         void release(size_t buffer_slot_index);
         bool is_empty();
+        void clear();
 };
 
 #endif
