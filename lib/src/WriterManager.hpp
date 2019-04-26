@@ -6,9 +6,13 @@
 #include <atomic>
 #include <mutex>
 #include <boost/any.hpp>
+#include <boost/thread.hpp>
 #include <chrono>
 #include "date.h"
 #include <deque>
+
+#include "ZmqReceiver.hpp"
+#include "RingBuffer.hpp"
 #include "H5Format.hpp"
 
 namespace writer_utils {
@@ -40,8 +44,28 @@ class WriterManager
     std::atomic<int64_t> n_frames_to_receive;
     std::atomic<int64_t> n_frames_to_write;
 
+
+    protected:
+        RingBuffer& ring_buffer;
+        const H5Format& format;
+        hsize_t frames_per_file;
+
+        boost::thread writing_thread;
+
+        typedef std::unordered_map<std::string, HeaderDataType> header_map;
+        std::shared_ptr<header_map> header_values_type = NULL;
+
+        void write_h5(std::string output_file, 
+                      uint64_t n_frames);
+        void write_h5_format(H5::H5File& file);
+
+
     public:
-        WriterManager();
+        WriterManager(RingBuffer& ring_buffer, 
+                      const H5Format& format, 
+                      std::shared_ptr<header_map> header_values_type,
+                      hsize_t frames_per_file=0);
+
         virtual ~WriterManager();
 
         void start(std::string output_file, int n_frames, int user_id);
@@ -54,16 +78,15 @@ class WriterManager
         bool receive_frame();
         // True if the process should conitnue.
         bool is_running() const;
+        bool is_writing() const;
 
         // Return True if the frame is to be written, False otherwise.
         bool write_frame();
         // True if the writing should continue.
-        bool is_writing() const;
-        
         
         // Signal that the writing has completed.
         void writing_completed();
-        void writing_error(std::string error_message);
+        void writing_error(std::string error);
 };
 
 #endif
