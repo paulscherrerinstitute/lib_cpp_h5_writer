@@ -14,15 +14,18 @@ void writer_utils::set_process_id(int user_id)
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
+        using namespace chrono; 
+        error_message << "[" << system_clock::now() << "]";
         cout << "[writer_utils::set_process_id] Setting process user to ";
         cout << user_id << endl;
     #endif
 
     if (setegid(user_id)) {
         stringstream error_message;
+
         using namespace date;
-        error_message << "[" << std::chrono::system_clock::now() << "]";
+        using namespace chrono; 
+        error_message << "[" << system_clock::now() << "]";
         error_message << "[writer_utils::set_process_id] Cannot set group_id to ";
         error_message << user_id << endl;
 
@@ -32,7 +35,8 @@ void writer_utils::set_process_id(int user_id)
     if (seteuid(user_id)) {
         stringstream error_message;
         using namespace date;
-        error_message << "[" << std::chrono::system_clock::now() << "]";
+        using namespace chrono; 
+        error_message << "[" << system_clock::now() << "]";
         error_message << "[writer_utils::set_process_id] Cannot set user_id to ";
         error_message << user_id << endl;
 
@@ -46,8 +50,10 @@ void writer_utils::create_destination_folder(const string& output_file)
 
     if (file_separator_index != string::npos) {
         string output_folder(output_file.substr(0, file_separator_index));
+
         using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
+        using namespace chrono; 
+        cout << "[" << system_clock::now() << "]";
         cout << "[writer_utils::create_destination_folder] Creating folder ";
         cout << output_folder << endl;
 
@@ -74,10 +80,10 @@ WriterManager::WriterManager(
     n_frames_to_receive = 0;
     n_frames_to_write = 0;
 
-
     #ifdef DEBUG_OUTPUT
         using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << 
+        using namespace chrono; 
+        error_message << "[" << system_clock::now() << "]";
         cout << "[WriterManager::WriterManager] Writer manager initialized." << endl;
     #endif
 }
@@ -89,10 +95,12 @@ void WriterManager::stop()
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[WriterManager::stop] Stopping the writer manager." << endl;
+        cout << "[WriterManager::stop] Stopping the writer." << endl;
     #endif
-
+    
     running_flag = false;
+    
+    
 }
 
 string WriterManager::get_status()

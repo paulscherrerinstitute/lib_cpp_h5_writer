@@ -34,7 +34,6 @@ struct WriterManagerLog
 class WriterManager
 {
     // Initialize in constructor.
-    const std::deque<WriterManagerLog> logs;
 
     std::atomic<bool> running_flag;
 
@@ -54,6 +53,8 @@ class WriterManager
 
         typedef std::unordered_map<std::string, HeaderDataType> header_map;
         std::shared_ptr<header_map> header_values_type = NULL;
+
+        const std::deque<WriterManagerLog> logs;
 
         void write_h5(std::string output_file, 
                       uint64_t n_frames);
@@ -76,7 +77,7 @@ class WriterManager
 
         // Return True if the frame is to be received, False if is to be dropped.
         bool receive_frame();
-        // True if the process should conitnue.
+        // True if the process should continue.
         bool is_running() const;
         bool is_writing() const;
 
