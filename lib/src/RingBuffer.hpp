@@ -52,7 +52,8 @@ class RingBuffer
         virtual ~RingBuffer();
         void initialize(size_t slot_size);
         
-        void write(const std::shared_ptr<FrameMetadata> metadata, const char* data);
+        char* reserve(std::shared_ptr<FrameMetadata> metadata);
+        void commit(std::shared_ptr<FrameMetadata> metadata);
         std::pair<std::shared_ptr<FrameMetadata>, char*> read();
         void release(size_t buffer_slot_index);
         bool is_empty();
