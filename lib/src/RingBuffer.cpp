@@ -262,3 +262,9 @@ void RingBuffer::clear()
     ringbuffer_slots = vector<bool>(n_slots, 0);
     frame_metadata_queue.clear();
 }
+
+size_t RingBuffer::get_slot_size()
+{
+    return slot_size;
+}
+

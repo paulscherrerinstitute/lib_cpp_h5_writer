@@ -58,6 +58,7 @@ class RingBuffer
         void release(size_t buffer_slot_index);
         bool is_empty();
         void clear();
+        size_t get_slot_size();
 };
 
 #endif
