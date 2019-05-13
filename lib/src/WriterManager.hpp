@@ -10,10 +10,13 @@
 #include <chrono>
 #include "date.h"
 #include <deque>
+#include <memory>
+#include <list>
 
 #include "ZmqReceiver.hpp"
 #include "RingBuffer.hpp"
 #include "H5Format.hpp"
+#include "compression/compression.h"
 
 namespace writer_utils {
     void set_process_id(int user_id);
@@ -43,12 +46,16 @@ class WriterManager
     std::atomic<int64_t> n_frames_to_receive;
     std::atomic<int64_t> n_frames_to_write;
 
-
     protected:
         RingBuffer& ring_buffer;
+
+        ZmqReceiver& receiver;
+        uint8_t n_receiving_threads;
+
         const H5Format& format;
         hsize_t frames_per_file;
 
+        std::list<std::unique_ptr<boost::thread>> receiving_threads;
         boost::thread writing_thread;
 
         typedef std::unordered_map<std::string, HeaderDataType> header_map;
@@ -56,15 +63,18 @@ class WriterManager
 
         const std::deque<WriterManagerLog> logs;
 
-        void write_h5(std::string output_file, 
-                      uint64_t n_frames);
+        void receive_zmq();
+        void write_h5(std::string output_file, uint64_t n_frames);
+
         void write_h5_format(H5::H5File& file);
 
-
     public:
-        WriterManager(RingBuffer& ring_buffer, 
+
+        WriterManager(ZmqReceiver& receiver,
+                      RingBuffer& ring_buffer, 
                       const H5Format& format, 
                       std::shared_ptr<header_map> header_values_type,
+                      uint8_t n_receiving_threads,
                       hsize_t frames_per_file=0);
 
         virtual ~WriterManager();
@@ -75,17 +85,13 @@ class WriterManager
         std::string get_status();
         std::unordered_map<std::string, uint64_t> get_statistics() const;
 
-        // Return True if the frame is to be received, False if is to be dropped.
         bool receive_frame();
-        // True if the process should continue.
         bool is_running() const;
         bool is_writing() const;
 
-        // Return True if the frame is to be written, False otherwise.
-        bool write_frame();
-        // True if the writing should continue.
+        bool should_write_frame();
+        bool should_receive_frame();
         
-        // Signal that the writing has completed.
         void writing_completed();
         void writing_error(std::string error);
 };
