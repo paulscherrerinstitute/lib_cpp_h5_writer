@@ -12,24 +12,39 @@ extern "C"
 
 using namespace std;
 
-std::unique_ptr<H5Writer> get_h5_writer(const string& filename, hsize_t frames_per_file, 
-    hsize_t initial_dataset_size, hsize_t dataset_increase_step)
+std::unique_ptr<H5Writer> get_h5_writer(
+    const string& filename, 
+    hsize_t frames_per_file, 
+    hsize_t initial_dataset_size, 
+    hsize_t dataset_increase_step)
 {
     if (filename == "/dev/null") {
         return unique_ptr<H5Writer>(new DummyH5Writer());
     } else {
-        return unique_ptr<H5Writer>(new H5Writer(filename, frames_per_file, initial_dataset_size, dataset_increase_step));
+        return unique_ptr<H5Writer>(
+            new H5Writer(filename, 
+                         frames_per_file, 
+                         initial_dataset_size, 
+                         dataset_increase_step)
+            );
     }
 }
 
-H5Writer::H5Writer(const std::string& filename, hsize_t frames_per_file, hsize_t initial_dataset_size, 
+H5Writer::H5Writer(
+    const std::string& filename, 
+    hsize_t frames_per_file, 
+    hsize_t initial_dataset_size, 
     hsize_t dataset_increase_step) :
-        filename(filename), frames_per_file(frames_per_file), 
-        initial_dataset_size(initial_dataset_size), dataset_increase_step(dataset_increase_step)
+        filename(filename), 
+        frames_per_file(frames_per_file), 
+        initial_dataset_size(initial_dataset_size),   
+        dataset_increase_step(dataset_increase_step)
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
+        using namespace chrono;
+
+        cout << "[" << system_clock::now() << "]";
         cout << "[H5Writer::H5Writer] Creating chunked writer"; 
         cout << " with filename " << filename;
         cout << " and frames_per_file " << frames_per_file;
@@ -49,7 +64,8 @@ void H5Writer::close_file()
 
         #ifdef DEBUG_OUTPUT
             using namespace date;
-            cout << "[" << std::chrono::system_clock::now() << "]";
+            using namespace chrono;
+            cout << "[" << system_clock::now() << "]";
             cout << "[H5Writer::close_file] Closing file." << endl;
         #endif
 
@@ -67,8 +83,12 @@ void H5Writer::close_file()
 
         #ifdef DEBUG_OUTPUT
             using namespace date;
-            cout << "[" << std::chrono::system_clock::now() << "]";
-            cout << "[H5Writer::close_file] Setting datasets attribute image_nr_low=" << image_nr_low;
+            using namespace chrono;
+
+            cout << "[" << system_clock::now() << "]";
+            cout << "[H5Writer::close_file]"
+            cout << " Setting datasets attribute"
+            cout << image_nr_low=" << image_nr_low";
             cout << " and image_nr_high=" << image_nr_high << endl;
         #endif
 
@@ -77,8 +97,13 @@ void H5Writer::close_file()
 
             H5FormatUtils::compact_dataset(dataset, max_data_index);
 
-            H5FormatUtils::write_attribute(dataset, "image_nr_low", image_nr_low);
-            H5FormatUtils::write_attribute(dataset, "image_nr_high", image_nr_high);
+            H5FormatUtils::write_attribute(dataset, 
+                                           "image_nr_low", 
+                                           image_nr_low);
+
+            H5FormatUtils::write_attribute(dataset, 
+                                           "image_nr_high", 
+                                           image_nr_high);
         }
 
         file.close();
@@ -86,8 +111,10 @@ void H5Writer::close_file()
     } else {
         #ifdef DEBUG_OUTPUT
             using namespace date;
-            cout << "[" << std::chrono::system_clock::now() << "]";
-            cout << "[H5Writer::close_file] Trying to close an already closed file." << endl;
+            using namespace chrono;
+
+            cout << "[" << system_clock::now() << "]";
+            cout << "[H5Writer::close_file] File already closed." << endl;
         #endif
     }
 
@@ -294,7 +321,12 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
 
     // Create the dataset if we don't have it yet.
     if (datasets.find(dataset_name) == datasets.end()) {
-        create_dataset(dataset_name, data_shape, data_type, endianness, true, initial_dataset_size);
+        create_dataset(dataset_name, 
+                       data_shape, 
+                       data_type, 
+                       endianness, 
+                       true, 
+                       initial_dataset_size);
     }
 
     hsize_t current_dataset_size = datasets_current_size.at(dataset_name);
@@ -305,11 +337,15 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
     if (relative_data_index > current_dataset_size) {
         auto dataset = datasets.at(dataset_name);
 
-        hsize_t new_dataset_size = H5FormatUtils::expand_dataset(dataset, relative_data_index, dataset_increase_step);
+        hsize_t new_dataset_size = H5FormatUtils::expand_dataset(
+            dataset, 
+            relative_data_index, 
+            dataset_increase_step);
+
         datasets_current_size[dataset_name] = new_dataset_size;
     }
 
-    // Keep track of the max index in this file - needed for shrinking the dataset at the end.
+    // Max dataset size needed to shring the datasets before closing file.
     if (relative_data_index > max_data_index) {
         max_data_index = relative_data_index;
     }
