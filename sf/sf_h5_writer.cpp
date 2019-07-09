@@ -68,7 +68,8 @@ int main (int argc, char *argv[])
         {"pulse_ids", HeaderDataType("uint64", n_modules)},
         {"framenums", HeaderDataType("uint64", n_modules)},
         
-        {"module_number", HeaderDataType("uint64", n_modules)}
+        {"module_number", HeaderDataType("uint64", n_modules)},
+        {"module_map", HeaderDataType("int16", n_modules)},
     });
 
     SfFormat format(detector_name, n_bad_modules);   
