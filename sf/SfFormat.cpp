@@ -52,6 +52,7 @@ class SfFormat : public H5Format
                 {"framenums", "data/" + dataset_name + "/framenums"},
                 {"pulse_id_diff", "data/" + dataset_name + "/pulse_id_diff"},
                 {"module_number", "data/" + dataset_name + "/module_number"},
+                {"module_map", "data/" + dataset_name + "/module_map"},
             }));
 
             // Definition of the file format.
