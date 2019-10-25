@@ -41,11 +41,13 @@ void ZmqSender::bind()
 
 }
 
-bool ZmqSender::get_stat(){
+bool ZmqSender::get_stat() const
+{
     return stat;
 }
 
-std::string ZmqSender::get_mode(){
+std::string ZmqSender::get_mode() const
+{
     return mode;
 }
 

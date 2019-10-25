@@ -14,9 +14,9 @@
 
 using namespace std;
 
-ProcessManager::ProcessManager(WriterManager& writer_manager, ZmqReceiver& receiver, RingBuffer& ring_buffer, 
+ProcessManager::ProcessManager(WriterManager& writer_manager, ZmqReceiver& receiver, ZmqSender& sender, RingBuffer& ring_buffer,
     const H5Format& format, uint16_t rest_port, const string& bsread_rest_address, hsize_t frames_per_file) :
-        writer_manager(writer_manager), receiver(receiver), ring_buffer(ring_buffer), format(format), rest_port(rest_port), 
+        writer_manager(writer_manager), receiver(receiver), sender(sender), ring_buffer(ring_buffer), format(format), rest_port(rest_port), 
         bsread_rest_address(bsread_rest_address), frames_per_file(frames_per_file)
 {
 }
@@ -83,6 +83,7 @@ void ProcessManager::run_writer()
     #endif
 
     boost::thread receiver_thread(&ProcessManager::receive_zmq, this);
+    boost::thread sender_thread(&ProcessManager::send_writer_stats, this);
     boost::thread writer_thread(&ProcessManager::write_h5, this);
 
     RestApi::start_rest_api(writer_manager, rest_port);
@@ -97,6 +98,7 @@ void ProcessManager::run_writer()
     writer_manager.stop();
 
     receiver_thread.join();
+    sender_thread.join();
     writer_thread.join();
 
     #ifdef DEBUG_OUTPUT
@@ -320,4 +322,27 @@ void ProcessManager::write_h5_format(H5::H5File& file) {
         std::cout << "[" << std::chrono::system_clock::now() << "]";
         std::cout << "[ProcessManager::write_h5_format] Error while trying to write file format: "<< ex.what() << endl;
     }
+}
+
+void ProcessManager::send_writer_stats()
+{
+    sender.bind();
+
+    while (writer_manager.is_running()) {
+        // mode indicates if there is statistics to be sent out
+        auto [mode, category] = writer_manager.get_mode_category();
+        if ( mode ){
+            // fetches the statistic from the writer manager
+            // and sends the filter + statistics json to the sender
+            sender.send(writer_manager.get_filter(), writer_manager.get_writer_stats());
+            // after statistics was sent, redefine mode
+            writer_manager.set_mode_category(false, "");
+        }
+   }
+
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[ProcessManager::send_writer_stats] Sender zmq statistics thread stopped." << endl;
+    #endif
 }

@@ -37,9 +37,9 @@ class ZmqSender
 
     void set_stat_mode(bool stat, const std::string& mode_indication);
 
-    bool get_stat();
+    bool get_stat() const;
 
-    std::string get_mode();
+    std::string get_mode() const;
 
 };
 

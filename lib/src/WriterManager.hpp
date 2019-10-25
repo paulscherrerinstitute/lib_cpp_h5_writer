@@ -7,9 +7,13 @@
 #include <mutex>
 #include <boost/any.hpp>
 #include <chrono>
+#include <boost/property_tree/json_parser.hpp>
 #include "date.h"
-
 #include "H5Format.hpp"
+
+using namespace std;
+
+namespace pt = boost::property_tree;
 
 namespace writer_utils {
     void set_process_id(int user_id);
@@ -48,13 +52,37 @@ class WriterManager
         const std::unordered_map<std::string, DATA_TYPE>& get_parameters_type() const;
         std::unordered_map<std::string, boost::any> get_parameters();
         void set_parameters(const std::unordered_map<std::string, boost::any>& new_parameters);
-        
+
         std::unordered_map<std::string, uint64_t> get_statistics() const;
         void received_frame(size_t frame_index);
         void written_frame(size_t frame_index);
         void lost_frame(size_t frame_index);
 
-        size_t get_n_frames();
+        size_t get_n_frames() const;
+
+        // statistics variables
+        std::tuple<bool, std::string> mode_category;
+        uint64_t first_pulse_id;
+        int user_id;
+        std::chrono::steady_clock::time_point time_start;
+        std::chrono::steady_clock::time_point time_end;
+        std::chrono::duration<double> processing_rate;
+
+        // statistics methods
+        std::tuple<bool, std::string> get_mode_category() const;
+        std::string get_filter() const;
+        void set_mode_category(const bool new_mode, const std::string new_category);
+        std::string get_writer_stats() const;
+        int get_user_id() const;
+        size_t get_n_written_frames() const;
+        size_t get_n_received_frames() const;
+        uint64_t get_n_lost_frames() const;
+
+
+
+
+
+
 };
 
 #endif
