@@ -121,7 +121,7 @@ unordered_map<string, boost::any> WriterManager::get_parameters()
     return parameters;
 }
 
-void WriterManager::set_processing_rate(std::chrono::duration<double> diff)
+void WriterManager::set_processing_rate(float diff)
 {
     processing_rate = diff;
 }
@@ -267,19 +267,19 @@ std::string WriterManager::get_writer_stats() const
         root.add_child("statistics_wr_finish", stats_json);
     } else if (std::get<1>(mode_category) == "adv"){
         // calculates the elapsed time from beginning
-        // auto now = std::chrono::steady_clock::now();
-        // auto time_diff = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(now - time_start).count();
+        auto now = std::chrono::system_clock::now();
+        auto time_diff = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(now - time_start).count();
         // received_rate = total number of received frames / elapsed time
-        // auto receiving_rate = get_n_received_frames() / time_diff;
+        auto receiving_rate = get_n_received_frames() / time_diff;
         // writting_rate = total number of written frames / elapsed time
-        // auto writting_rate = get_n_written_frames() / time_diff;
+        auto writting_rate = get_n_written_frames() / time_diff;
         stats_json.put("n_written_frames", get_n_written_frames());
         stats_json.put("n_received_frames", get_n_received_frames());
         stats_json.put("n_free_slots", "-1");
         stats_json.put("enable", "true");
         stats_json.put("processing_rate", "-1");
-        stats_json.put("receiving_rate", "-1");
-        stats_json.put("writting_rate", "-1");
+        stats_json.put("receiving_rate", receiving_rate);
+        stats_json.put("writting_rate", writting_rate);
         stats_json.put("avg_compressed_size", "0.0");
         root.add_child("statistics_wr_adv", stats_json);
     } else if (std::get<1>(mode_category) == "end") {

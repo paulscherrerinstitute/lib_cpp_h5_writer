@@ -66,7 +66,7 @@ class WriterManager
         int user_id;
         std::chrono::system_clock::time_point time_start;
         std::chrono::system_clock::time_point time_end;
-        std::chrono::duration<double> processing_rate;
+        float processing_rate;
 
         // statistics methods
         std::tuple<bool, std::string> get_mode_category() const;
@@ -77,7 +77,7 @@ class WriterManager
         size_t get_n_written_frames() const;
         size_t get_n_received_frames() const;
         uint64_t get_n_lost_frames() const;
-        void set_processing_rate(std::chrono::duration<double> diff);
+        void set_processing_rate(float diff);
         void set_time_end();
 
 

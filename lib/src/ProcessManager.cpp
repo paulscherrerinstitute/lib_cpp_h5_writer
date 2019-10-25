@@ -268,7 +268,9 @@ void ProcessManager::write_h5()
         
         writer_manager.written_frame(received_data.first->frame_index);
         // setting the mode to adv
-        writer_manager.set_processing_rate(std::chrono::system_clock::now() - start_processing_rate);
+        auto frame_time_difference = std::chrono::system_clock::now() - start_processing_rate;
+        auto frame_diff_ms = std::chrono::duration<float, milli>(frame_time_difference).count();
+        writer_manager.set_processing_rate(frame_diff_ms);
         writer_manager.set_mode_category(true, "adv");
 
     }
