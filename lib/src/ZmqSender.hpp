@@ -16,7 +16,6 @@
 class ZmqSender
 {
     const std::string connect_address;
-    const int receive_timeout;
     std::string filter;
     bool stat;
     const int n_io_threads;
@@ -28,7 +27,7 @@ class ZmqSender
 
     public:
     ZmqSender(const std::string& connect_address, 
-                const int n_io_threads, const int receive_timeout);
+                const int n_io_threads);
     virtual ~ZmqSender(){};
 
     void bind();

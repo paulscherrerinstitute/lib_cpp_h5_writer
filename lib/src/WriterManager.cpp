@@ -121,6 +121,11 @@ unordered_map<string, boost::any> WriterManager::get_parameters()
     return parameters;
 }
 
+void WriterManager::set_processing_rate(std::chrono::duration<double> diff)
+{
+    processing_rate = diff;
+}
+
 void WriterManager::set_parameters(const unordered_map<string, boost::any>& new_parameters)
 {
     lock_guard<mutex> lock(parameters_mutex);
@@ -241,6 +246,11 @@ size_t WriterManager::get_n_written_frames() const
 size_t WriterManager::get_n_received_frames() const
 {
     return n_received_frames;
+}
+
+void WriterManager::set_time_end()
+{
+    time_end = std::chrono::system_clock::now();
 }
 
 std::string WriterManager::get_writer_stats() const

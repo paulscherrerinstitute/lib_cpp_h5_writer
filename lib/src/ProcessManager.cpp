@@ -24,9 +24,10 @@ ProcessManager::ProcessManager(WriterManager& writer_manager, ZmqReceiver& recei
 void ProcessManager::notify_first_pulse_id(uint64_t pulse_id) 
 {
     string request_address(bsread_rest_address);
+    WriterManager& writer_manager(writer_manager);
 
     // First pulse_id should be an async operation - we do not want to make the writer wait.
-    async(launch::async, [pulse_id, &request_address]{
+    async(launch::async, [pulse_id, &request_address, &writer_manager]{
         try {
 
             cout << "Sending first received pulse_id " << pulse_id << " to bsread_rest_address " << request_address << endl;
@@ -44,7 +45,8 @@ void ProcessManager::notify_first_pulse_id(uint64_t pulse_id)
 
             system(request_call.c_str());
         } catch (...){}
-        
+        // writer is ready to send stats
+        writer_manager.set_mode_category(true, "start");
     });
 }
 
@@ -66,6 +68,8 @@ void ProcessManager::notify_last_pulse_id(uint64_t pulse_id)
             cout << "[" << std::chrono::system_clock::now() << "]";
             cout << "[ProcessManager::notify_last_pulse_id] Sending request (" << request_call << ")." << endl;
         #endif
+        // time of the last pulse_id
+        writer_manager.set_time_end();
 
         system(request_call.c_str());
     } catch (...){}
@@ -171,6 +175,8 @@ void ProcessManager::write_h5()
             continue;
         }
 
+        std::chrono::system_clock::time_point start_processing_rate = std::chrono::system_clock::now();
+
         const pair< shared_ptr<FrameMetadata>, char* > received_data = ring_buffer.read();
         
         // NULL pointer means that the ringbuffer->read() timeouted. Faster than rising an exception.
@@ -261,6 +267,10 @@ void ProcessManager::write_h5()
         #endif
         
         writer_manager.written_frame(received_data.first->frame_index);
+        // setting the mode to adv
+        writer_manager.set_processing_rate(std::chrono::system_clock::now() - start_processing_rate);
+        writer_manager.set_mode_category(true, "adv");
+
     }
 
     // Send the last_pulse_id only if it was set.

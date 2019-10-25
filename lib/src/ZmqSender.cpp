@@ -8,9 +8,8 @@
 using namespace std;
 namespace pt = boost::property_tree;
 
-ZmqSender::ZmqSender(const std::string& connect_address, const int n_io_threads, const int receive_timeout) :
-        connect_address(connect_address), n_io_threads(n_io_threads),
-        receive_timeout(receive_timeout), sender(NULL)
+ZmqSender::ZmqSender(const std::string& connect_address, const int n_io_threads) :
+        connect_address(connect_address), n_io_threads(n_io_threads), sender(NULL)
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
