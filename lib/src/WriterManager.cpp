@@ -258,11 +258,13 @@ std::string WriterManager::get_writer_stats() const
     pt::ptree root;
     pt::ptree stats_json;
     if (std::get<1>(mode_category) == "start"){
+        std::chrono::time_t tt;
+        tt = std::chrono::system_clock::to_time_t(time_start);
         stats_json.put("first_frame_id", first_pulse_id);
         stats_json.put("n_frames", get_n_frames() );
         stats_json.put("output_file", get_output_file());
         stats_json.put("user_id", get_user_id());
-        stats_json.put("timestamp", "-1");
+        stats_json.put("start_time", ctime(&tt));
         stats_json.put("compression_method", "test");
         root.add_child("statistics_wr_finish", stats_json);
     } else if (std::get<1>(mode_category) == "adv"){
@@ -277,14 +279,16 @@ std::string WriterManager::get_writer_stats() const
         stats_json.put("n_received_frames", get_n_received_frames());
         stats_json.put("n_free_slots", "-1");
         stats_json.put("enable", "true");
-        stats_json.put("processing_rate", "-1");
+        stats_json.put("processing_rate", processing_rate);
         stats_json.put("receiving_rate", receiving_rate);
         stats_json.put("writting_rate", writting_rate);
         stats_json.put("avg_compressed_size", "0.0");
         root.add_child("statistics_wr_adv", stats_json);
     } else if (std::get<1>(mode_category) == "end") {
         // creates the finish statistics json
-        stats_json.put("end_time", "-1");
+        std::chrono::time_t tt;
+        tt = std::chrono::system_clock::to_time_t(time_end);
+        stats_json.put("end_time", ctime(&tt));
         stats_json.put("enable", "true");
         stats_json.put("n_lost_frames", get_n_lost_frames());
         stats_json.put("n_total_written_frames", get_n_written_frames());
