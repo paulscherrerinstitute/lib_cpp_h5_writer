@@ -86,9 +86,9 @@ void H5Writer::close_file()
             using namespace chrono;
 
             cout << "[" << system_clock::now() << "]";
-            cout << "[H5Writer::close_file]"
-            cout << " Setting datasets attribute"
-            cout << image_nr_low=" << image_nr_low";
+            cout << "[H5Writer::close_file]";
+            cout << " Setting datasets attribute";
+            cout << " image_nr_low = " << image_nr_low;
             cout << " and image_nr_high=" << image_nr_high << endl;
         #endif
 
@@ -367,4 +367,3 @@ H5::H5File& DummyH5Writer::get_h5_file()
 
     throw runtime_error(error_message.str());
 };
-
