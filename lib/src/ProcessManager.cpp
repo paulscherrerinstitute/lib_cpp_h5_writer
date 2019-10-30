@@ -24,12 +24,10 @@ ProcessManager::ProcessManager(WriterManager& writer_manager, ZmqReceiver& recei
 void ProcessManager::notify_first_pulse_id(uint64_t pulse_id) 
 {
     string request_address(bsread_rest_address);
-    WriterManager& writer_manager(writer_manager);
 
     // First pulse_id should be an async operation - we do not want to make the writer wait.
-    async(launch::async, [pulse_id, &request_address, &writer_manager]{
+    async(launch::async, [pulse_id, &request_address]{
         try {
-
             cout << "Sending first received pulse_id " << pulse_id << " to bsread_rest_address " << request_address << endl;
 
             stringstream request;
@@ -45,8 +43,6 @@ void ProcessManager::notify_first_pulse_id(uint64_t pulse_id)
 
             system(request_call.c_str());
         } catch (...){}
-        // writer is ready to send stats
-        writer_manager.set_mode_category(true, "start");
     });
 }
 
@@ -166,10 +162,10 @@ void ProcessManager::write_h5()
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
 
     uint64_t last_pulse_id = 0;
-    
+
     // Run until the running flag is set or the ring_buffer is empty.  
     while(writer_manager.is_running() || !ring_buffer.is_empty()) {
-        
+
         if (ring_buffer.is_empty()) {
             boost::this_thread::sleep_for(boost::chrono::milliseconds(config::ring_buffer_read_retry_interval));
             continue;
