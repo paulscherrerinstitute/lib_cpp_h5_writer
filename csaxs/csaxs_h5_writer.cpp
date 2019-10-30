@@ -33,7 +33,7 @@ int main (int argc, char *argv[])
     int rest_port = atoi(argv[4]);
     int user_id = atoi(argv[5]);
     int n_modules = atoi(argv[6]);
-    int statistics_monitor_address = atoi(argv[7]);
+    string statistics_monitor_address = string(argv[7]);
     string bsread_rest_address = "http://localhost:9999/";
 
     if (user_id != -1) {
@@ -60,11 +60,11 @@ int main (int argc, char *argv[])
 
     CsaxsFormat format("images");
 
-    WriterManager writer_manager(format.get_input_value_type(), output_file, n_frames);
+    
+    WriterManager writer_manager(format.get_input_value_type(), output_file, user_id, n_frames);
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
     ZmqSender sender(statistics_monitor_address, config::zmq_n_io_threads);
     RingBuffer ring_buffer(config::ring_buffer_n_slots);
-
     ProcessManager process_manager(writer_manager, receiver, sender, ring_buffer, format, rest_port, bsread_rest_address);
     process_manager.run_writer();
 
