@@ -230,9 +230,19 @@ void RingBuffer::release(size_t buffer_slot_index)
     }
 }
 
+size_t RingBuffer::free_slots()
+{
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[RingBuffer::free_slots] Number of free slots: " << buffer_size - buffer_used_slots << endl;
+    #endif
+    return buffer_size - buffer_used_slots;
+}
+
 bool RingBuffer::is_empty()
 {
     lock_guard<mutex> lock(ringbuffer_slots_mutex);
-    
+
     return buffer_used_slots == 0;
 }
