@@ -60,6 +60,12 @@ H5Writer::~H5Writer()
 
 void H5Writer::close_file()
 {
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        using namespace chrono;
+        cout << "[" << system_clock::now() << "]";
+        cout << "[H5Writer::close_file] is_file_open" << is_file_open() << endl;
+    #endif
     if (is_file_open()) {
 
         #ifdef DEBUG_OUTPUT
@@ -86,9 +92,9 @@ void H5Writer::close_file()
             using namespace chrono;
 
             cout << "[" << system_clock::now() << "]";
-            cout << "[H5Writer::close_file]"
-            cout << " Setting datasets attribute"
-            cout << image_nr_low=" << image_nr_low";
+            cout << "[H5Writer::close_file]";
+            cout << " Setting datasets attribute";
+            cout << " image_nr_low = " << image_nr_low;
             cout << " and image_nr_high=" << image_nr_high << endl;
         #endif
 
@@ -230,6 +236,12 @@ void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& 
 void H5Writer::create_file(hsize_t frame_chunk) 
 {
 
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[H5Writer::create_file] Getting file id: " << file.getId() << endl;
+    #endif
+    
     if (file.getId() != -1) {
         close_file();
     }
