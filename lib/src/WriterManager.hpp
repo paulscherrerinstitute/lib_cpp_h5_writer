@@ -7,9 +7,11 @@
 #include <mutex>
 #include <boost/any.hpp>
 #include <chrono>
+#include <ctime>
 #include <boost/property_tree/json_parser.hpp>
 #include "date.h"
 #include "H5Format.hpp"
+
 
 using namespace std;
 
@@ -38,7 +40,7 @@ class WriterManager
     std::atomic<uint64_t> n_lost_frames;
 
     public:
-        WriterManager(const std::unordered_map<std::string, DATA_TYPE>& parameters_type, const std::string& output_file, uint64_t n_frames=0);
+        WriterManager(const std::unordered_map<std::string, DATA_TYPE>& parameters_type, const std::string& output_file, int user_id, uint64_t n_frames=0);
         virtual ~WriterManager();
 
         void stop();
@@ -68,6 +70,7 @@ class WriterManager
         std::chrono::system_clock::time_point time_end;
         float processing_rate;
 
+
         // statistics methods
         std::tuple<bool, std::string> get_mode_category() const;
         std::string get_filter() const;
@@ -79,11 +82,6 @@ class WriterManager
         uint64_t get_n_lost_frames() const;
         void set_processing_rate(float diff);
         void set_time_end();
-
-
-
-
-
 
 };
 

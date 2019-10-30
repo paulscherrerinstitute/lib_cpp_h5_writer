@@ -49,8 +49,8 @@ void writer_utils::create_destination_folder(const string& output_file)
 }
 
 WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type, 
-    const string& output_file, uint64_t n_frames):
-        parameters_type(parameters_type), output_file(output_file), n_frames(n_frames), 
+    const string& output_file, int user_id, uint64_t n_frames):
+        parameters_type(parameters_type), output_file(output_file), user_id(user_id), n_frames(n_frames),
         running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0), n_lost_frames(0)
 {
     #ifdef DEBUG_OUTPUT
@@ -221,6 +221,10 @@ std::string WriterManager::get_filter() const
 
 void WriterManager::set_mode_category(bool new_mode, std::string new_cat){
     mode_category = std::make_tuple(new_mode, new_cat);
+    if (new_cat == "start")
+    {
+        time_start = std::chrono::system_clock::now();
+    }
 }
 
 std::tuple<bool, std::string> WriterManager::get_mode_category() const
@@ -255,10 +259,15 @@ void WriterManager::set_time_end()
 
 std::string WriterManager::get_writer_stats() const
 {
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[WriterManager::get_writer_stats] Writer manager getting the statistics..." << endl;
+    #endif
     pt::ptree root;
     pt::ptree stats_json;
     if (std::get<1>(mode_category) == "start"){
-        std::chrono::time_t tt;
+        time_t tt;
         tt = std::chrono::system_clock::to_time_t(time_start);
         stats_json.put("first_frame_id", first_pulse_id);
         stats_json.put("n_frames", get_n_frames() );
@@ -286,7 +295,7 @@ std::string WriterManager::get_writer_stats() const
         root.add_child("statistics_wr_adv", stats_json);
     } else if (std::get<1>(mode_category) == "end") {
         // creates the finish statistics json
-        std::chrono::time_t tt;
+        time_t tt;
         tt = std::chrono::system_clock::to_time_t(time_end);
         stats_json.put("end_time", ctime(&tt));
         stats_json.put("enable", "true");
@@ -297,6 +306,7 @@ std::string WriterManager::get_writer_stats() const
         stats_json.put("problem", "unidentified_mode");
         root.add_child("unidentified_mode", stats_json);
     }
+    
     std::ostringstream buf;
     pt::write_json(buf, root, false);
     return buf.str();
