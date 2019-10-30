@@ -17,7 +17,7 @@ ZmqSender::ZmqSender(const std::string& connect_address, const int n_io_threads)
         cout << "[ZmqSender::ZmqSender] Creating ZMQ sender with";
         cout << " connect_address " << connect_address;
         cout << " n_io_threads " << n_io_threads;
-        cout << " receive_timeout " << receive_timeout;
+        cout << " receive_timeout " << config::zmq_receive_timeout;
         cout << endl;
     #endif
 }
@@ -75,8 +75,8 @@ void ZmqSender::send(const std::string& filter, const std::string& message_data)
     zmq::message_t message_content(message_data.size());
     memcpy (message_content.data(), message_data.data(), message_data.size());
     
-    auto rv0 = sender->send(message_filter, ZMQ_SNDMORE);
-    auto rv1 = sender->send(message_content);
+    auto rv0 = sender->send(message_filter, ZMQ_SNDMORE | ZMQ_NOBLOCK);
+    auto rv1 = sender->send(message_content, ZMQ_NOBLOCK);
 
     // verifies the return value
     if (rv0 != 0 && rv1 != 0) {
