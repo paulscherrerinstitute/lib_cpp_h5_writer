@@ -20,7 +20,9 @@ def main():
     dtype = "uint16"
 
     print("Use writer start command:")
-    print("\t./sf_h5_writer tcp://127.0.0.1:8888 test%d.h5 100 12000 -1 localhost 5 0 test_sf_writer 10")
+    print("\t./csaxs_h5_writer [connection_address] [output_file] [n_frames] [rest_port] [user_id] [n_modules] [statistic_monitor_address]")
+    print("\t./csaxs_h5_writer tcp://127.0.0.1:8888 test%d.h5 10 12000 -1 1 tcp://127.0.0.1:8088")
+    # print("\t./csaxs_h5_writer tcp://127.0.0.1:8888 test%d.h5 100 12000 -1 localhost 5 0 test_sf_writer 10")
 
     writer_parameters_url = "http://localhost:12000/parameters"
     writer_parameters = {
@@ -62,8 +64,9 @@ def main():
         stream.send(header, send_more=True, as_json=True)
         stream.send(image, send_more=False)
 
-        if pulse_id == 0:
-            requests.post(url=writer_parameters_url, json=writer_parameters)
+
+        # if pulse_id == 0:
+        #     requests.post(url=writer_parameters_url, json=writer_parameters)
 
 
 if __name__ == "__main__":
