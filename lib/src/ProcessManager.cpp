@@ -73,7 +73,6 @@ void ProcessManager::notify_last_pulse_id(uint64_t pulse_id)
 
 void ProcessManager::run_writer()
 {
-
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
@@ -82,8 +81,8 @@ void ProcessManager::run_writer()
         cout << endl;
     #endif
 
-    boost::thread receiver_thread(&ProcessManager::receive_zmq, this);
     boost::thread sender_thread(&ProcessManager::send_writer_stats, this);
+    boost::thread receiver_thread(&ProcessManager::receive_zmq, this);
     boost::thread writer_thread(&ProcessManager::write_h5, this);
 
     RestApi::start_rest_api(writer_manager, rest_port);
@@ -98,8 +97,8 @@ void ProcessManager::run_writer()
     writer_manager.stop();
 
     receiver_thread.join();
-    sender_thread.join();
     writer_thread.join();
+    sender_thread.join();
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
@@ -113,9 +112,9 @@ void ProcessManager::receive_zmq()
     receiver.connect();
 
     while (writer_manager.is_running()) {
-        
+
         auto frame = receiver.receive();
-        
+
         // In case no message is available before the timeout, both pointers are NULL.
         if (!frame.first){
             continue;
@@ -136,6 +135,12 @@ void ProcessManager::receive_zmq()
             cout << "." << endl;
         #endif
 
+
+        // checks if ring buffer is initialized, if not, it defines the
+        // statistics writer to send the start statistics
+        if (!ring_buffer.is_initialized()){
+            writer_manager.create_writer_stats_2queue("start");
+        }
         // Commit the frame to the buffer.
         ring_buffer.write(frame_metadata, frame_data);
 
@@ -165,16 +170,14 @@ void ProcessManager::write_h5()
 
     // Run until the running flag is set or the ring_buffer is empty.  
     while(writer_manager.is_running() || !ring_buffer.is_empty()) {
-
         if (ring_buffer.is_empty()) {
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(config::ring_buffer_read_retry_interval));
+            std::this_thread::sleep_for(std::chrono::milliseconds(config::ring_buffer_read_retry_interval));
             continue;
         }
-
         std::chrono::system_clock::time_point start_processing_rate = std::chrono::system_clock::now();
 
         const pair< shared_ptr<FrameMetadata>, char* > received_data = ring_buffer.read();
-        
+
         // NULL pointer means that the ringbuffer->read() timeouted. Faster than rising an exception.
         if(!received_data.first) {
             continue;
@@ -230,9 +233,7 @@ void ProcessManager::write_h5()
         // Write image metadata if mapping specified.
         auto header_values_type = receiver.get_header_values_type();
         if (header_values_type) {
-
             for (const auto& header_type : *header_values_type) {
-
                 auto& name = header_type.first;
                 auto value = received_data.first->header_values.at(name);
 
@@ -261,14 +262,12 @@ void ProcessManager::write_h5()
             cout << "[ProcessManager::write_h5] Frame metadata index "; 
             cout << received_data.first->frame_index << " written in " << metadata_diff_ms << " ms." << endl;
         #endif
-        
         writer_manager.written_frame(received_data.first->frame_index);
         // setting the mode to adv
         auto frame_time_difference = std::chrono::system_clock::now() - start_processing_rate;
         auto frame_diff_ms = std::chrono::duration<float, milli>(frame_time_difference).count();
         writer_manager.set_processing_rate(frame_diff_ms);
-        writer_manager.set_mode_category(true, "adv");
-
+        writer_manager.create_writer_stats_2queue("adv");
     }
 
     // Send the last_pulse_id only if it was set.
@@ -276,6 +275,8 @@ void ProcessManager::write_h5()
         notify_last_pulse_id(last_pulse_id);
     }
 
+    // before killing it, sends the end statistics
+    writer_manager.create_writer_stats_2queue("end");
     if (writer->is_file_open()) {
         #ifdef DEBUG_OUTPUT
             using namespace date;
@@ -288,6 +289,7 @@ void ProcessManager::write_h5()
             boost::this_thread::sleep_for(boost::chrono::milliseconds(config::parameters_read_retry_interval));
         }
 
+
         writer->write_metadata_to_file();
         
         write_h5_format(writer->get_h5_file());
@@ -298,7 +300,7 @@ void ProcessManager::write_h5()
         cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::write] Closing file " << writer_manager.get_output_file() << endl;
     #endif
-    
+
     writer->close_file();
 
     #ifdef DEBUG_OUTPUT
@@ -337,15 +339,34 @@ void ProcessManager::send_writer_stats()
     sender.bind();
 
     while (writer_manager.is_running()) {
-        // mode indicates if there is statistics to be sent out
-        auto [mode, category] = writer_manager.get_mode_category();
-        if ( mode ){
-            // fetches the statistic from the writer manager
-            // and sends the filter + statistics json to the sender
-            sender.send(writer_manager.get_filter(), writer_manager.get_writer_stats());
-            // after statistics was sent, redefine mode
-            writer_manager.set_mode_category(false, "");
+
+        if (writer_manager.is_stats_queue_empty()){
+            continue;
         }
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
+            cout << "[ProcessManager::send_writer_stats] size of queue " << writer_manager.is_stats_queue_empty() << endl;
+        #endif
+        // fetches the statistic from the writer manager
+        // and sends the filter + statistics json to the sender
+        auto stats_str = writer_manager.get_stats_from_queue();
+        cout << " STATS " << stats_str << endl;
+        auto filter = writer_manager.get_filter();
+        sender.send(filter , stats_str);
+        writer_manager.set_last_statistics_timestamp();
+
+   }
+
+    // sleeps for 2 seconds before verifying statistics again
+    std::this_thread::sleep_for(std::chrono::milliseconds(3));
+   // if writer is not running anymore, still needs to send out possible
+   // stuff from statistics queue
+   while (!writer_manager.is_stats_queue_empty())
+   {
+        auto stats_str = writer_manager.get_stats_from_queue();
+        auto filter = writer_manager.get_filter();
+        sender.send(filter , stats_str);
    }
 
     #ifdef DEBUG_OUTPUT

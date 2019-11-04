@@ -50,8 +50,8 @@ void writer_utils::create_destination_folder(const string& output_file)
 
 WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type, 
     const string& output_file, int user_id, uint64_t n_frames):
-        parameters_type(parameters_type), output_file(output_file), user_id(user_id), n_frames(n_frames),
-        running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0), n_lost_frames(0)
+        parameters_type(parameters_type), output_file(output_file), n_frames(n_frames),
+        running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0), n_lost_frames(0), user_id(user_id)
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
@@ -219,16 +219,28 @@ std::string WriterManager::get_filter() const
     return "statisticsWriter";
 }
 
-void WriterManager::set_mode_category(bool new_mode, std::string new_cat){
+void WriterManager::set_stat_flag(bool new_mode, std::string new_cat){
+    lock_guard<mutex> lock(statistics_mutex);
     mode_category = std::make_tuple(new_mode, new_cat);
     if (new_cat == "start")
     {
-        time_start = std::chrono::system_clock::now();
+        set_time_start();
     }
+    if (new_cat == "end")
+    {
+        set_time_end();
+    }
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[WriterManager::set_stat_flag] Setting flag, statistics should be sent! " << std::get<0>(mode_category) << " " << std::get<1>(mode_category);
+        cout << "." << endl;
+    #endif
 }
 
-std::tuple<bool, std::string> WriterManager::get_mode_category() const
+std::tuple<bool, std::string> WriterManager::get_stat_flag()
 {
+    lock_guard<mutex> lock(statistics_mutex);
     return mode_category;
 }
 
@@ -257,16 +269,44 @@ void WriterManager::set_time_end()
     time_end = std::chrono::system_clock::now();
 }
 
-std::string WriterManager::get_writer_stats() const
+void WriterManager::set_time_start()
 {
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[WriterManager::get_writer_stats] Writer manager getting the statistics..." << endl;
-    #endif
+    time_start = std::chrono::system_clock::now();
+}
+
+bool WriterManager::is_stats_queue_empty()
+{
+    return (stats_queue.empty());
+}
+
+std::chrono::system_clock::time_point WriterManager::get_last_statistics_timestamp() const
+{
+    return last_statistics_timestamp;
+}
+
+void WriterManager::set_last_statistics_timestamp()
+{
+     last_statistics_timestamp = std::chrono::system_clock::now();
+}
+
+
+
+std::string WriterManager::get_stats_from_queue()
+{
+    
+    auto stats_str_from_queue = stats_queue.front();
+    stats_queue.pop_front();
+    return stats_str_from_queue;
+}
+
+void WriterManager::create_writer_stats_2queue(const std::string category)
+{
+
+    lock_guard<mutex> lock(statistics_mutex);
     pt::ptree root;
     pt::ptree stats_json;
-    if (std::get<1>(mode_category) == "start"){
+    bool always_add = false;
+    if (category == "start"){
         time_t tt;
         tt = std::chrono::system_clock::to_time_t(time_start);
         stats_json.put("first_frame_id", first_pulse_id);
@@ -275,8 +315,9 @@ std::string WriterManager::get_writer_stats() const
         stats_json.put("user_id", get_user_id());
         stats_json.put("start_time", ctime(&tt));
         stats_json.put("compression_method", "test");
-        root.add_child("statistics_wr_finish", stats_json);
-    } else if (std::get<1>(mode_category) == "adv"){
+        root.add_child("statistics_wr_start", stats_json);
+        always_add = true;
+    } else if (category == "adv"){
         // calculates the elapsed time from beginning
         auto now = std::chrono::system_clock::now();
         auto time_diff = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(now - time_start).count();
@@ -293,7 +334,7 @@ std::string WriterManager::get_writer_stats() const
         stats_json.put("writting_rate", writting_rate);
         stats_json.put("avg_compressed_size", "0.0");
         root.add_child("statistics_wr_adv", stats_json);
-    } else if (std::get<1>(mode_category) == "end") {
+    } else if (category == "end") {
         // creates the finish statistics json
         time_t tt;
         tt = std::chrono::system_clock::to_time_t(time_end);
@@ -302,13 +343,25 @@ std::string WriterManager::get_writer_stats() const
         stats_json.put("n_lost_frames", get_n_lost_frames());
         stats_json.put("n_total_written_frames", get_n_written_frames());
         root.add_child("statistics_wr_finish", stats_json);
+        always_add = true;
     } else {
         stats_json.put("problem", "unidentified_mode");
         root.add_child("unidentified_mode", stats_json);
     }
-    
     std::ostringstream buf;
     pt::write_json(buf, root, false);
-    return buf.str();
-    // return "test string statistics method";
+    auto now = std::chrono::system_clock::now();
+    // always add to the queue START/FINISH
+    stats_queue.push_back(buf.str());
+    // if (always_add)
+    // {
+    //     cout << " ADIDIONOU ALWAYS ADD" << endl;
+    //     stats_queue.push_back(buf.str());
+    // }else{ // checks if it has 1sec gap between last adv statistics
+    //     if (now - get_last_statistics_timestamp() >= std::chrono::seconds(1))
+    //     {
+    //         cout << " ADIDIONOU timestamp " << endl;
+    //         stats_queue.push_back(buf.str());
+    //     }
+    // }
 }

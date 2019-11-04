@@ -59,8 +59,6 @@ int main (int argc, char *argv[])
     });
 
     CsaxsFormat format("images");
-
-    
     WriterManager writer_manager(format.get_input_value_type(), output_file, user_id, n_frames);
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
     ZmqSender sender(statistics_monitor_address, config::zmq_n_io_threads);

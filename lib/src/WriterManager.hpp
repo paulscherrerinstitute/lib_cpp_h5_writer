@@ -11,6 +11,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include "date.h"
 #include "H5Format.hpp"
+#include "config.hpp"
 
 
 using namespace std;
@@ -25,9 +26,10 @@ namespace writer_utils {
 
 class WriterManager
 {
-    
+
     std::unordered_map<std::string, boost::any> parameters = {};
     std::mutex parameters_mutex;
+    std::mutex statistics_mutex;
 
     // Initialize in constructor.
     const std::unordered_map<std::string, DATA_TYPE>& parameters_type;
@@ -68,20 +70,28 @@ class WriterManager
         int user_id;
         std::chrono::system_clock::time_point time_start;
         std::chrono::system_clock::time_point time_end;
+        std::chrono::system_clock::time_point last_statistics_timestamp;
         float processing_rate;
+        std::list<std::string> stats_queue;
+
 
 
         // statistics methods
-        std::tuple<bool, std::string> get_mode_category() const;
+        bool is_stats_queue_empty();
+        std::string get_stats_from_queue();
+        std::tuple<bool, std::string> get_stat_flag();
         std::string get_filter() const;
-        void set_mode_category(const bool new_mode, const std::string new_category);
-        std::string get_writer_stats() const;
+        void set_stat_flag(const bool new_mode, const std::string new_category);
+        void create_writer_stats_2queue(const std::string category);
         int get_user_id() const;
         size_t get_n_written_frames() const;
         size_t get_n_received_frames() const;
         uint64_t get_n_lost_frames() const;
         void set_processing_rate(float diff);
         void set_time_end();
+        void set_time_start();
+        void set_last_statistics_timestamp();
+        std::chrono::system_clock::time_point get_last_statistics_timestamp() const;
 
 };
 
