@@ -277,6 +277,10 @@ void ProcessManager::write_h5()
 
     // before killing it, sends the end statistics
     writer_manager.create_writer_stats_2queue("end");
+    // waits for all the statistics to be sent
+    while (!writer_manager.is_stats_queue_empty()){
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
     if (writer->is_file_open()) {
         #ifdef DEBUG_OUTPUT
             using namespace date;
@@ -286,7 +290,7 @@ void ProcessManager::write_h5()
 
         // Wait until all parameters are set or writer is killed.
         while (!writer_manager.are_all_parameters_set() && !writer_manager.is_killed()) {
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(config::parameters_read_retry_interval));
+            std::this_thread::sleep_for(std::chrono::milliseconds(config::parameters_read_retry_interval));
         }
 
 
@@ -338,8 +342,8 @@ void ProcessManager::send_writer_stats()
 {
     sender.bind();
 
-    while (writer_manager.is_running()) {
-
+    while (writer_manager.is_running()) 
+    {
         if (writer_manager.is_stats_queue_empty()){
             continue;
         }
@@ -358,8 +362,8 @@ void ProcessManager::send_writer_stats()
 
    }
 
-    // sleeps for 2 seconds before verifying statistics again
-    std::this_thread::sleep_for(std::chrono::milliseconds(3));
+    // sleeps for 1 seconds before verifying statistics again
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
    // if writer is not running anymore, still needs to send out possible
    // stuff from statistics queue
    while (!writer_manager.is_stats_queue_empty())
@@ -367,6 +371,7 @@ void ProcessManager::send_writer_stats()
         auto stats_str = writer_manager.get_stats_from_queue();
         auto filter = writer_manager.get_filter();
         sender.send(filter , stats_str);
+        writer_manager.set_last_statistics_timestamp();
    }
 
     #ifdef DEBUG_OUTPUT

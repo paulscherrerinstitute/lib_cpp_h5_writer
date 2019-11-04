@@ -17,7 +17,8 @@ namespace config {
     uint32_t ring_buffer_read_retry_interval = 5;
 
     // Delay before trying again to get statistics from the statistics writer buffer
-    uint32_t statistics_buffer_read_retry_interval = 1;
+    uint32_t statistics_buffer_adv_interval = 10;//milliseconds
+
     std::string raw_image_dataset_name = "raw_data";
     
     // By how much to enlarge a dataset when a resizing is needed.

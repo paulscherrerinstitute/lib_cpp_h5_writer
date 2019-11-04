@@ -13,7 +13,7 @@ namespace config
 
     extern size_t ring_buffer_n_slots;
     extern uint32_t ring_buffer_read_retry_interval;
-    extern uint32_t statistics_buffer_read_retry_interval;
+    extern uint32_t statistics_buffer_adv_interval;
 
     extern hsize_t dataset_increase_step;
     extern hsize_t initial_dataset_size;

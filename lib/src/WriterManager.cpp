@@ -348,20 +348,12 @@ void WriterManager::create_writer_stats_2queue(const std::string category)
         stats_json.put("problem", "unidentified_mode");
         root.add_child("unidentified_mode", stats_json);
     }
-    std::ostringstream buf;
-    pt::write_json(buf, root, false);
     auto now = std::chrono::system_clock::now();
-    // always add to the queue START/FINISH
-    stats_queue.push_back(buf.str());
-    // if (always_add)
-    // {
-    //     cout << " ADIDIONOU ALWAYS ADD" << endl;
-    //     stats_queue.push_back(buf.str());
-    // }else{ // checks if it has 1sec gap between last adv statistics
-    //     if (now - get_last_statistics_timestamp() >= std::chrono::seconds(1))
-    //     {
-    //         cout << " ADIDIONOU timestamp " << endl;
-    //         stats_queue.push_back(buf.str());
-    //     }
-    // }
+    auto diff = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(now - get_last_statistics_timestamp()).count();
+    if (always_add || diff >= config::statistics_buffer_adv_interval)
+    {
+        std::ostringstream buf;
+        pt::write_json(buf, root, false);
+        stats_queue.push_back(buf.str());
+    }
 }
