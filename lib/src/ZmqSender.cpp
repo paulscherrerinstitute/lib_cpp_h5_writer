@@ -77,11 +77,10 @@ void ZmqSender::send(const std::string& filter, const std::string& message_data)
     
     auto rv0 = sender->send(message_filter, ZMQ_SNDMORE | ZMQ_NOBLOCK);
     auto rv1 = sender->send(message_content, ZMQ_NOBLOCK);
-
     // verifies the return value
-    if (rv0 != 0 && rv1 != 0) {
+    if (!rv0 || !rv1) {
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[ZmqSender::send] Error while sending statistics via ZMQ."; 
+        cout << "[ZmqSender::send] Error while sending statistics via ZMQ. " << endl; 
     }
 }
