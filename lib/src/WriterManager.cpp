@@ -86,6 +86,12 @@ void WriterManager::kill()
     stop();
 }
 
+uint64_t WriterManager::get_n_received_frames() const
+{
+    return n_received_frames;
+}
+
+
 string WriterManager::get_status()
 {
     if (running_flag) {
@@ -103,6 +109,8 @@ string WriterManager::get_output_file() const
 {
     return output_file;
 }
+
+
 
 unordered_map<string, uint64_t> WriterManager::get_statistics() const
 {
@@ -207,4 +215,9 @@ bool WriterManager::are_all_parameters_set()
 size_t WriterManager::get_n_frames()
 {
     return n_frames;
+}
+
+void WriterManager::set_n_frames(size_t new_n_frames)
+{
+    n_frames = new_n_frames;
 }

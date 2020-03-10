@@ -31,7 +31,8 @@ size_t get_type_byte_size(const string& type)
 
     } else if (type == "uint64" || type == "int64" || type == "float64") {
         return 8;
-
+    } else if (type == "string") {
+        return 8;
     } else {
         stringstream error_message;
         using namespace date;
@@ -97,7 +98,6 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
 
     auto header_string = string(static_cast<char*>(message_header.data()), message_header.size());
     auto frame_metadata = read_json_header(header_string);
-
     // Get the message data.
     if (!receiver->recv(&message_data)) {
         using namespace date;
@@ -139,15 +139,14 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
                 
                 const auto& name = value_mapping.first;
                 const auto& header_data_type = value_mapping.second;
-
+                
                 auto value = get_value_from_json(json_header, name, header_data_type);
-
+                
                 header_data->header_values.insert(
                     {name, value}
                 );
             }
         }
-        
         return header_data;
 
     } catch (...) {
@@ -209,7 +208,9 @@ void copy_value_to_buffer(char* buffer, const size_t offset, const pt::ptree& js
     } else if (header_data_type.type == "float64") {
         auto value = json_value.get_value<double>();
         memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
-
+    } else if (header_data_type.type == "string") {
+        auto value = json_value.get_value<std::string>();
+        memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
     } else {
         // We cannot really convert this attribute.
         stringstream error_message;
@@ -224,7 +225,7 @@ void copy_value_to_buffer(char* buffer, const size_t offset, const pt::ptree& js
 shared_ptr<char> get_value_from_json(const pt::ptree& json_header, const string& name, const HeaderDataType& header_data_type)
 {
     char* buffer = new char[header_data_type.value_bytes_size * header_data_type.value_shape];
-
+    // cout << name << header_data_type.is_array << endl;
     if (header_data_type.is_array) {
         size_t index = 0;
 

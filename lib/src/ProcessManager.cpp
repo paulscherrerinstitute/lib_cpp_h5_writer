@@ -15,16 +15,15 @@
 using namespace std;
 
 ProcessManager::ProcessManager(WriterManager& writer_manager, ZmqReceiver& receiver, RingBuffer& ring_buffer, 
-    const H5Format& format, uint16_t rest_port, const string& bsread_rest_address, hsize_t frames_per_file) :
+    const H5Format& format, uint16_t rest_port, const string& bsread_rest_address, hsize_t frames_per_file, uint16_t adjust_n_frames):
         writer_manager(writer_manager), receiver(receiver), ring_buffer(ring_buffer), format(format), rest_port(rest_port), 
-        bsread_rest_address(bsread_rest_address), frames_per_file(frames_per_file)
+        bsread_rest_address(bsread_rest_address), frames_per_file(frames_per_file), adjust_n_frames(adjust_n_frames)
 {
 }
 
 void ProcessManager::notify_first_pulse_id(uint64_t pulse_id) 
 {
     string request_address(bsread_rest_address);
-
     // First pulse_id should be an async operation - we do not want to make the writer wait.
     async(launch::async, [pulse_id, &request_address]{
         try {
@@ -133,6 +132,14 @@ void ProcessManager::receive_zmq()
             cout << " and frame_bytes_size " << frame_metadata->frame_bytes_size;
             cout << "." << endl;
         #endif
+
+        // if the n_frames needs offset adjust based on the first frame_index
+        // pco.edge file-number
+        if(adjust_n_frames){
+            if(writer_manager.get_n_received_frames() == 0){
+                writer_manager.set_n_frames(writer_manager.get_n_frames()+frame_metadata->frame_index);
+            }
+        }
 
         // Commit the frame to the buffer.
         ring_buffer.write(frame_metadata, frame_data);

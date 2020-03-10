@@ -50,11 +50,13 @@ class WriterManager
         void set_parameters(const std::unordered_map<std::string, boost::any>& new_parameters);
         
         std::unordered_map<std::string, uint64_t> get_statistics() const;
+        uint64_t get_n_received_frames() const;
         void received_frame(size_t frame_index);
         void written_frame(size_t frame_index);
         void lost_frame(size_t frame_index);
 
         size_t get_n_frames();
+        void set_n_frames(size_t new_n_frames);
 };
 
 #endif
