@@ -217,7 +217,12 @@ size_t WriterManager::get_n_frames()
     return n_frames;
 }
 
-void WriterManager::set_n_frames(size_t new_n_frames)
+void WriterManager::set_n_frames_offset(size_t new_n_frames)
 {
-    n_frames = new_n_frames;
+    n_frames_offset = new_n_frames;
+}
+
+size_t WriterManager::get_n_frames_offset()
+{
+    return n_frames_offset;
 }

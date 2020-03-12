@@ -24,9 +24,10 @@ MetadataBuffer::MetadataBuffer(uint64_t n_images, shared_ptr<unordered_map<strin
     }
 }
 
-void MetadataBuffer::add_metadata_to_buffer(string name, uint64_t frame_index, const char* data)
+void MetadataBuffer::add_metadata_to_buffer(string name, uint64_t frame_index, const char* data, uint64_t initial_frame_offset)
 {
-    if (frame_index >= n_images) {
+    cout << frame_index << " " << n_images << " " << initial_frame_offset << " " << n_images + initial_frame_offset << endl;
+    if (frame_index >= n_images + initial_frame_offset) {
         stringstream error_message;
         using namespace date;
         error_message << "[" << std::chrono::system_clock::now() << "] ";
@@ -49,7 +50,7 @@ void MetadataBuffer::add_metadata_to_buffer(string name, uint64_t frame_index, c
     }
 
     size_t bytes_size_per_frame = metadata_length_bytes.at(name);
-    size_t buffer_offset = frame_index * bytes_size_per_frame;
+    size_t buffer_offset = (frame_index-initial_frame_offset) * bytes_size_per_frame;
 
     char* buffer = metadata->second.get();
     buffer += buffer_offset;
@@ -82,3 +83,4 @@ uint64_t MetadataBuffer::get_n_images()
 {
     return n_images;
 }
+

@@ -137,7 +137,8 @@ void ProcessManager::receive_zmq()
         // pco.edge file-number
         if(adjust_n_frames){
             if(writer_manager.get_n_received_frames() == 0){
-                writer_manager.set_n_frames(writer_manager.get_n_frames()+frame_metadata->frame_index);
+                cout << " FIRST FRAME INDEX : " << frame_metadata->frame_index << endl;
+                writer_manager.set_n_frames_offset(frame_metadata->frame_index);
             }
         }
 
@@ -146,7 +147,7 @@ void ProcessManager::receive_zmq()
 
         writer_manager.received_frame(frame_metadata->frame_index);
    }
-
+    
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
@@ -183,6 +184,8 @@ void ProcessManager::write_h5()
             continue;
         }
 
+        
+
         // When using file roll over, write the file format before switching to the next file.
         if (!writer->is_data_for_current_file(received_data.first->frame_index)) {
             #ifdef DEBUG_OUTPUT
@@ -195,8 +198,8 @@ void ProcessManager::write_h5()
             writer->write_metadata_to_file();
 
             write_h5_format(writer->get_h5_file());
+            
         }
-
         #ifdef PERF_OUTPUT
             using namespace date;
             auto start_time_frame = std::chrono::system_clock::now();
@@ -248,9 +251,11 @@ void ProcessManager::write_h5()
                         last_pulse_id = *(reinterpret_cast<uint64_t*>(value.get()));
                     }
                 }
-
-                writer->cache_metadata(name, received_data.first->frame_index, value.get());
+                
+                writer->cache_metadata(name, received_data.first->frame_index, value.get(), writer_manager.get_n_frames_offset());
+                
             }
+            
         }
 
         #ifdef PERF_OUTPUT
@@ -284,6 +289,7 @@ void ProcessManager::write_h5()
         while (!writer_manager.are_all_parameters_set() && !writer_manager.is_killed()) {
             boost::this_thread::sleep_for(boost::chrono::milliseconds(config::parameters_read_retry_interval));
         }
+        
 
         writer->write_metadata_to_file();
         
