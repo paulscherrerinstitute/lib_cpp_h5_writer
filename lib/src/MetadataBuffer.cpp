@@ -26,7 +26,6 @@ MetadataBuffer::MetadataBuffer(uint64_t n_images, shared_ptr<unordered_map<strin
 
 void MetadataBuffer::add_metadata_to_buffer(string name, uint64_t frame_index, const char* data, uint64_t initial_frame_offset)
 {
-    cout << frame_index << " " << n_images << " " << initial_frame_offset << " " << n_images + initial_frame_offset << endl;
     if (frame_index >= n_images + initial_frame_offset) {
         stringstream error_message;
         using namespace date;

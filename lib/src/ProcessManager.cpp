@@ -137,7 +137,6 @@ void ProcessManager::receive_zmq()
         // pco.edge file-number
         if(adjust_n_frames){
             if(writer_manager.get_n_received_frames() == 0){
-                cout << " FIRST FRAME INDEX : " << frame_metadata->frame_index << endl;
                 writer_manager.set_n_frames_offset(frame_metadata->frame_index);
             }
         }
