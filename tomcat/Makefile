@@ -16,7 +16,7 @@ tomcat_h5_writer: lib build_dirs $(OBJS)
 	$(CC) $(LDFLAGS) -o $(BIN_DIR)/tomcat_h5_writer $(OBJS) $(LDFLAGS)
 
 lib:
-	$(MAKE) -C /Users/lhdamiani/Software/Tomcat/lib_cpp_h5_writer/lib deploy
+	$(MAKE) -C ../lib deploy
 
 debug: CFLAGS += -DDEBUG_OUTPUT -g
 debug: tomcat_h5_writer
