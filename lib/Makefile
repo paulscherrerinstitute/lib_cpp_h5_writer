@@ -33,6 +33,8 @@ deploy: libcpp_h5_writer
 	mkdir -p ${CONDA_PREFIX}/include/cpp_h5_writer
 	cp src/*.hpp ${CONDA_PREFIX}/include/cpp_h5_writer
 	cp include/date.h ${CONDA_PREFIX}/include/cpp_h5_writer
+	mkdir -p ${CONDA_PREFIX}/include/cpp_h5_writer/compression
+	cp src/compression/*.h ${CONDA_PREFIX}/include/cpp_h5_writer/compression
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CFLAGS) $(LDFLAGS) -c -o $@ $<
