@@ -12,14 +12,14 @@ using namespace std;
 
 #define is_little_endian htonl(1) != 1
 
-size_t bsread::get_lz4_max_buffer_size(size_t n_elements, 
+size_t compression::get_lz4_max_buffer_size(size_t n_elements,
                                        size_t element_size) 
 {
         size_t n_bytes = n_elements * element_size;
         return static_cast<size_t>(LZ4_compressBound(n_bytes)) + 4;
 }
 
-size_t bsread::compress_lz4(const char* data, 
+size_t compression::compress_lz4(const char* data,
                             size_t n_elements, 
                             size_t element_size,
                             char* buffer, 
@@ -44,7 +44,7 @@ size_t bsread::compress_lz4(const char* data,
 
 }
 
-size_t bsread::decompress_lz4(const char* compressed_data, size_t compressed_size, char* data) {
+size_t compression::decompress_lz4(const char* compressed_data, size_t compressed_size, char* data) {
 
     uint32_t expected_data_size;
 
@@ -67,13 +67,13 @@ size_t bsread::decompress_lz4(const char* compressed_data, size_t compressed_siz
     return (size_t) decompressed_size;
 }
 
-size_t bsread::get_bitshuffle_max_buffer_size(size_t n_elements, 
+size_t compression::get_bitshuffle_max_buffer_size(size_t n_elements,
                                               size_t element_size) 
 {
     return bshuf_compress_lz4_bound(n_elements, element_size, 0) + 12;
 }
 
-size_t bsread::compress_bitshuffle(const char* data, size_t n_elements, size_t element_size, char* buffer){
+size_t compression::compress_bitshuffle(const char* data, size_t n_elements, size_t element_size, char* buffer){
 
     size_t block_size = bshuf_default_block_size(element_size);
 
@@ -104,7 +104,7 @@ size_t bsread::compress_bitshuffle(const char* data, size_t n_elements, size_t e
     return (size_t)compressed_size+12;
 }
 
-size_t bsread::decompress_bitshuffle(const char* compressed_data, size_t compressed_size,
+size_t compression::decompress_bitshuffle(const char* compressed_data, size_t compressed_size,
                                      size_t n_elements, size_t element_size, char* data) {
 
     uint64_t header_expected_data_size = ((uint64_t*)compressed_data)[0];
