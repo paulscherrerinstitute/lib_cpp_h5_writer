@@ -4,8 +4,8 @@
 #include <arpa/inet.h>
 
 extern "C"{
-    #include "lz4.h"
-    #include "bitshuffle.h"
+    #include "bitshuffle/lz4.h"
+    #include "bitshuffle/bitshuffle.h"
 }
 
 using namespace std;
