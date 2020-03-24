@@ -250,7 +250,7 @@ bool H5Writer::is_file_open() const
     return (file.getId() != -1);
 }
 
-inline size_t H5Writer::get_relative_data_index(const size_t data_index) 
+size_t H5Writer::get_relative_data_index(const size_t data_index)
 {
     // No file roll over.
     if (frames_per_file == 0) {
