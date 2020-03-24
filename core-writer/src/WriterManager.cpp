@@ -92,7 +92,7 @@ WriterManager::WriterManager(
         using namespace chrono; 
 
         cout << "[" << system_clock::now() << "]";
-        cout << "[WriterManager::WriterManager]"
+        cout << "[WriterManager::WriterManager]";
         cout << " Writer manager initialized." << endl;
     #endif
 }
@@ -213,7 +213,7 @@ void WriterManager::writing_completed() {
         using namespace date;
         using namespace chrono; 
         cout << "[" << system_clock::now() << "]";
-        cout << "[WriterManager::writing_completed]"
+        cout << "[WriterManager::writing_completed]";
         cout << " Writing has finished." << endl;
     #endif
 
