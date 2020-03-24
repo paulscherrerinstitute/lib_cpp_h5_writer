@@ -3,7 +3,7 @@ file(GLOB SOURCES
         src/compression/*.cpp
         src/compression/*.c)
 
-add_library(core-writer ${SOURCES})
+add_library(core-writer STATIC ${SOURCES})
 include_directories(core-writer external/)
 
 target_include_directories(core-writer PUBLIC
@@ -14,5 +14,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(core-writer PRIVATE DEBUG_OUTPUT)
 endif()
 
-
-
+enable_testing()
+add_subdirectory(test/)
+add_test(core-writer_tests core-writer_tests)
