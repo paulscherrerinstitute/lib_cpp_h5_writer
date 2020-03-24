@@ -2,6 +2,8 @@
 bin/
 obj/
 
+cmake-build-*/
+
 # Project directories
 .vscode/
 .DS_store
