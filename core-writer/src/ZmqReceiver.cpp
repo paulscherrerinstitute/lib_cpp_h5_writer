@@ -208,50 +208,60 @@ void copy_value_to_buffer(
 {
     if (header_data_type.type == "uint8") {
         auto value = json_value.get_value<uint8_t>();
-        memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
+        memcpy(buffer + offset, reinterpret_cast<char*>(&value),
+                header_data_type.value_bytes_size);
 
     } else if (header_data_type.type == "uint16") {
         auto value = json_value.get_value<uint16_t>();
-        memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
+        memcpy(buffer + offset, reinterpret_cast<char*>(&value),
+                header_data_type.value_bytes_size);
 
     } else if (header_data_type.type == "uint32") {
         auto value = json_value.get_value<uint32_t>();
-        memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
+        memcpy(buffer + offset, reinterpret_cast<char*>(&value),
+                header_data_type.value_bytes_size);
 
     } else if (header_data_type.type == "uint64") {
         auto value = json_value.get_value<uint64_t>();
-        memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
+        memcpy(buffer + offset, reinterpret_cast<char*>(&value),
+                header_data_type.value_bytes_size);
 
     } else if (header_data_type.type == "int8") {
         auto value = json_value.get_value<int8_t>();
-        memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
+        memcpy(buffer + offset, reinterpret_cast<char*>(&value),
+                header_data_type.value_bytes_size);
         
     } else if (header_data_type.type == "int16") {
         auto value = json_value.get_value<int16_t>();
-        memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
+        memcpy(buffer + offset, reinterpret_cast<char*>(&value),
+                header_data_type.value_bytes_size);
 
     } else if (header_data_type.type == "int32") {
         auto value = json_value.get_value<int32_t>();
-        memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
+        memcpy(buffer + offset, reinterpret_cast<char*>(&value),
+                header_data_type.value_bytes_size);
     
     } else if (header_data_type.type == "int64") {
         auto value = json_value.get_value<int64_t>();
-        memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
+        memcpy(buffer + offset, reinterpret_cast<char*>(&value),
+                header_data_type.value_bytes_size);
     
     } else if (header_data_type.type == "float32") {
         auto value = json_value.get_value<float>();
-        memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
+        memcpy(buffer + offset, reinterpret_cast<char*>(&value),
+                header_data_type.value_bytes_size);
 
     } else if (header_data_type.type == "float64") {
         auto value = json_value.get_value<double>();
-        memcpy(buffer + offset, reinterpret_cast<char*>(&value), header_data_type.value_bytes_size);
+        memcpy(buffer + offset, reinterpret_cast<char*>(&value),
+                header_data_type.value_bytes_size);
 
     } else {
         // We cannot really convert this attribute.
         stringstream error_message;
         using namespace date;
         error_message << "[" << std::chrono::system_clock::now() << "]";
-        error_message << "[ZmqReceiver::get_value_from_json] ";
+        error_message << "[ZmqReceiver::get_value_from_json]";
         error_message << " Unsupported header data type ";
         error_message << header_data_type.type << endl;
 
