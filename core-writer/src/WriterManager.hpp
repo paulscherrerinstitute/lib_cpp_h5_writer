@@ -16,7 +16,7 @@
 #include "ZmqReceiver.hpp"
 #include "RingBuffer.hpp"
 #include "H5Format.hpp"
-#include "compression/compression.h"
+#include "compression.h"
 
 namespace writer_utils {
     void set_process_id(int user_id);
