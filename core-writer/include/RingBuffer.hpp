@@ -30,20 +30,20 @@ struct FrameMetadata
 class RingBuffer
 {
     // Initialized in constructor.
-    size_t n_slots = 0;
-    std::vector<bool> ringbuffer_slots;    
+    size_t n_slots_ = 0;
+    std::vector<bool> ringbuffer_slots_;
 
     // Set in initialize().
-    size_t slot_size = 0;
-    size_t buffer_size = 0;
-    char* frame_data_buffer = NULL;
-    size_t write_index = 0;
-    size_t buffer_used_slots = 0;
-    bool ring_buffer_initialized = false;
+    size_t slot_size_ = 0;
+    size_t buffer_size_ = 0;
+    char* frame_data_buffer_ = NULL;
+    size_t write_index_ = 0;
+    size_t buffer_used_slots_ = 0;
+    bool ring_buffer_initialized_ = false;
 
-    std::list< std::shared_ptr<FrameMetadata> > frame_metadata_queue;
-    std::mutex frame_metadata_queue_mutex;
-    std::mutex ringbuffer_slots_mutex;
+    std::list< std::shared_ptr<FrameMetadata> > frame_metadata_queue_;
+    std::mutex frame_metadata_queue_mutex_;
+    std::mutex ringbuffer_slots_mutex_;
 
     char* get_buffer_slot_address(size_t buffer_slot_index);
 
@@ -56,6 +56,7 @@ class RingBuffer
         void commit(std::shared_ptr<FrameMetadata> metadata);
         std::pair<std::shared_ptr<FrameMetadata>, char*> read();
         void release(size_t buffer_slot_index);
+
         bool is_empty();
         void clear();
         size_t get_slot_size();
