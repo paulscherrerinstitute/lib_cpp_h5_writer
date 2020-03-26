@@ -5,7 +5,7 @@ file(GLOB SOURCES src/*.cpp)
 add_library(core-writer STATIC ${SOURCES})
 include_directories(core-writer external/)
 
-target_include_directories(core-writer PUBLIC src/)
+target_include_directories(core-writer PUBLIC include/)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(core-writer PRIVATE DEBUG_OUTPUT)
