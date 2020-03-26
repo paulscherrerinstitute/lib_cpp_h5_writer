@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/BufferedWriter.hpp"
+#include "BufferedWriter.hpp"
 using namespace std;
 
 TEST(BufferedWriter, get_buffered_writer)

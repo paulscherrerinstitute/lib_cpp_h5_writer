@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/MetadataBuffer.hpp"
+#include "MetadataBuffer.hpp"
 
 using namespace std;
 

@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/H5Writer.hpp"
+#include "H5Writer.hpp"
 using namespace std;
 
 TEST(H5Writer, get_h5_writer)

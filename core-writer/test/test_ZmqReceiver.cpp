@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/ZmqReceiver.hpp"
+#include "ZmqReceiver.hpp"
 
 using namespace std;
 namespace pt = boost::property_tree;
