@@ -28,11 +28,15 @@ struct HeaderDataType
 
 size_t get_type_byte_size(const std::string& type);
 
-void copy_value_to_buffer(const char* buffer, size_t offset, const boost::property_tree::ptree& json_value, 
-    const HeaderDataType& header_data_type);
+void copy_value_to_buffer(
+        const char* buffer, size_t offset,
+        const boost::property_tree::ptree& json_value,
+        const HeaderDataType& header_data_type);
 
-std::shared_ptr<char> get_value_from_json(const boost::property_tree::ptree& json_header, 
-    const std::string& name, const HeaderDataType& header_data_type);
+std::shared_ptr<char> get_value_from_json(
+        const boost::property_tree::ptree& json_header,
+        const std::string& name,
+        const HeaderDataType& header_data_type);
 
 class ZmqReceiver
 {
