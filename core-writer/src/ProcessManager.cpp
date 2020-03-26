@@ -12,7 +12,7 @@
 #include "ProcessManager.hpp"
 #include "config.hpp"
 #include "BufferedWriter.hpp"
-#include "compression.h"
+#include "compression.hpp"
 
 using namespace std;
 

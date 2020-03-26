@@ -1,4 +1,4 @@
-#include "compression.h"
+#include "compression.hpp"
 
 #include <stdexcept>
 #include <arpa/inet.h>
