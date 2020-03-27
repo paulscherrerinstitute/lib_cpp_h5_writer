@@ -121,7 +121,6 @@ char* RingBuffer::reserve(shared_ptr<FrameMetadata> frame_metadata)
         }
     }
 
-    // The slot is already reserved, no need for synchronization.
     return get_buffer_slot_address(frame_metadata->buffer_slot_index);
 }
 
