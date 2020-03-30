@@ -141,7 +141,6 @@ unordered_map<string, uint64_t> WriterManager::get_statistics() const
     return result;
 }
 
-
 void WriterManager::start(const string output_file,
                           const int n_frames, 
                           const int user_id)
@@ -175,9 +174,7 @@ void WriterManager::start(const string output_file,
             new boost::thread(&WriterManager::receive_zmq, this)
         ));
     }
-
 }
-
 
 bool WriterManager::is_running() const
 {
@@ -197,7 +194,8 @@ bool WriterManager::should_receive_frame() {
     return false;
 }
 
-bool WriterManager::should_write_frame() {
+bool WriterManager::should_write_frame()
+{
     if (n_frames_to_write > 0) {
         return (n_frames_to_write.fetch_sub(1) >= 0);
     }
@@ -205,7 +203,8 @@ bool WriterManager::should_write_frame() {
     return false;
 }
 
-void WriterManager::writing_completed() {
+void WriterManager::writing_completed()
+{
     writing_flag = false;    
 
     #ifdef DEBUG_OUTPUT
@@ -223,8 +222,8 @@ void WriterManager::writing_error(string error) {
 
 }
 
-void WriterManager::write_h5_format(H5::H5File& file) {
-
+void WriterManager::write_h5_format(H5::H5File& file)
+{
     try {
         H5FormatUtils::write_format(file, format, {});
     } catch (const runtime_error& ex) {
