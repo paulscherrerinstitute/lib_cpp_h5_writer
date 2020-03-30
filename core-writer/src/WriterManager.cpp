@@ -14,34 +14,34 @@ void writer_utils::set_process_id(int user_id)
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
-        using namespace chrono; 
+        using namespace chrono;
         cout << "[" << system_clock::now() << "]";
-        cout << "[writer_utils::set_process_id] Setting process user to ";
-        cout << user_id << endl;
+        cout << "[writer_utils::set_process_id]";
+        cout << " Setting process user to " << user_id << endl;
     #endif
 
     if (setegid(user_id)) {
-        stringstream error_message;
+        stringstream err_msg;
 
         using namespace date;
-        using namespace chrono; 
-        error_message << "[" << system_clock::now() << "]";
-        error_message << "[writer_utils::set_process_id] Cannot set group_id to ";
-        error_message << user_id << endl;
+        using namespace chrono;
+        err_msg << "[" << system_clock::now() << "]";
+        err_msg << "[writer_utils::set_process_id]";
+        err_msg << " Cannot set group_id to " << user_id << endl;
 
-        throw runtime_error(error_message.str());
+        throw runtime_error(err_msg.str());
     }
 
     if (seteuid(user_id)) {
-        stringstream error_message;
+        stringstream err_msg;
 
         using namespace date;
-        using namespace chrono; 
-        error_message << "[" << system_clock::now() << "]";
-        error_message << "[writer_utils::set_process_id] Cannot set user_id to ";
-        error_message << user_id << endl;
+        using namespace chrono;
+        err_msg << "[" << system_clock::now() << "]";
+        err_msg << "[writer_utils::set_process_id]";
+        err_msg << " Cannot set user_id to " << user_id << endl;
 
-        throw runtime_error(error_message.str());
+        throw runtime_error(err_msg.str());
     }
 }
 
@@ -53,10 +53,10 @@ void writer_utils::create_destination_folder(const string& output_file)
         string output_folder(output_file.substr(0, file_separator_index));
 
         using namespace date;
-        using namespace chrono; 
+        using namespace chrono;
         cout << "[" << system_clock::now() << "]";
-        cout << "[writer_utils::create_destination_folder] Creating folder ";
-        cout << output_folder << endl;
+        cout << "[writer_utils::create_destination_folder]";
+        cout << " Creating folder " << output_folder << endl;
 
         string create_folder_command("mkdir -p " + output_folder);
         system(create_folder_command.c_str());
@@ -89,8 +89,7 @@ WriterManager::WriterManager(
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
-        using namespace chrono; 
-
+        using namespace chrono;
         cout << "[" << system_clock::now() << "]";
         cout << "[WriterManager::WriterManager]";
         cout << " Writer manager initialized." << endl;
@@ -108,7 +107,8 @@ void WriterManager::stop()
         using namespace date;
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
-        cout << "[WriterManager::stop] Stopping the writer." << endl;
+        cout << "[WriterManager::stop]";
+        cout << " Stopping the writer." << endl;
     #endif
     
     running_flag = false;
@@ -152,7 +152,8 @@ void WriterManager::start(const string output_file,
         using namespace date;
         using namespace chrono; 
         cout << "[" << system_clock::now() << "]";
-        cout << "[WriterManager::start] Starting with parameters: ";
+        cout << "[WriterManager::start]";
+        cout << " Starting with parameters:";
         cout << "\toutput_file: " << output_file;
         cout << "\tn_frames: " << n_frames;
         cout << "\tuser_id: " << user_id;
@@ -165,8 +166,7 @@ void WriterManager::start(const string output_file,
     n_frames_to_receive = n_frames;
     receiving_flag = true;
 
-    
-    writing_thread = boost::thread(&WriterManager::write_h5, 
+    writing_thread = boost::thread(&WriterManager::write_h5,
                                    this, 
                                    output_file, 
                                    n_frames);
@@ -352,17 +352,10 @@ void WriterManager::write_h5(const string output_file, const uint64_t n_frames)
                     auto& name = header_type.first;
                     auto value = received_data.first->header_values.at(name);
     
-                    // TODO: Ugly hack until we get the start sequence in bsread.
-                    if (name == "pulse_id") {
-                        if (!last_pulse_id) {
-                            last_pulse_id = *(reinterpret_cast<uint64_t*>(value.get()));
-                            //notify_first_pulse_id(last_pulse_id);
-                        } else {
-                            last_pulse_id = *(reinterpret_cast<uint64_t*>(value.get()));
-                        }
-                    }
-    
-                    writer->cache_metadata(name, received_data.first->frame_index, value.get());
+                    writer->cache_metadata(
+                            name,
+                            received_data.first->frame_index,
+                            value.get());
                 }
             }
     
@@ -379,18 +372,14 @@ void WriterManager::write_h5(const string output_file, const uint64_t n_frames)
             #endif
         }
     
-        // Send the last_pulse_id only if it was set.
-        if (last_pulse_id) {
-            //notify_last_pulse_id(last_pulse_id);
-        }
-    
         if (writer->is_file_open()) {
             #ifdef DEBUG_OUTPUT
                 using namespace date;
                 using namespace chrono;
 
                 cout << "[" << system_clock::now() << "]";
-                cout << "[ProcessManager::write] Writing file format." << endl;
+                cout << "[ProcessManager::write]";
+                cout << " Writing file format." << endl;
             #endif
     
             writer->write_metadata_to_file();
@@ -403,7 +392,8 @@ void WriterManager::write_h5(const string output_file, const uint64_t n_frames)
             using namespace chrono;
 
             cout << "[" << system_clock::now() << "]";
-            cout << "[ProcessManager::write] Closing file " << output_file << endl;
+            cout << "[ProcessManager::write]";
+            cout << " Closing file " << output_file << endl;
         #endif
         
         writer->close_file(); 
@@ -413,7 +403,8 @@ void WriterManager::write_h5(const string output_file, const uint64_t n_frames)
             using namespace chrono;
             
             cout << "[" << system_clock::now() << "]";
-            cout << "[ProcessManager::write] Writer thread stopped." << endl;
+            cout << "[ProcessManager::write]";
+            cout << " Writer thread stopped." << endl;
         #endif
     
         writing_completed();
@@ -443,7 +434,8 @@ void WriterManager::receive_zmq()
             using namespace date;
             using namespace chrono;
             cout << "[" << system_clock::now() << "]";
-            cout << "[ProcessManager::receive_zmq] Processing FrameMetadata"; 
+            cout << "[ProcessManager::receive_zmq]";
+            cout << " Processing FrameMetadata";
             cout << " with frame_index " << frame_metadata->frame_index;
             cout << " and frame_shape [" << frame_metadata->frame_shape[0];
             cout << ", " << frame_metadata->frame_shape[1] << "]";
@@ -472,7 +464,8 @@ void WriterManager::receive_zmq()
             using namespace date;
             using namespace chrono;
             cout << "[" << system_clock::now() << "]";
-            cout << "[WriterManager::receive_zmq] Compressed image from "; 
+            cout << "[WriterManager::receive_zmq]";
+            cout << " Compressed image from ";
             cout << frame_metadata->frame_bytes_size << " bytes to "; 
             cout << compressed_size << " bytes." << endl; 
         #endif
@@ -484,7 +477,9 @@ void WriterManager::receive_zmq()
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[WriterManager::receive_zmq] Receiver thread stopped." << endl;
+        using namespace chrono;
+        cout << "[" << system_clock::now() << "]";
+        cout << "[WriterManager::receive_zmq]";
+        cout << " Receiver thread stopped." << endl;
     #endif
 }
