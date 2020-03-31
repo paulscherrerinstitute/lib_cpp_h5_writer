@@ -66,7 +66,7 @@ TEST(ZmqReceiver, read_json_header)
 {
   int n_modules = 1;
 
-  auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>(new unordered_map<string, HeaderDataType> {
+  unordered_map<string, HeaderDataType> header_values = {
       {"pulse_id", HeaderDataType("uint64")},
       {"frame", HeaderDataType("uint64")},
       {"is_good_frame", HeaderDataType("uint64")},
@@ -83,7 +83,7 @@ TEST(ZmqReceiver, read_json_header)
       {"framenums", HeaderDataType("uint64", n_modules)},
       
       {"module_number", HeaderDataType("uint64", n_modules)}
-  });
+  };
 
   ZmqReceiver receiver("something", 1, 1, header_values);
 
