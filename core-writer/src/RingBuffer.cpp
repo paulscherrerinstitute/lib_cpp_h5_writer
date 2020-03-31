@@ -14,7 +14,8 @@ RingBuffer::RingBuffer(size_t n_slots) :
         using namespace date;
         using namespace chrono; 
         cout << "[" << system_clock::now() << "]";
-        cout << "[RingBuffer::RingBuffer] Creating ring buffer";
+        cout << "[RingBuffer::RingBuffer]";
+        cout << " Creating ring buffer";
         cout << " with n_slots " << n_slots << endl;
     #endif
 }
@@ -45,7 +46,8 @@ void RingBuffer::initialize(size_t slot_size)
         using namespace date;
         using namespace chrono; 
         cout << "[" << system_clock::now() << "]";
-        cout << "[RingBuffer::initialize] Initializing ring buffer";
+        cout << "[RingBuffer::initialize]";
+        cout << " Initializing ring buffer";
         cout << " with slot_size " << slot_size << endl;
     #endif
     
@@ -60,7 +62,7 @@ void RingBuffer::initialize(size_t slot_size)
         using namespace date;
         using namespace chrono; 
         cout << "[" << system_clock::now() << "]";
-        cout << "[RingBuffer::initialize] ";
+        cout << "[RingBuffer::initialize]";
         cout << " Total buffer_size " << buffer_size_ << endl;
     #endif
 }
@@ -77,9 +79,9 @@ char* RingBuffer::reserve(shared_ptr<FrameMetadata> frame_metadata)
         using namespace date;
         using namespace chrono; 
         err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[RingBuffer::reserve] Received frame index ";
-        err_msg << frame_metadata->frame_index;
-        err_msg << " that is too large for ring buffer slot. ";
+        err_msg << "[RingBuffer::reserve]";
+        err_msg << " Received frame index " << frame_metadata->frame_index;
+        err_msg << " that is too large for ring buffer slot.";
         err_msg << "Slot size " << slot_size_ << ", but frame bytes size ";
         err_msg << frame_metadata->frame_bytes_size << endl;
 
@@ -99,7 +101,8 @@ char* RingBuffer::reserve(shared_ptr<FrameMetadata> frame_metadata)
                 using namespace date;
                 using namespace chrono; 
                 cout << "[" << system_clock::now() << "]";
-                cout << "[RingBuafer::reserve] Ring buffer slot ";
+                cout << "[RingBuafer::reserve]";
+                cout << " Ring buffer slot ";
                 cout << frame_metadata->buffer_slot_index;
                 cout << " reserved for frame_index ";
                 cout << frame_metadata->frame_index << endl;
@@ -114,8 +117,10 @@ char* RingBuffer::reserve(shared_ptr<FrameMetadata> frame_metadata)
             using namespace date;
             using namespace chrono; 
             err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[RingBuffer::reserve] Ring buffer is full.";
-            err_msg << " Collision at write_index = " << write_index_ << endl;
+            err_msg << "[RingBuffer::reserve]";
+            err_msg << " Ring buffer is full.";
+            err_msg << " Collision at write_index = " << write_index_;
+            err_msg << endl;
 
             throw runtime_error(err_msg.str());
         }
@@ -134,8 +139,8 @@ void RingBuffer::commit(shared_ptr<FrameMetadata> frame_metadata)
         using namespace date;
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
-        cout << "[RingBuffer::commit] Metadata for frame_index ";
-        cout << frame_metadata->frame_index;
+        cout << "[RingBuffer::commit]";
+        cout << " Metadata for frame_index " << frame_metadata->frame_index;
         cout << " added to metadata queue." << endl;
     #endif
 }
@@ -181,7 +186,8 @@ pair<shared_ptr<FrameMetadata>, char*> RingBuffer::read()
         using namespace date;
         using namespace chrono; 
         cout << "[" << system_clock::now() << "]";
-        cout << "[RingBuffer::read] Received metadata for frame_index ";
+        cout << "[RingBuffer::read]";
+        cout << " Received metadata for frame_index ";
         cout << frame_metadata->frame_index << endl;
     #endif
 
@@ -195,7 +201,8 @@ pair<shared_ptr<FrameMetadata>, char*> RingBuffer::read()
             using namespace date;
             using namespace chrono; 
             err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[RingBuffer::read] Ring buffer slot";
+            err_msg << "[RingBuffer::read]";
+            err_msg << " Ring buffer slot";
             err_msg << " referenced in message header ";
             err_msg << frame_metadata->buffer_slot_index << " is empty.";
             err_msg << endl;
@@ -216,8 +223,8 @@ void RingBuffer::release(size_t buffer_slot_index)
         using namespace date;
         using namespace chrono; 
         err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[RingBuffer::release] Slot index ";
-        err_msg << buffer_slot_index << " is out of range.";
+        err_msg << "[RingBuffer::release]";
+        err_msg << " Slot index " << buffer_slot_index << " is out of range.";
         err_msg << " Ring buffer n_slots = " << n_slots_ << endl;
 
         throw runtime_error(err_msg.str());
@@ -237,8 +244,9 @@ void RingBuffer::release(size_t buffer_slot_index)
             using namespace date;
             using namespace chrono; 
             err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[RingBuffer::release] Cannot release empty";
-            err_msg << " ring buffer slot " << buffer_slot_index << endl;
+            err_msg << "[RingBuffer::release]";
+            err_msg << " Cannot release empty ring buffer slot ";
+            err_msg << buffer_slot_index << endl;
 
             throw runtime_error(err_msg.str());
         }
