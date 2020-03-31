@@ -11,6 +11,7 @@ class ZmqRecvModule
     RingBuffer& ring_buffer_;
     const header_map& header_values_;
     const std::atomic_bool& is_writing_;
+    std::atomic_bool is_receiving_;
 
 protected:
     void receive_thread(
