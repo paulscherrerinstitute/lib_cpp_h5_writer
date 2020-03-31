@@ -40,6 +40,8 @@ std::shared_ptr<char> get_value_from_json(
 
 class ZmqReceiver
 {
+    typedef std::unordered_map<std::string, HeaderDataType> header_map;
+
     const std::string connect_address;
     const int n_io_threads;
     const int receive_timeout;
@@ -49,24 +51,20 @@ class ZmqReceiver
     zmq::message_t message_data;
     boost::property_tree::ptree json_header;
 
-    std::shared_ptr<std::unordered_map<std::string, HeaderDataType>> header_values_type = NULL;
+    const header_map& header_values_type_;
 
     public:
-        ZmqReceiver(const std::string& connect_address, const int n_io_threads, const int receive_timeout,
-            std::shared_ptr<std::unordered_map<std::string, HeaderDataType>> header_values_type=NULL);
-
-        ZmqReceiver(const ZmqReceiver& other);
-
-        virtual ~ZmqReceiver(){};
+        ZmqReceiver(
+                const std::string& connect_address,
+                const int n_io_threads,
+                const int receive_timeout,
+                const header_map& header_values_type);
 
         void connect();
 
         std::shared_ptr<FrameMetadata> read_json_header(const std::string& header);
 
         std::pair<std::shared_ptr<FrameMetadata>, char*> receive();
-
-        const std::shared_ptr<std::unordered_map<std::string, HeaderDataType>> get_header_values_type() const;
-
 };
 
 #endif
