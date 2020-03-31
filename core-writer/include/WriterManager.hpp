@@ -74,7 +74,7 @@ class WriterManager
                       RingBuffer& ring_buffer, 
                       const H5Format& format, 
                       std::shared_ptr<header_map> header_values_type,
-                      uint8_t n_receiving_threads,
+                      uint8_t n_receiving_threads=1,
                       hsize_t frames_per_file=0);
 
         virtual ~WriterManager();
