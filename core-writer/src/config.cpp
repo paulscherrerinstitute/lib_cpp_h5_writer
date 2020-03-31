@@ -22,7 +22,4 @@ namespace config {
     hsize_t dataset_increase_step = 1000;
     // To which value to initialize a dataset size.
     hsize_t initial_dataset_size = 1000;
-
-    // Delay in between attempts to see if the requred parameters were passed over the REST api.
-    uint32_t parameters_read_retry_interval = 300;
 }
