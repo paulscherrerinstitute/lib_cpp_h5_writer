@@ -1,6 +1,9 @@
 add_subdirectory(external/)
 
-file(GLOB SOURCES src/*.cpp)
+file(GLOB SOURCES
+        src/*.cpp
+        src/writer/*.cpp
+        src/receiver/*.cpp)
 
 add_library(core-writer STATIC ${SOURCES})
 include_directories(core-writer external/)
