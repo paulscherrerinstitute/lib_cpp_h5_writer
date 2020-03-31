@@ -117,7 +117,7 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
 
     // Get the message header.
     if (!receiver->recv(&message_header)){
-        return {NULL, NULL};
+        return {nullptr, nullptr};
     }
 
     auto header_string = string(static_cast<char*>(message_header.data()),
@@ -133,7 +133,7 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
         cout << " Frame index " << frame_metadata->frame_index << " lost.";
         cout << " Trying to continue with the next frame." << endl;
 
-        return {NULL, NULL};
+        return {nullptr, nullptr};
     }
 
     frame_metadata->frame_bytes_size = message_data.size();
