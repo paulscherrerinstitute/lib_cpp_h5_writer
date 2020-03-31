@@ -69,6 +69,7 @@ void RingBuffer::initialize(size_t slot_size)
 
 char* RingBuffer::reserve(shared_ptr<FrameMetadata> frame_metadata)
 {
+    // TODO: Synchronize this as well.
     if (!ring_buffer_initialized_) {
         initialize(frame_metadata->frame_bytes_size);
     }
