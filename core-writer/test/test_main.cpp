@@ -3,6 +3,7 @@
 #include "test_H5Writer.cpp"
 #include "test_MetadataBuffer.cpp"
 #include "test_BufferedWriter.cpp"
+#include "test_ZmqRecvModule.cpp"
 
 using namespace std;
 
