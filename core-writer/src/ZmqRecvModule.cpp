@@ -8,12 +8,11 @@ using namespace std;
 
 ZmqRecvModule::ZmqRecvModule(
         RingBuffer &ringBuffer,
-        const header_map &header_values,
-        const std::atomic_bool& is_writing) :
+        const header_map &header_values) :
             ring_buffer_(ring_buffer_),
             header_values_(header_values),
-            is_writing_(is_writing),
-            is_receiving_(false)
+            is_receiving_(false),
+            is_writing_(false)
 {}
 
 void ZmqRecvModule::start_recv(
@@ -67,6 +66,16 @@ void ZmqRecvModule::stop_recv()
     }
 
     receiving_threads_.clear();
+}
+
+void ZmqRecvModule::start_writing()
+{
+    is_writing_ = true;
+}
+
+void ZmqRecvModule::stop_writing()
+{
+    is_writing_ = false;
 }
 
 void ZmqRecvModule::receive_thread(const string& connect_address)
