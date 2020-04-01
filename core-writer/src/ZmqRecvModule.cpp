@@ -16,7 +16,7 @@ ZmqRecvModule::ZmqRecvModule(
             is_receiving_(false)
 {}
 
-void ZmqRecvModule::start(
+void ZmqRecvModule::start_recv(
         const string& connect_address,
         const uint8_t n_receiving_threads)
 {
@@ -50,7 +50,7 @@ void ZmqRecvModule::start(
     }
 }
 
-void ZmqRecvModule::stop()
+void ZmqRecvModule::stop_recv()
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;

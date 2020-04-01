@@ -25,9 +25,11 @@ public:
             const header_map& header_values,
             const std::atomic_bool& is_writing);
 
-    void start(const std::string& connect_address,
+    void start_recv(const std::string& connect_address,
                const uint8_t n_receiving_threads);
-    void stop();
+    void stop_recv();
+
+
 };
 
 #endif
