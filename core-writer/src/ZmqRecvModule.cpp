@@ -18,19 +18,46 @@ ZmqRecvModule::ZmqRecvModule(
 
 void ZmqRecvModule::start(
         const string& connect_address,
-        const uint8_t n_receiving_thread)
+        const uint8_t n_receiving_threads)
 {
+    if (is_receiving_ == true) {
+        stringstream err_msg;
 
+        using namespace date;
+        using namespace chrono;
+        err_msg << "[" << system_clock::now() << "]";
+        err_msg << "[ZmqRecvModule::start]";
+        err_msg << " Receivers already running." << endl;
+
+        throw runtime_error(err_msg.str());
+    }
+
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        using namespace chrono;
+        cout << "[" << system_clock::now() << "]";
+        cout << "[ZmqRecvModule::start]";
+        cout << " Starting with parameters:";
+        cout << "\tconnect_address: " << connect_address;
+        cout << "\tn_receiving_thread: " << n_receiving_threads;
+        cout << endl;
+    #endif
+
+    is_receiving_ = true;
+
+    for (uint8_t i_rec=0; i_rec < n_receiving_threads; i_rec++) {
+        receiving_threads_.emplace_back(
+                &ZmqRecvModule::receive_thread, this, connect_address);
+    }
 }
 
 void ZmqRecvModule::stop()
 {
+    is_receiving_ = false;
 
 }
 
-void ZmqRecvModule::receive_thread(
-        const string& connect_address,
-        const uint8_t n_receiving_threads)
+void ZmqRecvModule::receive_thread(const string& connect_address)
 {
     ZmqReceiver receiver(
             connect_address,
@@ -44,7 +71,7 @@ void ZmqRecvModule::receive_thread(
 
         auto frame = receiver.receive();
 
-        // If no message, first and second = nullptr
+        // If no message, .first and .second = nullptr
         if (frame.first == nullptr ||
             !is_writing_.load(memory_order_relaxed)) {
             continue;
