@@ -70,11 +70,27 @@ void ZmqRecvModule::stop_recv()
 
 void ZmqRecvModule::start_writing()
 {
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        using namespace chrono;
+        cout << "[" << system_clock::now() << "]";
+        cout << "[ZmqRecvModule::start_writing]";
+        cout << " Enable writing." << endl;
+    #endif
+
     is_writing_ = true;
 }
 
 void ZmqRecvModule::stop_writing()
 {
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        using namespace chrono;
+        cout << "[" << system_clock::now() << "]";
+        cout << "[ZmqRecvModule::stop_writing]";
+        cout << " Enable writing." << endl;
+    #endif
+
     is_writing_ = false;
 }
 
@@ -105,7 +121,7 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
             using namespace date;
             using namespace chrono;
             cout << "[" << system_clock::now() << "]";
-            cout << "[ProcessManager::receive_zmq]";
+            cout << "[ZmqRecvModule::receive_thread]";
             cout << " Processing FrameMetadata with frame_index ";
             cout << frame_metadata->frame_index;
             cout << " and frame_shape [" << frame_metadata->frame_shape[0];
@@ -140,7 +156,7 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
             using namespace date;
             using namespace chrono;
             cout << "[" << system_clock::now() << "]";
-            cout << "[ProcessManager::receive_zmq]";
+            cout << "[ZmqRecvModule::receive_thread]";
             cout << " Compressed image from ";
             cout << frame_metadata->frame_bytes_size << " bytes to ";
             cout << compressed_size << " bytes." << endl;
@@ -155,7 +171,7 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
         using namespace date;
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
-        cout << "[ProcessManager::receive_zmq]";
+        cout << "[ZmqRecvModule::receive_thread]";
         cout << " Receiver thread stopped." << endl;
     #endif
 }
