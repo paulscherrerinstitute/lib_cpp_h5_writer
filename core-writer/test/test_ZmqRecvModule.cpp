@@ -7,8 +7,6 @@ using namespace std;
 
 TEST(ZmqRecvModule, basic_interaction)
 {
-    uint8_t n_receivers = 4;
-
     RingBuffer ring_buffer(10);
 
     size_t n_modules(4);
@@ -31,7 +29,13 @@ TEST(ZmqRecvModule, basic_interaction)
             {"module_number", HeaderDataType("uint64", n_modules)}
     };
 
-    //ZmqRecvModule zmq_recv_module(ring_buffer,header_values,);
+    ZmqRecvModule zmq_recv_module(ring_buffer,header_values);
 
+    uint8_t n_receivers = 4;
+    zmq_recv_module.start_recv("tcp://127.0.0.1:10000", n_receivers);
 
+    zmq_recv_module.start_writing();
+    zmq_recv_module.stop_writing();
+
+    zmq_recv_module.stop_recv();
 }
