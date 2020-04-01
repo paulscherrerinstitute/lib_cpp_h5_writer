@@ -39,8 +39,7 @@ void ZmqRecvModule::start(
         cout << "[ZmqRecvModule::start]";
         cout << " Starting with parameters:";
         cout << "\tconnect_address: " << connect_address;
-        cout << "\tn_receiving_thread: " << n_receiving_threads;
-        cout << endl;
+        cout << "\tn_receiving_thread: " << n_receiving_threads << endl;
     #endif
 
     is_receiving_ = true;
@@ -53,8 +52,21 @@ void ZmqRecvModule::start(
 
 void ZmqRecvModule::stop()
 {
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        using namespace chrono;
+        cout << "[" << system_clock::now() << "]";
+        cout << "[ZmqRecvModule::stop]";
+        cout << " Stop receiving threads." << endl;
+    #endif
+
     is_receiving_ = false;
 
+    for (auto& thread_ptr:receiving_threads_) {
+        thread_ptr.join();
+    }
+
+    receiving_threads_.clear();
 }
 
 void ZmqRecvModule::receive_thread(const string& connect_address)
