@@ -62,6 +62,8 @@ class ZmqReceiver
 
         void connect();
 
+        void disconnect();
+
         std::shared_ptr<FrameMetadata> read_json_header(const std::string& header);
 
         std::pair<std::shared_ptr<FrameMetadata>, char*> receive();

@@ -96,6 +96,20 @@ void ZmqReceiver::connect()
     receiver->connect(connect_address);
 }
 
+void ZmqReceiver::disconnect()
+{
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        using namespace chrono;
+        cout << "[" << system_clock::now() << "]";
+        cout << "[ZmqReceiver::disconnect]";
+        cout << " Disconnect." << endl;
+    #endif
+
+    receiver->disconnect(connect_address);
+    context->close();
+}
+
 pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
 {
     if (!receiver) {
