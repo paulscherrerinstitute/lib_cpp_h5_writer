@@ -7,9 +7,9 @@
 using namespace std;
 
 ZmqRecvModule::ZmqRecvModule(
-        RingBuffer &ringBuffer,
+        RingBuffer &ring_buffer,
         const header_map &header_values) :
-            ring_buffer_(ring_buffer_),
+            ring_buffer_(ring_buffer),
             header_values_(header_values),
             is_receiving_(false),
             is_writing_(false)
