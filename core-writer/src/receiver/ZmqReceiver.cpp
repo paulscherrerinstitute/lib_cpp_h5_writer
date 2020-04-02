@@ -106,7 +106,7 @@ void ZmqReceiver::disconnect()
         cout << " Disconnect." << endl;
     #endif
 
-    receiver->disconnect(connect_address);
+    receiver->close();
     context->close();
 }
 

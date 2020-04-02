@@ -63,7 +63,6 @@ void ZmqRecvModule::stop_recv()
 
     for (auto& recv_thread:receiving_threads_) {
         if (recv_thread.joinable()) {
-            cout << "joining first thread" << endl;
             recv_thread.join();
         }
     }
