@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 project(lib_cpp_h5_writer)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 set (LIB_CPP_H5_WRITER_VERSION "1.0.0")
 
