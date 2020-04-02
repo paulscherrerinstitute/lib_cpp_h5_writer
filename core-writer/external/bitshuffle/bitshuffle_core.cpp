@@ -10,7 +10,10 @@
  */
 
 #include "bitshuffle_core.h"
-#include "bitshuffle_internals.h"
+
+extern "C" {
+    #include "bitshuffle_internals.h"
+}
 
 #include <stdio.h>
 #include <string.h>

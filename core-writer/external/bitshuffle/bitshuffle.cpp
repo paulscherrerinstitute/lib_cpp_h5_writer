@@ -11,8 +11,12 @@
 
 #include "bitshuffle.h"
 #include "bitshuffle_core.h"
-#include "bitshuffle_internals.h"
-#include "lz4.h"
+
+extern "C" {
+    #include "bitshuffle_internals.h"
+    #include "lz4.h"
+}
+
 
 #include <stdio.h>
 #include <string.h>
