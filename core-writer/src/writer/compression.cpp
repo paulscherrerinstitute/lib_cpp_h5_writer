@@ -1,11 +1,11 @@
 #include "compression.hpp"
+#include "bitshuffle/bitshuffle.h"
 
 #include <stdexcept>
 #include <arpa/inet.h>
 
-extern "C"{
+extern "C" {
     #include "bitshuffle/lz4.h"
-    #include "bitshuffle/bitshuffle.h"
 }
 
 using namespace std;
