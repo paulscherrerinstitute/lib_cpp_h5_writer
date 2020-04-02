@@ -94,7 +94,7 @@ char* RingBuffer::reserve(shared_ptr<FrameMetadata> frame_metadata)
         lock_guard<mutex> lock(ringbuffer_slots_mutex_);
 
         if (!ringbuffer_slots_[write_index_]) {
-            ringbuffer_slots_[write_index_] = 1;
+            ringbuffer_slots_[write_index_] = true;
             
             frame_metadata->buffer_slot_index = write_index_;
 
@@ -235,7 +235,7 @@ void RingBuffer::release(size_t buffer_slot_index)
         lock_guard<mutex> lock(ringbuffer_slots_mutex_);
 
         if (ringbuffer_slots_[buffer_slot_index]) {
-            ringbuffer_slots_[buffer_slot_index] = 0;
+            ringbuffer_slots_[buffer_slot_index] = false;
 
             buffer_used_slots_--;
 
