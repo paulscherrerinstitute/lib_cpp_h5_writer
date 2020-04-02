@@ -13,12 +13,13 @@ void generate_stream(size_t n_messages)
     zmq::socket_t socket(context, ZMQ_PUSH);
     socket.bind("tcp://127.0.0.1:11000");
 
-    for (size_t i=0; i<n_messages; i++) {
-        // TODO: Implement the actual sending.
-        // Header: {"frame": 0, "shape": [16], "type": "uint8"}
-        // Data: bytes of 16x uint8
-    }
+    string header = "{\"frame\": 0, \"shape\": [1,16], \"type\": \"uint8\"}";
+    unique_ptr<char[]> buffer(make_unique<char[]>(16));
 
+    for (size_t i=0; i<n_messages; i++) {
+        socket.send(header.c_str(), header.length(), ZMQ_SNDMORE);
+        socket.send(buffer.get(), 16);
+    }
 }
 
 TEST(ZmqRecvModule, basic_interaction)
@@ -27,7 +28,7 @@ TEST(ZmqRecvModule, basic_interaction)
     ZmqRecvModule zmq_recv_module(ring_buffer, {});
 
     uint8_t n_receivers = 4;
-    zmq_recv_module.start_recv("tcp://127.0.0.1:10000", n_receivers);
+    zmq_recv_module.start_recv("tcp://127.0.0.1:11000", n_receivers);
 
     zmq_recv_module.start_writing();
     zmq_recv_module.stop_writing();
@@ -37,7 +38,7 @@ TEST(ZmqRecvModule, basic_interaction)
 
 TEST(ZmqRecvModule, simple_recv)
 {
-    size_t n_msg = 10;
+    size_t n_msg = 9;
 
     thread sender(generate_stream, n_msg);
     RingBuffer ring_buffer(n_msg);
@@ -47,6 +48,8 @@ TEST(ZmqRecvModule, simple_recv)
     zmq_recv_module.start_recv("tcp://127.0.0.1:11000", 4);
 
     sender.join();
+    this_thread::sleep_for(chrono::milliseconds(100));
+
     zmq_recv_module.stop_recv();
 
     for (size_t i=0;i<n_msg;i++) {
@@ -55,6 +58,10 @@ TEST(ZmqRecvModule, simple_recv)
         ASSERT_TRUE(data.first != nullptr);
         ASSERT_TRUE(data.second != nullptr);
     }
+
+    // no more messages in the buffer.
+    auto data = ring_buffer.read();
+    ASSERT_TRUE(data.first == nullptr);
 
     ASSERT_TRUE(ring_buffer.is_empty());
 }
