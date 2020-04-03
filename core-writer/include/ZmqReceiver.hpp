@@ -13,6 +13,7 @@
 #include "date.h"
 
 #include "RingBuffer.hpp"
+#include "config.hpp"
 
 struct HeaderDataType
 {
@@ -42,24 +43,23 @@ class ZmqReceiver
 {
     typedef std::unordered_map<std::string, HeaderDataType> header_map;
 
-    const std::string connect_address;
-    const int receive_timeout;
+    const header_map& header_values_type_;
     zmq::context_t context_;
     zmq::socket_t socket_;
-    zmq::message_t message_header;
-    zmq::message_t message_data;
-    boost::property_tree::ptree json_header;
+    zmq::message_t message_header_;
+    zmq::message_t message_data_;
 
-    const header_map& header_values_type_;
+    boost::property_tree::ptree json_header;
 
     public:
         ZmqReceiver(
-                const std::string& connect_address,
-                const int n_io_threads,
-                const int receive_timeout,
-                const header_map& header_values_type);
+                const header_map& header_values_type,
+                const int n_io_threads=config::zmq_n_io_threads
+                );
 
-        void connect();
+        void connect(
+                const std::string& connect_address,
+                const int receive_timeout=config::zmq_receive_timeout);
 
         void disconnect();
 
