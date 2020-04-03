@@ -132,14 +132,30 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
         char* buffer = ring_buffer_.reserve(frame_metadata);
 
         // TODO: Add flag to disable compression.
+        // TODO: Cache results no to calculate this every time.
         {
-            // TODO: Cache results no to calculate this every time.
+            size_t n_elements =
+                    frame_metadata->frame_shape[0] *
+                    frame_metadata->frame_shape[1];
+
             size_t max_buffer_size =
                     compression::get_bitshuffle_max_buffer_size(
-                    frame_metadata->frame_bytes_size, 1);
+                            n_elements,
+                            frame_metadata->frame_bytes_size/n_elements);
 
             if (max_buffer_size > ring_buffer_.get_slot_size()) {
-                //TODO: Throw error if not large enough.
+                stringstream err_msg;
+
+                using namespace date;
+                using namespace chrono;
+                err_msg << "[" << system_clock::now() << "]";
+                err_msg << "[ZmqRecvModule::receive_thread]";
+                err_msg << " RingBuffer slot size ";
+                err_msg << ring_buffer_.get_slot_size();
+                err_msg << " smaller than max_buffer_size ";
+                err_msg << max_buffer_size << endl;
+
+                throw runtime_error(err_msg.str());
             }
         }
 
