@@ -67,8 +67,9 @@ size_t compression::decompress_lz4(const char* compressed_data, size_t compresse
     return (size_t) decompressed_size;
 }
 
-size_t compression::get_bitshuffle_max_buffer_size(size_t n_elements,
-                                              size_t element_size) 
+size_t compression::get_bitshuffle_max_buffer_size(
+        size_t n_elements,
+        size_t element_size)
 {
     return bshuf_compress_lz4_bound(n_elements, element_size, 0) + 12;
 }
