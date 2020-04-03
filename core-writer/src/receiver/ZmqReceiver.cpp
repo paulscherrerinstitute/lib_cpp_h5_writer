@@ -117,17 +117,17 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
     }
 
     // Get the message header.
-    if (!socket_.recv(&message_header_)){
+    if (!socket_.recv(message_header_)){
         return {nullptr, nullptr};
     }
 
     auto header_string = string(
-            static_cast<char*>(message_header.data()),
-            message_header.size());
+            static_cast<char*>(message_header_.data()),
+            message_header_.size());
     auto frame_metadata = read_json_header(header_string);
 
     // Get the message data.
-    if (!socket_.recv(&message_data)) {
+    if (!socket_.recv(message_data_)) {
         using namespace date;
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
@@ -139,9 +139,9 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
         return {nullptr, nullptr};
     }
 
-    frame_metadata->frame_bytes_size = message_data.size();
+    frame_metadata->frame_bytes_size = message_data_.size();
 
-    return {frame_metadata, static_cast<char*>(message_data.data())};
+    return {frame_metadata, static_cast<char*>(message_data_.data())};
 }
 
 shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
