@@ -98,13 +98,8 @@ void ZmqRecvModule::stop_writing()
 
 void ZmqRecvModule::receive_thread(const string& connect_address)
 {
-    ZmqReceiver receiver(
-            connect_address,
-            config::zmq_n_io_threads,
-            config::zmq_receive_timeout,
-            header_values_);
-
-    receiver.connect();
+    ZmqReceiver receiver(header_values_);
+    receiver.connect(connect_address);
 
     while (is_receiving_.load(memory_order_relaxed)) {
 
