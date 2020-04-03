@@ -85,7 +85,7 @@ TEST(ZmqReceiver, read_json_header)
       {"module_number", HeaderDataType("uint64", n_modules)}
   };
 
-  ZmqReceiver receiver("something", 1, 1, header_values);
+  ZmqReceiver receiver(header_values);
 
   auto header_string = "{\"missing_packets_2\":[2],"
                         "\"missing_packets_1\":[1],"

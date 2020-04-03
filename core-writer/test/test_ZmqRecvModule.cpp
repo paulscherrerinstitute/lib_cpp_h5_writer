@@ -38,7 +38,7 @@ TEST(ZmqRecvModule, basic_interaction)
 
 TEST(ZmqRecvModule, simple_recv)
 {
-    size_t n_msg = 9;
+    size_t n_msg = 1;
 
     thread sender(generate_stream, n_msg);
     RingBuffer ring_buffer(n_msg);
