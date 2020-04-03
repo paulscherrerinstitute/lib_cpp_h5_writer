@@ -51,12 +51,12 @@ void RingBuffer::initialize(size_t slot_size)
         cout << " with slot_size " << slot_size << endl;
     #endif
     
-    this->write_index_ = 0;
-    this->slot_size_ = slot_size;
-    this->buffer_size_ = slot_size * n_slots_;
-    this->frame_data_buffer_ = new char[buffer_size_];
-    this->buffer_used_slots_ = 0;
-    this->ring_buffer_initialized_ = true;
+    write_index_ = 0;
+    slot_size_ = slot_size;
+    buffer_size_ = slot_size * n_slots_;
+    frame_data_buffer_ = new char[buffer_size_];
+    buffer_used_slots_ = 0;
+    ring_buffer_initialized_ = true;
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
