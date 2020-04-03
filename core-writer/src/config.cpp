@@ -7,8 +7,8 @@ namespace config {
     
     // JSON header buffer size - 1MB.
     int zmq_buffer_size_header = 1024 * 1024 * 1;
-    // Data message buffer size - 10MB.
-    int zmq_buffer_size_data = 1024 * 1024 * 10;
+    // Data message buffer size - 15MB.
+    int zmq_buffer_size_data = 1024 * 1024 * 15;
 
     // Ring buffer config.
     // Allow for a couple of seconds (file creation might be slow).
