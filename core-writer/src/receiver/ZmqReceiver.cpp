@@ -57,9 +57,9 @@ ZmqReceiver::ZmqReceiver(
         const int receive_timeout,
         const header_map& header_values_type) :
             connect_address(connect_address),
-            n_io_threads(n_io_threads),
             receive_timeout(receive_timeout),
-            receiver(NULL),
+            context_(n_io_threads),
+            socket_(context_, ZMQ_PULL),
             header_values_type_(header_values_type)
 {
     #ifdef DEBUG_OUTPUT
@@ -85,15 +85,11 @@ void ZmqReceiver::connect()
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
         cout << "[ZmqReceiver::connect]";
-        cout << " Connecting to address " << connect_address;
-        cout << " with n_io_threads " << n_io_threads << endl;
+        cout << " Connecting to address " << connect_address << endl;
     #endif
 
-    context = make_shared<zmq::context_t>(n_io_threads);
-    receiver = make_shared<zmq::socket_t>(*context, ZMQ_PULL);
-
-    receiver->setsockopt(ZMQ_RCVTIMEO, receive_timeout);
-    receiver->connect(connect_address);
+    socket_.setsockopt(ZMQ_RCVTIMEO, receive_timeout);
+    socket_.connect(connect_address);
 }
 
 void ZmqReceiver::disconnect()
@@ -106,13 +102,13 @@ void ZmqReceiver::disconnect()
         cout << " Disconnect." << endl;
     #endif
 
-    receiver->close();
-    context->close();
+    socket_.close();
+    context_.close();
 }
 
 pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
 {
-    if (!receiver) {
+    if (!socket_.connected()) {
         stringstream error_message;
         using namespace date;
         using namespace chrono;
@@ -125,7 +121,7 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
     }
 
     // Get the message header.
-    if (!receiver->recv(&message_header)){
+    if (!socket_.recv(&message_header)){
         return {nullptr, nullptr};
     }
 
@@ -135,7 +131,7 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
     auto frame_metadata = read_json_header(header_string);
 
     // Get the message data.
-    if (!receiver->recv(&message_data)) {
+    if (!socket_.recv(&message_data)) {
         using namespace date;
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";

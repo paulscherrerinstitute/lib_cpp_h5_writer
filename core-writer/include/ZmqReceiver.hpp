@@ -43,10 +43,9 @@ class ZmqReceiver
     typedef std::unordered_map<std::string, HeaderDataType> header_map;
 
     const std::string connect_address;
-    const int n_io_threads;
     const int receive_timeout;
-    std::shared_ptr<zmq::socket_t> receiver = NULL;
-    std::shared_ptr<zmq::context_t> context = NULL;
+    zmq::context_t context_;
+    zmq::socket_t socket_;
     zmq::message_t message_header;
     zmq::message_t message_data;
     boost::property_tree::ptree json_header;
