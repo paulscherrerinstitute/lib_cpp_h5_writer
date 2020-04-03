@@ -42,7 +42,7 @@ TEST(ZmqRecvModule, basic_interaction)
 
 TEST(ZmqRecvModule, simple_recv)
 {
-    size_t n_msg = 1;
+    size_t n_msg = 10;
 
     thread sender(generate_stream, n_msg);
     RingBuffer ring_buffer(n_msg);
@@ -61,6 +61,8 @@ TEST(ZmqRecvModule, simple_recv)
         // nullptr means there is no data in the buffer.
         ASSERT_TRUE(data.first != nullptr);
         ASSERT_TRUE(data.second != nullptr);
+
+        ring_buffer.release(data.first->buffer_slot_index);
     }
 
     // no more messages in the buffer.
