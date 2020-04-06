@@ -28,7 +28,7 @@ RingBuffer::~RingBuffer()
     }
 }
 
-void RingBuffer::initialize(size_t slot_size)
+void RingBuffer::initialize(const size_t requested_slot_size)
 {
     if (initialized_.load(memory_order_relaxed)) {
         return;
@@ -37,12 +37,27 @@ void RingBuffer::initialize(size_t slot_size)
     lock_guard<mutex> lock(ringbuffer_slots_mutex_);
 
     if (initialized_) {
+
+        if (requested_slot_size > slot_size_) {
+            stringstream err_msg;
+
+            using namespace date;
+            using namespace chrono;
+            err_msg << "[" << system_clock::now() << "]";
+            err_msg << "[RingBuffer::initialize]";
+            err_msg << " Ringbuffer initialized with smaller slot_size ";
+            err_msg << slot_size_ << " than requested_slot_size ";
+            err_msg << requested_slot_size << endl;
+
+            throw runtime_error(err_msg.str());
+        }
+
         return;
     }
 
     write_index_ = 0;
-    slot_size_ = slot_size;
-    buffer_size_ = slot_size * n_slots_;
+    slot_size_ = requested_slot_size;
+    buffer_size_ = slot_size_ * n_slots_;
     frame_data_buffer_ = new char[buffer_size_];
     buffer_used_slots_ = 0;
 
