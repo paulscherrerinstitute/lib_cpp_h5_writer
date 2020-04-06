@@ -12,7 +12,7 @@ ZmqRecvModule::ZmqRecvModule(
             ring_buffer_(ring_buffer),
             header_values_(header_values),
             is_receiving_(false),
-            is_writing_(false)
+            is_saving_(false)
 {}
 
 void ZmqRecvModule::start_recv(
@@ -70,30 +70,30 @@ void ZmqRecvModule::stop_recv()
     receiving_threads_.clear();
 }
 
-void ZmqRecvModule::start_writing()
+void ZmqRecvModule::start_saving()
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
-        cout << "[ZmqRecvModule::start_writing]";
+        cout << "[ZmqRecvModule::start_saving]";
         cout << " Enable writing." << endl;
     #endif
 
-    is_writing_ = true;
+    is_saving_ = true;
 }
 
-void ZmqRecvModule::stop_writing()
+void ZmqRecvModule::stop_saving()
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
-        cout << "[ZmqRecvModule::stop_writing]";
+        cout << "[ZmqRecvModule::stop_saving]";
         cout << " Enable writing." << endl;
     #endif
 
-    is_writing_ = false;
+    is_saving_ = false;
 }
 
 void ZmqRecvModule::receive_thread(const string& connect_address)
@@ -110,7 +110,7 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
         // .first and .second = nullptr when no message received
         // If no message or currently not writing, idle.
         if (frame.first == nullptr ||
-            !is_writing_.load(memory_order_relaxed)) {
+            !is_saving_.load(memory_order_relaxed)) {
             continue;
         }
 

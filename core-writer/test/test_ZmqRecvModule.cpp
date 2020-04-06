@@ -34,8 +34,8 @@ TEST(ZmqRecvModule, basic_interaction)
     uint8_t n_receivers = 4;
     zmq_recv_module.start_recv("tcp://127.0.0.1:11000", n_receivers);
 
-    zmq_recv_module.start_writing();
-    zmq_recv_module.stop_writing();
+    zmq_recv_module.start_saving();
+    zmq_recv_module.stop_saving();
 
     zmq_recv_module.stop_recv();
 }
@@ -48,7 +48,7 @@ TEST(ZmqRecvModule, simple_recv)
     RingBuffer ring_buffer(n_msg);
 
     ZmqRecvModule zmq_recv_module(ring_buffer, {});
-    zmq_recv_module.start_writing();
+    zmq_recv_module.start_saving();
     zmq_recv_module.start_recv("tcp://127.0.0.1:11000", 4);
 
     sender.join();
