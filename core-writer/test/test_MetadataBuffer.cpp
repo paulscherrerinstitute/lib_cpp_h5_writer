@@ -8,12 +8,14 @@ TEST(MetadataBuffer, basic_operations)
     int n_frames = 10;
     int n_modules = 3;
 
-    auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>(new unordered_map<string, HeaderDataType> {
+    unordered_map<string, HeaderDataType> header_values {
         {"frame", HeaderDataType("uint64")},
         {"module_number", HeaderDataType("uint64", n_modules)}
-    });
+    };
 
-    MetadataBuffer metadata_buffer(n_frames, header_values);
+    MetadataBuffer metadata_buffer(
+            static_cast<const uint64_t>(n_frames),
+            header_values);
 
     uint64_t base_frame_data = 12345678;
     uint64_t base_module_number = 0;
@@ -49,10 +51,10 @@ TEST(MetadataBuffer, missing_keys)
     int n_frames = 10;
     int n_modules = 3;
 
-    auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>(new unordered_map<string, HeaderDataType> {
+    unordered_map<string, HeaderDataType> header_values = {
         {"frame", HeaderDataType("uint64")},
         {"module_number", HeaderDataType("uint64", n_modules)}
-    });
+    };
 
     MetadataBuffer metadata_buffer(n_frames, header_values);
 
@@ -61,7 +63,13 @@ TEST(MetadataBuffer, missing_keys)
     metadata_buffer.add_metadata_to_buffer("frame", 0, (char*)&data);
     metadata_buffer.get_metadata_values("frame");
 
-    EXPECT_THROW(metadata_buffer.get_metadata_values("non_existant"), runtime_error);
-    EXPECT_THROW(metadata_buffer.add_metadata_to_buffer("non_existant", 0, nullptr), runtime_error);
-    EXPECT_THROW(metadata_buffer.add_metadata_to_buffer("frame", n_frames, nullptr), runtime_error);
+    EXPECT_THROW(
+            metadata_buffer.get_metadata_values("non_existant"),
+            runtime_error);
+    EXPECT_THROW(
+            metadata_buffer.add_metadata_to_buffer("non_existant", 0, nullptr),
+            runtime_error);
+    EXPECT_THROW(
+            metadata_buffer.add_metadata_to_buffer("frame", n_frames, nullptr),
+            runtime_error);
 }
