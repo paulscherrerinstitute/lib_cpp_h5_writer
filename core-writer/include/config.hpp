@@ -19,6 +19,8 @@ namespace config
     extern std::string raw_image_dataset_name;
 
     extern uint32_t parameters_read_retry_interval;
+
+    extern int default_writing_user_id;
 }
 
 #endif
