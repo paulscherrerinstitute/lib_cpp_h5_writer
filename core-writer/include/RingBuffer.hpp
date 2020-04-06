@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <mutex>
+#include <atomic>
 #include <memory>
 #include <string>
 #include <boost/any.hpp>
@@ -39,7 +40,7 @@ class RingBuffer
     char* frame_data_buffer_ = NULL;
     size_t write_index_ = 0;
     size_t buffer_used_slots_ = 0;
-    bool ring_buffer_initialized_ = false;
+    std::atomic_bool initialized_ = false;
 
     std::list< std::shared_ptr<FrameMetadata> > frame_metadata_queue_;
     std::mutex frame_metadata_queue_mutex_;
@@ -58,6 +59,7 @@ class RingBuffer
         void release(size_t buffer_slot_index);
 
         bool is_empty();
+        bool is_initialized();
         void clear();
         size_t get_slot_size();
 };

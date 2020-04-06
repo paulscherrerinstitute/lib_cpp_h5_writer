@@ -30,53 +30,48 @@ RingBuffer::~RingBuffer()
 
 void RingBuffer::initialize(size_t slot_size)
 {
-    if (frame_data_buffer_) {
-        stringstream err_msg;
-
-        using namespace date;
-        using namespace chrono; 
-        err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[RingBuffer::initialize]";
-        err_msg << " Ring buffer already initialized." << endl;
-
-        throw runtime_error(err_msg.str());
+    if (initialized_.load(memory_order_relaxed)) {
+        return;
     }
 
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        using namespace chrono; 
-        cout << "[" << system_clock::now() << "]";
-        cout << "[RingBuffer::initialize]";
-        cout << " Initializing ring buffer";
-        cout << " with slot_size " << slot_size << endl;
-    #endif
-    
+    lock_guard<mutex> lock(ringbuffer_slots_mutex_);
+
+    if (initialized_) {
+        return;
+    }
+
     write_index_ = 0;
     slot_size_ = slot_size;
     buffer_size_ = slot_size * n_slots_;
     frame_data_buffer_ = new char[buffer_size_];
     buffer_used_slots_ = 0;
-    ring_buffer_initialized_ = true;
+
+    initialized_ = true;
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
-        using namespace chrono; 
+        using namespace chrono;
         cout << "[" << system_clock::now() << "]";
         cout << "[RingBuffer::initialize]";
-        cout << " Total buffer_size " << buffer_size_ << endl;
+        cout << " Ringbuffer initialized";
+        cout << " with slot_size " << slot_size_;
+        cout << " with n_slots " << n_slots_;
+        cout << " and buffer_size " << buffer_size_;
     #endif
 }
 
 char* RingBuffer::reserve(shared_ptr<FrameMetadata> frame_metadata)
 {
-    if (!ring_buffer_initialized_) {
-        {
-            lock_guard<mutex> lock(ringbuffer_slots_mutex_);
+    if (!is_initialized()) {
+        stringstream err_msg;
 
-            if (!ring_buffer_initialized_) {
-                initialize(frame_metadata->frame_bytes_size);
-            }
-        }
+        using namespace date;
+        using namespace chrono;
+        err_msg << "[" << system_clock::now() << "]";
+        err_msg << "[RingBuffer::reserve]";
+        err_msg << " Ringbuffer not initialized.";
+
+        throw runtime_error(err_msg.str());
     }
 
     if (frame_metadata->frame_bytes_size > slot_size_) {
@@ -264,6 +259,11 @@ bool RingBuffer::is_empty()
     lock_guard<mutex> lock(ringbuffer_slots_mutex_);
     
     return buffer_used_slots_ == 0;
+}
+
+bool RingBuffer::is_initialized()
+{
+    return initialized_.load(memory_order_relaxed);
 }
 
 void RingBuffer::clear()
