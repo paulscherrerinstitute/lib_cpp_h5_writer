@@ -12,15 +12,6 @@ extern "C"
 
 using namespace std;
 
-std::unique_ptr<H5Writer> get_h5_writer(const string& filename, hsize_t frames_per_file, 
-    hsize_t initial_dataset_size, hsize_t dataset_increase_step)
-{
-    if (filename == "/dev/null") {
-        return unique_ptr<H5Writer>(new DummyH5Writer());
-    } else {
-        return unique_ptr<H5Writer>(new H5Writer(filename, frames_per_file, initial_dataset_size, dataset_increase_step));
-    }
-}
 
 H5Writer::H5Writer(const std::string& filename, hsize_t frames_per_file, hsize_t initial_dataset_size, 
     hsize_t dataset_increase_step) :
@@ -321,14 +312,3 @@ H5::H5File& H5Writer::get_h5_file()
 {
     return file;
 }
-
-H5::H5File& DummyH5Writer::get_h5_file()
-{
-    stringstream error_message;
-    using namespace date;
-    error_message << "[" << std::chrono::system_clock::now() << "]";
-    error_message << "Cannot get the H5 file with the dummy writer." << endl;
-
-    throw runtime_error(error_message.str());
-};
-

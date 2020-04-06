@@ -46,28 +46,4 @@ class H5Writer
         
 };
 
-class DummyH5Writer : public H5Writer
-{
-    public:
-        DummyH5Writer() : H5Writer("/dev/null", 0, 0, 0) {}
-
-        bool is_file_open() const override
-            { return false; }
-
-        void create_file(const hsize_t frame_chunk=1) override {}
-
-        void close_file() override {}
-
-        void write_data(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
-            const size_t data_bytes_size, const std::string& data_type, const std::string& endianness) override {}
-
-        H5::H5File& get_h5_file() override;
-
-        bool is_data_for_current_file(const size_t data_index) override
-            { return true; }
-};
-
-std::unique_ptr<H5Writer> get_h5_writer(const std::string& filename, hsize_t frames_per_file=0, 
-    hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
-
 #endif
