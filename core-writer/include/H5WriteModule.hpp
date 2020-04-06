@@ -32,6 +32,7 @@ public:
             const int n_frames = 0,
             const int user_id = -1
             );
+
     void stop_writing();
 };
 
