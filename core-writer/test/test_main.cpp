@@ -4,6 +4,7 @@
 #include "test_MetadataBuffer.cpp"
 #include "test_BufferedWriter.cpp"
 #include "test_ZmqRecvModule.cpp"
+#include "test_H5WriteModule.cpp"
 
 using namespace std;
 
