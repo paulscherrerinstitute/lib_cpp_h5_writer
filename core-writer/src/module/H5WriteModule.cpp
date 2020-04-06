@@ -198,31 +198,18 @@ void H5WriteModule::write_thread(
             writer.write_metadata_to_file();
 
             write_h5_format(writer.get_h5_file());
+            writer.close_file();
         }
-
-        #ifdef DEBUG_OUTPUT
-            using namespace date;
-            using namespace chrono;
-
-            cout << "[" << system_clock::now() << "]";
-            cout << "[H5WriteModule::write_thread]";
-            cout << " Closing file " << output_file << endl;
-        #endif
-
-        writer.close_file();
-
-        #ifdef DEBUG_OUTPUT
-            using namespace date;
-            using namespace chrono;
-
-            cout << "[" << system_clock::now() << "]";
-            cout << "[H5WriteModule::write_thread]";
-            cout << " Writer thread stopped." << endl;
-        #endif
-
-        writing_completed();
-
     } catch (const exception& ex) {
         writing_error(ex.what());
     }
+
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        using namespace chrono;
+
+        cout << "[" << system_clock::now() << "]";
+        cout << "[H5WriteModule::write_thread]";
+        cout << " Write thread stopped." << endl;
+    #endif
 }
