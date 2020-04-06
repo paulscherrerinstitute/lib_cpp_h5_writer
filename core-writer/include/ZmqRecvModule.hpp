@@ -30,8 +30,6 @@ public:
 
     void start_writing();
     void stop_writing();
-
-
 };
 
 #endif
