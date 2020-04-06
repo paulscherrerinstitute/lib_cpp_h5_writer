@@ -77,7 +77,7 @@ void ZmqRecvModule::start_saving()
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
         cout << "[ZmqRecvModule::start_saving]";
-        cout << " Enable writing." << endl;
+        cout << " Enable saving." << endl;
     #endif
 
     is_saving_ = true;
@@ -90,7 +90,7 @@ void ZmqRecvModule::stop_saving()
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
         cout << "[ZmqRecvModule::stop_saving]";
-        cout << " Enable writing." << endl;
+        cout << " Disable saving." << endl;
     #endif
 
     is_saving_ = false;
