@@ -16,7 +16,10 @@ class H5WriteModule {
     std::thread writing_thread_;
 
 protected:
-    void write_thread();
+    void write_thread(
+            const std::string& output_file,
+            const int n_frames,
+            const int user_id);
 
 public:
     H5WriteModule(
@@ -24,7 +27,11 @@ public:
             const header_map& header_values,
             const H5Format& format);
 
-    void start_writing();
+    void start_writing(
+            const std::string& output_file,
+            const int n_frames = 0,
+            const int user_id = -1
+            );
     void stop_writing();
 };
 

@@ -14,7 +14,10 @@ H5WriteModule::H5WriteModule(
 {
 }
 
-void H5WriteModule::start_writing()
+void H5WriteModule::start_writing(
+        const string& output_file,
+        const int n_frames,
+        const int user_id)
 {
     if (is_writing_ == true) {
         stringstream err_msg;
@@ -33,11 +36,20 @@ void H5WriteModule::start_writing()
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
         cout << "[H5WriteModule::start_writing]";
-        cout << " Start writing." << endl;
+        cout << " Start writing with parameters:" << endl;
+        cout << "\toutput_file: " << output_file;
+        cout << "\tn_frames: " << n_frames;
+        cout << "\tuser_id: " << user_id;
+        cout << endl;
     #endif
 
    is_writing_ = true;
-   writing_thread_ = thread(&H5WriteModule::write_thread, this);
+
+   writing_thread_ = thread(
+           &H5WriteModule::write_thread, this,
+           output_file,
+           n_frames,
+           user_id);
 }
 
 void H5WriteModule::stop_writing()
