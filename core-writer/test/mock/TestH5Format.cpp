@@ -25,7 +25,9 @@ public:
 
         // After format has been writen, where to move the raw datasets.
         dataset_move_mapping.reset(
-                new std::unordered_map<string, string>({}));
+                new std::unordered_map<string, string>({
+                    {config::raw_image_dataset_name, "detector/data"}
+                }));
 
         // Definition of the file format.
         file_format.reset(
