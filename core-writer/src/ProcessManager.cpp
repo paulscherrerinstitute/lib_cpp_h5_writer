@@ -14,7 +14,7 @@ ProcessManager::ProcessManager(
 }
 
 
-void ProcessManager::start(uint16_t rest_port)
+void ProcessManager::start_rest_api(const uint16_t rest_port)
 {
     RestApi::start_rest_api(*this, rest_port);
 

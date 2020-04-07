@@ -19,8 +19,10 @@ class ProcessManager
         ProcessManager(H5WriteModule& write_module,
                        ZmqRecvModule& recv_module);
 
+        void start_rest_api(const uint16_t rest_port);
 
-        void start(uint16_t rest_port);
+
+        std::string get_status();
 
 };
 
