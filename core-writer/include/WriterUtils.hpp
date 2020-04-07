@@ -4,7 +4,7 @@
 #include <string>
 
 namespace WriterUtils {
-    void set_process_effective_id(int user_id);
+    void set_fs_id(int user_id);
     void create_destination_folder(const std::string& output_file);
 }
 
