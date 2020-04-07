@@ -40,8 +40,6 @@ TEST(ZmqRecvModule, basic_interaction)
     zmq_recv_module.start_saving();
     EXPECT_NO_THROW(zmq_recv_module.start_saving());
 
-
-
     // Stop should never throw an exception.
     zmq_recv_module.stop_recv();
     EXPECT_NO_THROW(zmq_recv_module.stop_recv());
