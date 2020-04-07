@@ -1,11 +1,12 @@
 #include <iostream>
-#include <sys/fsuid.h>
+#include <unistd.h>
+
 #include "WriterUtils.hpp"
 #include "date.h"
 
 using namespace std;
 
-void WriterUtils::set_fs_id(int user_id)
+void WriterUtils::set_process_effective_id(int user_id)
 {
 
     #ifdef DEBUG_OUTPUT
@@ -16,25 +17,27 @@ void WriterUtils::set_fs_id(int user_id)
         cout << " Setting process user to " << user_id << endl;
     #endif
 
-    if (setfsgid(user_id)) {
+    // TODO: use setfsuid and setfsgid
+
+    if (setegid(user_id)) {
         stringstream err_msg;
 
         using namespace date;
         using namespace chrono;
         err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[WriterUtils::set_fs_uid]";
+        err_msg << "[WriterUtils::set_process_effective_id]";
         err_msg << " Cannot set group_id to " << user_id << endl;
 
         throw runtime_error(err_msg.str());
     }
 
-    if (setfsuid(user_id)) {
+    if (seteuid(user_id)) {
         stringstream err_msg;
 
         using namespace date;
         using namespace chrono;
         err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[WriterUtils::set_fs_uid]";
+        err_msg << "[WriterUtils::set_process_effective_id]";
         err_msg << " Cannot set user_id to " << user_id << endl;
 
         throw runtime_error(err_msg.str());
