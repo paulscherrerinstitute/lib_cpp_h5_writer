@@ -18,7 +18,7 @@ class H5WriteModule {
 protected:
     void write_thread(
             const std::string& output_file,
-            const int n_frames,
+            const size_t n_frames,
             const int user_id);
 
 public:
@@ -29,7 +29,7 @@ public:
 
     void start_writing(
             const std::string& output_file,
-            const int n_frames = 0,
+            const size_t n_frames = 0,
             const int user_id = -1
             );
 

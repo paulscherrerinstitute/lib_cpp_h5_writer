@@ -19,7 +19,7 @@ H5WriteModule::H5WriteModule(
 
 void H5WriteModule::start_writing(
         const string& output_file,
-        const int n_frames,
+        const size_t n_frames,
         const int user_id)
 {
     if (is_writing_ == true) {
@@ -74,7 +74,7 @@ void H5WriteModule::stop_writing()
 
 void H5WriteModule::write_thread(
         const std::string& output_file,
-        const int n_frames,
+        const size_t n_frames,
         const int user_id)
 {
     if (user_id != -1) {
@@ -85,11 +85,10 @@ void H5WriteModule::write_thread(
 
     MetadataBuffer metadata_buffer(n_frames, header_values_);
     BufferedWriter writer(output_file, n_frames, metadata_buffer);
+    writer.create_file();
 
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
-
-    writer.create_file();
-    uint64_t last_pulse_id = 0;
+    size_t n_written_frames = 0;
 
     while(is_writing_.load(memory_order_relaxed)) {
 
@@ -171,6 +170,21 @@ void H5WriteModule::write_thread(
                     name,
                     received_data.first->frame_index,
                     value.get());
+        }
+
+        n_written_frames++;
+        if (n_written_frames == n_frames) {
+            is_writing_ = false;
+
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                using namespace chrono;
+
+                cout << "[" << system_clock::now() << "]";
+                cout << "[H5WriteModule::write_thread]";
+                cout << " Written all n_frames " << n_written_frames;
+                cout << endl;
+            #endif
         }
 
         #ifdef PERF_OUTPUT
