@@ -34,6 +34,8 @@ public:
             );
 
     void stop_writing();
+
+    bool is_writing();
 };
 
 
