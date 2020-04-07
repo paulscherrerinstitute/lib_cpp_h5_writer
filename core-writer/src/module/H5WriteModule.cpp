@@ -81,7 +81,6 @@ void H5WriteModule::write_thread(
     MetadataBuffer metadata_buffer(metadata_buffer_length, header_values_);
 
     BufferedWriter writer(output_file, n_frames, metadata_buffer);
-    writer.close_file();
 
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
 
