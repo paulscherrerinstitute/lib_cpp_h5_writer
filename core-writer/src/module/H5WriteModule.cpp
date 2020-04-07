@@ -1,6 +1,7 @@
 #include "H5WriteModule.hpp"
 #include <iostream>
 #include <MetadataBuffer.hpp>
+#include "WriterUtils.hpp"
 #include "BufferedWriter.hpp"
 
 using namespace std;
@@ -76,6 +77,12 @@ void H5WriteModule::write_thread(
         const int n_frames,
         const int user_id)
 {
+    if (user_id != -1) {
+        WriterUtils::set_process_effective_id(user_id);
+    }
+
+    WriterUtils::create_destination_folder(output_file);
+
     MetadataBuffer metadata_buffer(n_frames, header_values_);
     BufferedWriter writer(output_file, n_frames, metadata_buffer);
 
