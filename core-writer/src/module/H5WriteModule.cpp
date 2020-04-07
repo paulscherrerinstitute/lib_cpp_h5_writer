@@ -76,10 +76,7 @@ void H5WriteModule::write_thread(
         const int n_frames,
         const int user_id)
 {
-    // TODO: Take into account file rollover.
-    size_t metadata_buffer_length = n_frames;
-    MetadataBuffer metadata_buffer(metadata_buffer_length, header_values_);
-
+    MetadataBuffer metadata_buffer(n_frames, header_values_);
     BufferedWriter writer(output_file, n_frames, metadata_buffer);
 
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
