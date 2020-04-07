@@ -1,35 +1,26 @@
 #ifndef PROCESSMANAGER_H
 #define PROCESSMANAGER_H
 
-#include "WriterManager.hpp"
+#include "WriterUtils.hpp"
 #include "H5Format.hpp"
 #include "RingBuffer.hpp"
 #include "ZmqReceiver.hpp"
 #include <chrono>
 #include "date.h"
+#include "H5WriteModule.hpp"
+#include "ZmqRecvModule.hpp"
 
 class ProcessManager 
 {
-    WriterManager& writer_manager;
-    ZmqReceiver& receiver;
-    RingBuffer& ring_buffer;
-    const H5Format& format;
-
-    uint16_t rest_port;
-    const std::string& bsread_rest_address;
-    hsize_t frames_per_file;
+    H5WriteModule& write_module_;
+    ZmqRecvModule& recv_module_;
 
     public:
-        ProcessManager(WriterManager& writer_manager, 
-                       ZmqReceiver& receiver, 
-                       RingBuffer& ring_buffer, 
-                       const H5Format& format, 
-                       uint16_t rest_port, 
-                       const std::string& bsread_rest_address, 
-                       hsize_t frames_per_file=0);
+        ProcessManager(H5WriteModule& write_module,
+                       ZmqRecvModule& recv_module);
 
-        void receive_zmq();
-        void run_receivers(uint8_t n_receiving_threads);
+
+        void start(uint16_t rest_port);
 
 };
 
