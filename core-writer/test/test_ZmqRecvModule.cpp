@@ -33,11 +33,20 @@ TEST(ZmqRecvModule, basic_interaction)
 
     uint8_t n_receivers = 4;
     zmq_recv_module.start_recv("tcp://127.0.0.1:11000", n_receivers);
+    EXPECT_THROW(
+            zmq_recv_module.start_recv("tcp://127.0.0.1:11000", n_receivers),
+            runtime_error);
 
     zmq_recv_module.start_saving();
-    zmq_recv_module.stop_saving();
+    EXPECT_NO_THROW(zmq_recv_module.start_saving());
 
+
+
+    // Stop should never throw an exception.
     zmq_recv_module.stop_recv();
+    EXPECT_NO_THROW(zmq_recv_module.stop_recv());
+    zmq_recv_module.stop_saving();
+    EXPECT_NO_THROW(zmq_recv_module.stop_saving());
 }
 
 TEST(ZmqRecvModule, simple_recv)
