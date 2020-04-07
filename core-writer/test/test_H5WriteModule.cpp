@@ -30,11 +30,12 @@ void generate_frames(RingBuffer& ring_buffer, int n_frames)
         auto ptr_metadata = make_shared<FrameMetadata>(metadata);
         auto ptr_buffer = ring_buffer.reserve(ptr_metadata);
 
+        auto value_ptr = (uint16_t*) ptr_buffer;
+
         for (size_t y=0; y<y_length; y++) {
             for (size_t x=0; x<x_length; x++) {
-                // Buffer offset y*x* 2 (uint16)
-                char* value_ptr = ptr_buffer + y*x*2;
-                *value_ptr = static_cast<uint16_t>(i_frame);
+                size_t offset = y*x_length + x;
+                value_ptr[offset] = static_cast<uint16_t>(i_frame);
             }
         }
 
