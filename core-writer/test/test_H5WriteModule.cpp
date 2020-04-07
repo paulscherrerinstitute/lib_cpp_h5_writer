@@ -20,7 +20,7 @@ void generate_frames(RingBuffer& ring_buffer, int n_frames)
 
         FrameMetadata metadata = {
                 0, // size_t buffer_slot_index;
-                0, // size_t frame_bytes_size;
+                image_n_bytes, // size_t frame_bytes_size;
                 static_cast<uint64_t>(i_frame), // uint64_t frame_index;
                 "little", // std::string endianness;
                 "uint16", //std::string type;
