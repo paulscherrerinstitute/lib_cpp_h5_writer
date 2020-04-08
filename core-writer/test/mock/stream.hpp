@@ -3,11 +3,13 @@
 
 #include <zmq.hpp>
 
+const std::string MOCK_STREAM_ADDRESS("tcp://127.0.0.1:11000");
+
 void generate_stream(size_t n_messages)
 {
     zmq::context_t context(1);
     zmq::socket_t socket(context, ZMQ_PUSH);
-    socket.bind("tcp://127.0.0.1:11000");
+    socket.bind(MOCK_STREAM_ADDRESS);
 
     string header = "{\"frame\": 0, \"shape\": [1,16], \"type\": \"uint8\"}";
     zmq::const_buffer header_msg(header.c_str(), header.length());
