@@ -106,3 +106,15 @@ void ProcessManager::stop_receiving()
 
     recv_module_.stop_recv();
 }
+
+string ProcessManager::get_status()
+{
+    // TODO: Implement status collection.
+    return "nothing to see here";
+}
+
+unordered_map<std::string, float> ProcessManager::get_statistics()
+{
+    // TODO: Implement statistics.
+    return {};
+}
