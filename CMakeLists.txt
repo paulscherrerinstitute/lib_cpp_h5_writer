@@ -30,4 +30,4 @@ add_subdirectory(
 
 add_subdirectory("core-writer")
 add_subdirectory("csaxs")
-add_subdirectory("sf")
+add_subdirectory("sf-writer")
