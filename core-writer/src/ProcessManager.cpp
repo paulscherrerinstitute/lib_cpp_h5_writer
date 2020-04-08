@@ -45,6 +45,19 @@ void ProcessManager::start_writing(
         cout << " user_id " << user_id << endl;
     #endif
 
+    if (!recv_module_.is_receiving()) {
+        stringstream err_msg;
+
+        using namespace date;
+        using namespace chrono;
+        err_msg << "[" << system_clock::now() << "] ";
+        err_msg << "[ProcessManager::start_writing]";
+        err_msg << " Cannot start writing. ";
+        err_msg << " Must start receiving first." << endl;
+
+        throw runtime_error(err_msg.str());
+    }
+
     recv_module_.stop_saving_and_clear_buffer();
 
     write_module_.start_writing(output_file, n_frames, user_id);
