@@ -51,6 +51,10 @@ void H5WriteModule::start_writing(
         cout << endl;
     #endif
 
+   if (writing_thread_.joinable()) {
+       writing_thread_.join();
+   }
+
    is_writing_ = true;
 
    writing_thread_ = thread(
