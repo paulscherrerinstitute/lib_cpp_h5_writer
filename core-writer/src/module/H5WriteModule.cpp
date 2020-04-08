@@ -17,6 +17,11 @@ H5WriteModule::H5WriteModule(
 {
 }
 
+H5WriteModule::~H5WriteModule()
+{
+    stop_writing();
+}
+
 void H5WriteModule::start_writing(
         const string& output_file,
         const size_t n_frames,
@@ -243,6 +248,8 @@ void H5WriteModule::write_thread(
 
         throw;
     }
+
+    is_writing_ = false;
 }
 
 bool H5WriteModule::is_writing()

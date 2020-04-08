@@ -27,6 +27,8 @@ public:
             const header_map& header_values,
             const H5Format& format);
 
+    virtual ~H5WriteModule();
+
     void start_writing(
             const std::string& output_file,
             const size_t n_frames = 0,
