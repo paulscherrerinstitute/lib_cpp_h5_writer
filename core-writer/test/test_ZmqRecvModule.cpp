@@ -5,7 +5,7 @@
 #include <string>
 #include "RingBuffer.hpp"
 
-#include "mock/stream.cpp"
+#include "mock/stream.hpp"
 
 using namespace std;
 

@@ -1,3 +1,6 @@
+#ifndef MOCK_STREAM_H
+#define MOCK_STREAM_H
+
 #include <zmq.hpp>
 
 void generate_stream(size_t n_messages)
@@ -18,3 +21,5 @@ void generate_stream(size_t n_messages)
         socket.send(buffer_msg);
     }
 }
+
+#endif
