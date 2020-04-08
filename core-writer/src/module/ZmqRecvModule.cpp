@@ -15,6 +15,11 @@ ZmqRecvModule::ZmqRecvModule(
             is_saving_(false)
 {}
 
+ZmqRecvModule::~ZmqRecvModule()
+{
+    stop_recv();
+}
+
 void ZmqRecvModule::start_recv(
         const string& connect_address,
         const uint8_t n_receiving_threads)

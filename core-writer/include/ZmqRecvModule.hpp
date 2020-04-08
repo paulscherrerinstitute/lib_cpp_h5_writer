@@ -24,6 +24,8 @@ public:
             RingBuffer& ring_buffer,
             const header_map& header_values);
 
+    virtual ~ZmqRecvModule();
+
     void start_recv(const std::string& connect_address,
                const uint8_t n_receiving_threads);
     void stop_recv();
