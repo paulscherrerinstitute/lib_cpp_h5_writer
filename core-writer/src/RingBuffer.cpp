@@ -45,7 +45,7 @@ void RingBuffer::initialize(const size_t requested_slot_size)
             using namespace chrono;
             err_msg << "[" << system_clock::now() << "]";
             err_msg << "[RingBuffer::initialize]";
-            err_msg << " Ringbuffer initialized with smaller slot_size ";
+            err_msg << " Already initialized with smaller slot_size ";
             err_msg << slot_size_ << " than requested_slot_size ";
             err_msg << requested_slot_size << endl;
 
