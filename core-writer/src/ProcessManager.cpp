@@ -13,19 +13,19 @@ ProcessManager::ProcessManager(
 {
 }
 
-
 void ProcessManager::start_rest_api(const uint16_t rest_port)
 {
     RestApi::start_rest_api(*this, rest_port);
 
     // In case SIGINT stopped the rest_api.
-    // writer_manager.stop();
+    stop_receiving();
+    stop_writing();
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
-        cout << "[ProcessManager::start]";
+        cout << "[ProcessManager::start_rest_api]";
         cout << " Server stopped." << endl;
     #endif
 }
