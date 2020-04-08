@@ -24,7 +24,10 @@ TEST(ProcessManager, basic_interaction)
             runtime_error);
 
     thread sender(generate_stream, n_msg);
+    EXPECT_EQ(manager.get_status(), "idle");
+
     manager.start_receiving(MOCK_STREAM_ADDRESS, 3);
+    EXPECT_EQ(manager.get_status(), "ready");
 
     this_thread::sleep_for(chrono::milliseconds(100));
     sender.join();
@@ -34,6 +37,8 @@ TEST(ProcessManager, basic_interaction)
 
     // Write first 5 images you receive.
     manager.start_writing(output_file, 5, user_id);
+    EXPECT_EQ(manager.get_status(), "writing");
+
     // Send 6 images, so 1 will be left in the RB.
     thread sender2(generate_stream, 6);
     this_thread::sleep_for(chrono::milliseconds(100));
@@ -41,6 +46,7 @@ TEST(ProcessManager, basic_interaction)
 
     // Writer stopped because it received all frames.
     EXPECT_FALSE(write_module.is_writing());
+    EXPECT_EQ(manager.get_status(), "ready");
     // But there should be one more frame in the RB.
     EXPECT_FALSE(ring_buffer.is_empty());
 
@@ -55,4 +61,7 @@ TEST(ProcessManager, basic_interaction)
     EXPECT_FALSE(write_module.is_writing());
     // There should be no frames left in the RB.
     EXPECT_TRUE(ring_buffer.is_empty());
+
+    manager.stop_receiving();
+    EXPECT_EQ(manager.get_status(), "idle");
 }
