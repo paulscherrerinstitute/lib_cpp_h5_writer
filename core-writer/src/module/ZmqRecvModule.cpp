@@ -84,17 +84,18 @@ void ZmqRecvModule::stop_recv()
     receiving_threads_.clear();
 }
 
-void ZmqRecvModule::start_saving()
+void ZmqRecvModule::start_saving(const int n_frames_to_save)
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
         cout << "[ZmqRecvModule::start_saving]";
-        cout << " Enable saving." << endl;
+        cout << " n_frames_to_save " << n_frames_to_save;
+        cout << endl;
     #endif
 
-    is_saving_ = true;
+    n_frames_to_save_ = n_frames_to_save;
 }
 
 void ZmqRecvModule::stop_saving()
@@ -107,7 +108,12 @@ void ZmqRecvModule::stop_saving()
         cout << " Disable saving." << endl;
     #endif
 
-    is_saving_ = false;
+    n_frames_to_save_ = 0;
+}
+
+bool ZmqRecvModule::is_saving()
+{
+    return n_frames_to_save_ != 0;
 }
 
 void ZmqRecvModule::receive_thread(const string& connect_address)
@@ -128,9 +134,11 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
                 continue;
             }
 
-            if (!is_saving_.load(memory_order_relaxed)) {
+            if (!is_saving()) {
                 continue;
             }
+
+            n_frames_to_save_--;
 
             auto frame_metadata = frame.first;
             auto frame_data = frame.second;
