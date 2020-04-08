@@ -128,7 +128,7 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
                 continue;
             }
 
-            if (!is_saving_.load(memory_order_relaxed)) {
+            if (!is_saving_) {
                 continue;
             }
 
