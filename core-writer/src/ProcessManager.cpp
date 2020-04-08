@@ -45,7 +45,8 @@ void ProcessManager::start_writing(
         cout << " user_id " << user_id << endl;
     #endif
 
-    // TODO: Empty buffer to have a clean slate.
+    recv_module_.stop_saving_and_clear_buffer();
+
     write_module_.start_writing(output_file, n_frames, user_id);
     recv_module_.start_saving();
 }
@@ -59,8 +60,8 @@ void ProcessManager::stop_writing()
         cout << "[ProcessManager::stop_writing]" << endl;
     #endif
 
-    recv_module_.stop_saving();
     write_module_.stop_writing();
+    recv_module_.stop_saving_and_clear_buffer();
 }
 
 void ProcessManager::start_receiving(
