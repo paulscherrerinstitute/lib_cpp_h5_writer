@@ -124,9 +124,11 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
             auto frame = receiver.receive();
 
             // .first and .second = nullptr when no message received
-            // If no message or currently not writing, idle.
-            if (frame.first == nullptr ||
-                !is_saving_.load(memory_order_relaxed)) {
+            if (frame.first == nullptr ) {
+                continue;
+            }
+
+            if (!is_saving_.load(memory_order_relaxed)) {
                 continue;
             }
 
