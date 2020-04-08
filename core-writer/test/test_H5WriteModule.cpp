@@ -52,10 +52,18 @@ TEST(H5WriteModule, basic_interaction)
 
     H5WriteModule h5_write_module(ring_buffer, {}, format);
 
+    ASSERT_FALSE(h5_write_module.is_writing());
     h5_write_module.start_writing("ignore_out.h5", 5);
-    generate_frames(ring_buffer, 5);
+    ASSERT_TRUE(h5_write_module.is_writing());
 
+    generate_frames(ring_buffer, 3);
     this_thread::sleep_for(chrono::milliseconds(100));
+    ASSERT_TRUE(h5_write_module.is_writing());
+
+    generate_frames(ring_buffer, 2);
+    this_thread::sleep_for(chrono::milliseconds(100));
+    // Writing should be completed by now.
+    ASSERT_FALSE(h5_write_module.is_writing());
 
     // Stop should never throw an exception.
     h5_write_module.stop_writing();
