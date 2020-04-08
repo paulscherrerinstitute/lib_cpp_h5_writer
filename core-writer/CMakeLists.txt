@@ -17,4 +17,3 @@ endif()
 
 enable_testing()
 add_subdirectory(test/)
-add_test(core-writer_tests core-writer_tests)
