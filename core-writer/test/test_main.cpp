@@ -5,6 +5,7 @@
 #include "test_BufferedWriter.cpp"
 #include "test_ZmqRecvModule.cpp"
 #include "test_H5WriteModule.cpp"
+#include "test_ProcessManager.cpp"
 
 using namespace std;
 
