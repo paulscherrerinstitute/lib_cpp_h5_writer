@@ -43,8 +43,9 @@ TEST(ZmqRecvModule, basic_interaction)
     // Stop should never throw an exception.
     zmq_recv_module.stop_recv();
     EXPECT_NO_THROW(zmq_recv_module.stop_recv());
-    zmq_recv_module.stop_saving();
-    EXPECT_NO_THROW(zmq_recv_module.stop_saving());
+
+    zmq_recv_module.stop_saving_and_clear_buffer();
+    EXPECT_NO_THROW(zmq_recv_module.stop_saving_and_clear_buffer());
 }
 
 TEST(ZmqRecvModule, simple_recv)
@@ -76,5 +77,46 @@ TEST(ZmqRecvModule, simple_recv)
     auto data = ring_buffer.read();
     ASSERT_TRUE(data.first == nullptr);
 
+    ASSERT_TRUE(ring_buffer.is_empty());
+}
+
+TEST(ZmqRecvModule, stop_saving_and_clear_buffer)
+{
+    size_t n_msg = 10;
+
+    thread sender(generate_stream, n_msg);
+    RingBuffer ring_buffer(n_msg);
+
+    ZmqRecvModule zmq_recv_module(ring_buffer, {});
+    zmq_recv_module.start_saving();
+    zmq_recv_module.start_recv("tcp://127.0.0.1:11000", 4);
+
+    sender.join();
+    this_thread::sleep_for(chrono::milliseconds(100));
+
+    ASSERT_FALSE(ring_buffer.is_empty());
+    zmq_recv_module.stop_saving_and_clear_buffer();
+    ASSERT_TRUE(ring_buffer.is_empty());
+
+    thread sender2(generate_stream, 2);
+    sender2.join();
+    this_thread::sleep_for(chrono::milliseconds(100));
+
+    // No messages should be saved from this run.
+    ASSERT_TRUE(ring_buffer.is_empty());
+
+    zmq_recv_module.start_saving();
+
+    thread sender3(generate_stream, 2);
+    sender3.join();
+    this_thread::sleep_for(chrono::milliseconds(100));
+
+    ASSERT_FALSE(ring_buffer.is_empty());
+
+    // stop_recv does not invalidate the buffer.
+    zmq_recv_module.stop_recv();
+    ASSERT_FALSE(ring_buffer.is_empty());
+
+    zmq_recv_module.stop_saving_and_clear_buffer();
     ASSERT_TRUE(ring_buffer.is_empty());
 }
