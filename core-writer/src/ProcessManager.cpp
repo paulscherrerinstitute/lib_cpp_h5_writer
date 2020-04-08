@@ -30,3 +30,32 @@ void ProcessManager::start_rest_api(const uint16_t rest_port)
         cout << " Server stopped." << endl;
     #endif
 }
+
+void ProcessManager::start_writing(
+        const string& output_file,
+        const int n_frames,
+        const int user_id)
+{
+    recv_module_.start_saving();
+    write_module_.start_writing(output_file, n_frames, user_id);
+}
+
+void ProcessManager::stop_writing()
+{
+    recv_module_.stop_saving();
+    write_module_.stop_writing();
+}
+
+void ProcessManager::start_receiving(
+        const string& connect_address,
+        const int n_receiving_threads)
+{
+    recv_module_.start_recv(
+            connect_address,
+            static_cast<uint8_t>(n_receiving_threads));
+}
+
+void ProcessManager::stop_receiving()
+{
+    recv_module_.stop_recv();
+}

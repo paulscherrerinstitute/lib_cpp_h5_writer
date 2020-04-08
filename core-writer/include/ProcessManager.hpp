@@ -16,13 +16,13 @@ class ProcessManager
         void start_rest_api(const uint16_t rest_port);
 
         void start_writing(
-                const std::string output_file,
+                const std::string& output_file,
                 const int n_frames,
                 const int user_id);
         void stop_writing();
 
         void start_receiving(
-                const std::string connect_address,
+                const std::string& connect_address,
                 const int n_receiving_threads);
         void stop_receiving();
 
