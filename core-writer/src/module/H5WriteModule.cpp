@@ -258,5 +258,5 @@ void H5WriteModule::write_thread(
 
 bool H5WriteModule::is_writing()
 {
-    return is_writing_.load(memory_order_relaxed);
+    return is_writing_;
 }
