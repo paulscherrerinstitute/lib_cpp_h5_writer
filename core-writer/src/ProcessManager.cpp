@@ -109,8 +109,15 @@ void ProcessManager::stop_receiving()
 
 string ProcessManager::get_status()
 {
-    // TODO: Implement status collection.
-    return "nothing to see here";
+    if (write_module_.is_writing()) {
+        return "writing";
+    }
+
+    if (recv_module_.is_receiving()) {
+        return "ready";
+    }
+
+    return "idle";
 }
 
 unordered_map<std::string, float> ProcessManager::get_statistics()
