@@ -19,6 +19,7 @@ namespace config
     extern std::string raw_image_dataset_name;
 
     extern uint32_t parameters_read_retry_interval;
+    extern size_t recv_saving_wait_ms;
 }
 
 #endif

@@ -22,4 +22,7 @@ namespace config {
     hsize_t dataset_increase_step = 1000;
     // To which value to initialize a dataset size.
     hsize_t initial_dataset_size = 1000;
+
+    // Max time for compress and commit already acquired RB slots.
+    size_t recv_saving_wait_ms = 100;
 }
