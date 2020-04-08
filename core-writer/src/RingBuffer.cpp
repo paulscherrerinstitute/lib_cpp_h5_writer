@@ -30,7 +30,7 @@ RingBuffer::~RingBuffer()
 
 void RingBuffer::initialize(const size_t requested_slot_size)
 {
-    if (initialized_.load(memory_order_relaxed)) {
+    if (is_initialized()) {
         return;
     }
 
