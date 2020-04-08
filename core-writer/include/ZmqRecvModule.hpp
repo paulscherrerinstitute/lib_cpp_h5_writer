@@ -12,7 +12,7 @@ class ZmqRecvModule
     RingBuffer& ring_buffer_;
     const header_map& header_values_;
     std::atomic_bool is_receiving_;
-    std::atomic_int n_frames_to_save_;
+    std::atomic_bool is_saving_;
     std::vector<std::thread> receiving_threads_;
 
 protected:
@@ -24,14 +24,12 @@ public:
             RingBuffer& ring_buffer,
             const header_map& header_values);
 
-    void start_recv(
-            const std::string& connect_address,
-            const uint8_t n_receiving_threads);
+    void start_recv(const std::string& connect_address,
+               const uint8_t n_receiving_threads);
     void stop_recv();
 
-    void start_saving(const int n_frames = -1);
+    void start_saving();
     void stop_saving();
-    bool is_saving();
 };
 
 #endif
