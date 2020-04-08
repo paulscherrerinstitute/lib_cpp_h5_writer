@@ -31,14 +31,28 @@ void ZmqRecvModule::start_recv(
         throw runtime_error(err_msg.str());
     }
 
+    if (n_receiving_threads < 1) {
+        stringstream err_msg;
+
+        using namespace date;
+        using namespace chrono;
+        err_msg << "[" << system_clock::now() << "]";
+        err_msg << "[ZmqRecvModule::start_recv]";
+        err_msg << " n_receiving_threads ";
+        err_msg << n_receiving_threads << " must be > 1." << endl;
+
+        throw runtime_error(err_msg.str());
+    }
+
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
         cout << "[ZmqRecvModule::start]";
-        cout << " Starting with parameters:";
-        cout << "\tconnect_address: " << connect_address;
-        cout << "\tn_receiving_thread: " << (int) n_receiving_threads << endl;
+        cout << " Starting with ";
+        cout << "connect_address " << connect_address;
+        cout << " n_receiving_thread ";
+        cout << (int) n_receiving_threads << endl;
     #endif
 
     is_receiving_ = true;
