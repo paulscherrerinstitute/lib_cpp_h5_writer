@@ -27,6 +27,7 @@ public:
     void start_recv(const std::string& connect_address,
                const uint8_t n_receiving_threads);
     void stop_recv();
+    bool is_receiving();
 
     void start_saving();
     void stop_saving_and_clear_buffer();

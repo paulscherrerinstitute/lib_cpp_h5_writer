@@ -84,6 +84,11 @@ void ZmqRecvModule::stop_recv()
     receiving_threads_.clear();
 }
 
+bool ZmqRecvModule::is_receiving()
+{
+    return is_receiving_;
+}
+
 void ZmqRecvModule::start_saving()
 {
     #ifdef DEBUG_OUTPUT
