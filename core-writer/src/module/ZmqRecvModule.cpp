@@ -97,7 +97,7 @@ void ZmqRecvModule::start_saving()
     is_saving_ = true;
 }
 
-void ZmqRecvModule::stop_saving()
+void ZmqRecvModule::stop_saving_and_clear_buffer()
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
@@ -108,6 +108,12 @@ void ZmqRecvModule::stop_saving()
     #endif
 
     is_saving_ = false;
+
+    // TODO: Solve the problem differently - control to RB?
+    this_thread::sleep_for(chrono::milliseconds(
+            config::recv_saving_wait_ms));
+
+    ring_buffer_.clear();
 }
 
 void ZmqRecvModule::receive_thread(const string& connect_address)

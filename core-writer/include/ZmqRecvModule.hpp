@@ -29,7 +29,7 @@ public:
     void stop_recv();
 
     void start_saving();
-    void stop_saving();
+    void stop_saving_and_clear_buffer();
 };
 
 #endif
