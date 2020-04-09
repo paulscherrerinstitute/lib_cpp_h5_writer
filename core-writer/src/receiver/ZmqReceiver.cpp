@@ -84,7 +84,7 @@ void ZmqReceiver::connect(
         cout << " with receive timeout " << receive_timeout << endl;
     #endif
 
-    socket_.setsockopt(ZMQ_RCVTIMEO, receive_timeout);
+    socket_.set(zmq::sockopt::rcvtimeo, receive_timeout);
     socket_.connect(connect_address);
 }
 
