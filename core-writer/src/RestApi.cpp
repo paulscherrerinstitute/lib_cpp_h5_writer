@@ -17,66 +17,79 @@ void RestApi::start_rest_api(ProcessManager& manager, uint16_t port)
 
     crow::SimpleApp app;
 
-    CROW_ROUTE (app, "/writing").methods("POST"_method)
+    CROW_ROUTE (app, "/writing").methods("POST"_method, "DELETE"_method)
             ([&](const crow::request& req)
              {
-                 auto request_parameters = crow::json::load(req.body);
+                 if (req.method == "POST"_method) {
+                     auto request_parameters = crow::json::load(req.body);
 
-                 string output_file = request_parameters["output_file"].s();
-                 int n_frames = request_parameters["n_frames"].i();
-                 int user_id = request_parameters["user_id"].i();
+                     string output_file =
+                             request_parameters["output_file"].s();
+                     int n_frames =
+                             request_parameters["n_frames"].i();
+                     int user_id =
+                             request_parameters["user_id"].i();
 
-                 manager.start_writing(output_file, n_frames, user_id);
+                     manager.start_writing(output_file, n_frames, user_id);
 
-                 crow::json::wvalue result;
-                 result["state"] = "ok";
-                 result["status"] = manager.get_status();
-                 result["message"] = "Writing started.";
+                     crow::json::wvalue result;
+                     result["state"] = "ok";
+                     result["status"] = manager.get_status();
+                     result["message"] = "Writing started.";
 
-                 return result;
+                     return result;
+                 }
+
+                 if (req.method == "DELETE"_method) {
+                     manager.stop_writing();
+
+                     crow::json::wvalue result;
+                     result["state"] = "ok";
+                     result["status"] = manager.get_status();
+                     result["message"] = "Writing stopped.";
+
+                     return result;
+                 }
+
+                 throw runtime_error("You should not see this.");
+
              });
 
-    CROW_ROUTE(app, "/writing").methods("DELETE"_method)
-            ([&](const crow::request& req){
-                manager.stop_writing();
-
-                crow::json::wvalue result;
-                result["state"] = "ok";
-                result["status"] = manager.get_status();
-                result["message"] = "Writing stopped.";
-
-                return result;
-            });
-
-    CROW_ROUTE (app, "/receiving").methods("POST"_method)
+    CROW_ROUTE (app, "/receiving").methods("POST"_method, "DELETE"_method)
             ([&](const crow::request& req)
              {
-                 auto request_parameters = crow::json::load(req.body);
+                 if (req.method == "POST"_method) {
 
-                 string url = request_parameters["connect_address"].s();
-                 int n_threads = request_parameters["n_receiving_threads"].i();
+                     auto request_parameters = crow::json::load(req.body);
 
-                 manager.start_receiving(url, n_threads);
+                     string url =
+                             request_parameters["connect_address"].s();
+                     int n_threads =
+                             request_parameters["n_receiving_threads"].i();
 
-                 crow::json::wvalue result;
-                 result["state"] = "ok";
-                 result["status"] = manager.get_status();
-                 result["message"] = "Receiving started.";
+                     manager.start_receiving(url, n_threads);
 
-                 return result;
+                     crow::json::wvalue result;
+                     result["state"] = "ok";
+                     result["status"] = manager.get_status();
+                     result["message"] = "Receiving started.";
+
+                     return result;
+                 }
+
+                 if (req.method == "DELETE"_method) {
+                     manager.stop_receiving();
+
+                     crow::json::wvalue result;
+                     result["state"] = "ok";
+                     result["status"] = manager.get_status();
+                     result["message"] = "Receiving stopped.";
+
+                     return result;
+                 }
+
+                 throw runtime_error("You should not see this.");
              });
-
-    CROW_ROUTE(app, "/receiving").methods("DELETE"_method)
-            ([&](const crow::request& req){
-                manager.stop_receiving();
-
-                crow::json::wvalue result;
-                result["state"] = "ok";
-                result["status"] = manager.get_status();
-                result["message"] = "Receiving stopped.";
-
-                return result;
-            });
 
     CROW_ROUTE (app, "/status")
            ([&](){
