@@ -11,4 +11,5 @@ target_link_libraries(sf-writer
         hdf5
         hdf5_hl
         hdf5_cpp
+        boost_system
         pthread)
