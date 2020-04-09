@@ -183,24 +183,28 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
             }
 
             char* buffer = ring_buffer_.reserve(frame_metadata);
-
-            auto compressed_size = compression::compress_bitshuffle(
+            memcpy(
+                    buffer,
                     static_cast<const char*>(frame_data),
-                    frame_metadata->frame_bytes_size,
-                    1,
-                    buffer);
+                    frame_metadata->frame_bytes_size);
 
-            #ifdef DEBUG_OUTPUT
-                using namespace date;
-                using namespace chrono;
-                cout << "[" << system_clock::now() << "]";
-                cout << "[ZmqRecvModule::receive_thread]";
-                cout << " Compressed image from ";
-                cout << frame_metadata->frame_bytes_size << " bytes to ";
-                cout << compressed_size << " bytes." << endl;
-            #endif
+//            auto compressed_size = compression::compress_bitshuffle(
+//                    static_cast<const char*>(frame_data),
+//                    frame_metadata->frame_bytes_size,
+//                    1,
+//                    buffer);
+//
+//            #ifdef DEBUG_OUTPUT
+//                using namespace date;
+//                using namespace chrono;
+//                cout << "[" << system_clock::now() << "]";
+//                cout << "[ZmqRecvModule::receive_thread]";
+//                cout << " Compressed image from ";
+//                cout << frame_metadata->frame_bytes_size << " bytes to ";
+//                cout << compressed_size << " bytes." << endl;
+//            #endif
 
-            frame_metadata->frame_bytes_size = compressed_size;
+//            frame_metadata->frame_bytes_size = compressed_size;
 
             ring_buffer_.commit(frame_metadata);
         }
