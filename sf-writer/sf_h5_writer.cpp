@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
     ZmqRecvModule recv_module(ring_buffer, header_values);
     H5WriteModule write_module(ring_buffer, header_values, format);
 
-    recv_module.start_recv(connect_address, 4);
+    recv_module.start_recv(connect_address, 1);
 
     ProcessManager process_manager(write_module, recv_module);
     process_manager.start_rest_api(rest_port);
