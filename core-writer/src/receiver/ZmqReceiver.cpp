@@ -56,7 +56,7 @@ ZmqReceiver::ZmqReceiver(
         const int n_io_threads) :
             header_values_type_(header_values_type),
             context_(n_io_threads),
-            socket_(context_, ZMQ_PULL),
+            socket_(context_, ZMQ_SUB),
             message_header_(config::zmq_buffer_size_header),
             message_data_(config::zmq_buffer_size_data)
 {
