@@ -12,7 +12,7 @@ using namespace std;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 7) {
+    if (argc != 6) {
         cout << endl;
         cout << "Usage: sf_h5_writer [connection_address] [rest_port]";
         cout << " [bsread_address] [n_modules] [n_bad_modules] [detector_name]";
@@ -20,7 +20,6 @@ int main (int argc, char *argv[])
         cout << "\tconnection_address: Address to connect to the stream";
         cout << " (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\trest_port: Port to start the REST Api on." << endl;
-        cout << "\tbsread_address: HTTP address of the bsread REST api." << endl;
         cout << "\tn_modules: Number of detector modules to be written." << endl;
         cout << "\tn_bad_modules: Number of detector modules which";
         cout << " has more then half bad pixels" << endl;
@@ -33,10 +32,9 @@ int main (int argc, char *argv[])
 
     string connect_address = string(argv[1]);
     int rest_port = atoi(argv[2]);
-    string bsread_rest_address = string(argv[3]);
-    int n_modules = atoi(argv[4]);
-    int n_bad_modules = atoi(argv[5]);
-    string detector_name = string(argv[6]);
+    int n_modules = atoi(argv[3]);
+    int n_bad_modules = atoi(argv[4]);
+    string detector_name = string(argv[5]);
 
     unordered_map<string, HeaderDataType> header_values {
         {"pulse_id", HeaderDataType("uint64")},
