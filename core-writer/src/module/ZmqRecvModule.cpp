@@ -60,6 +60,8 @@ void ZmqRecvModule::start_recv(
         cout << (int) n_receiving_threads << endl;
     #endif
 
+    // TODO: Join threads if joinable and not yet joined.
+
     is_receiving_ = true;
 
     for (uint8_t i_rec=0; i_rec < n_receiving_threads; i_rec++) {
