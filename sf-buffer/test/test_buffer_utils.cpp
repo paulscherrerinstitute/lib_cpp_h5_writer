@@ -38,3 +38,10 @@ TEST(BufferUtils, get_filename)
 
     ASSERT_NE(result4, expected_file);
 }
+
+TEST(BufferUtils, get_file_frame_index)
+{
+    ASSERT_EQ(get_file_frame_index(12345000), 0);
+    ASSERT_EQ(get_file_frame_index(12345543), 543);
+    ASSERT_EQ(get_file_frame_index(12345999), 999);
+}
