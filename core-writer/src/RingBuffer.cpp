@@ -74,7 +74,7 @@ void RingBuffer<T>::initialize(const size_t requested_slot_size)
         cout << " Ringbuffer initialized";
         cout << " with slot_size " << slot_size_;
         cout << " and n_slots " << n_slots_;
-        cout << " and buffer_size " << buffer_size_;
+        cout << " and buffer_size " << buffer_size_ << endl;
     #endif
 }
 
