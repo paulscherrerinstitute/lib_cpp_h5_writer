@@ -7,7 +7,7 @@
 using namespace std;
 
 H5WriteModule::H5WriteModule(
-        RingBuffer& ring_buffer,
+        RingBuffer<FrameMetadata>& ring_buffer,
         const header_map& header_values,
         const H5Format& format) :
             ring_buffer_(ring_buffer),

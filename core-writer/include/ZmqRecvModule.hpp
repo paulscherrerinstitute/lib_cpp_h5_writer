@@ -9,7 +9,7 @@ class ZmqRecvModule
 {
     typedef std::unordered_map<std::string, HeaderDataType> header_map;
 
-    RingBuffer& ring_buffer_;
+    RingBuffer<FrameMetadata>& ring_buffer_;
     const header_map& header_values_;
     std::atomic_bool is_receiving_;
     std::atomic_bool is_saving_;
@@ -21,7 +21,7 @@ protected:
 
 public:
     ZmqRecvModule(
-            RingBuffer& ring_buffer,
+            RingBuffer<FrameMetadata>& ring_buffer,
             const header_map& header_values);
 
     virtual ~ZmqRecvModule();

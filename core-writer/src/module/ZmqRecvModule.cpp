@@ -7,7 +7,7 @@
 using namespace std;
 
 ZmqRecvModule::ZmqRecvModule(
-        RingBuffer &ring_buffer,
+        RingBuffer<FrameMetadata> &ring_buffer,
         const header_map &header_values) :
             ring_buffer_(ring_buffer),
             header_values_(header_values),
@@ -143,6 +143,8 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
             if (frame.first == nullptr ) {
                 continue;
             }
+
+            cout <<" Something!!!"<< endl;
 
             if (!is_saving_) {
                 continue;

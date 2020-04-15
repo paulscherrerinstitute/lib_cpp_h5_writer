@@ -9,7 +9,7 @@
 class H5WriteModule {
     typedef std::unordered_map<std::string, HeaderDataType> header_map;
 
-    RingBuffer& ring_buffer_;
+    RingBuffer<FrameMetadata>& ring_buffer_;
     const header_map& header_values_;
     const H5Format& format_;
     std::atomic_bool is_writing_;
@@ -23,7 +23,7 @@ protected:
 
 public:
     H5WriteModule(
-            RingBuffer& ring_buffer,
+            RingBuffer<FrameMetadata>& ring_buffer,
             const header_map& header_values,
             const H5Format& format);
 
