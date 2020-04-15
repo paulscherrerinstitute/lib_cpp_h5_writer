@@ -56,7 +56,7 @@ ZmqReceiver::ZmqReceiver(
         const int n_io_threads) :
             header_values_type_(header_values_type),
             context_(n_io_threads),
-            socket_(context_, ZMQ_SUB),
+            socket_(context_, ZMQ_PULL),
             message_header_(config::zmq_buffer_size_header),
             message_data_(config::zmq_buffer_size_data)
 {
@@ -118,6 +118,7 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
 
     // Get the message header.
     auto recv_n_bytes_header = socket_.recv(message_header_);
+
     if (!recv_n_bytes_header.has_value()){
         return {nullptr, nullptr};
     }
