@@ -102,7 +102,7 @@ char* RingBuffer<T>::reserve(shared_ptr<T> frame_metadata)
         err_msg << "[RingBuffer::reserve]";
         err_msg << " Received frame index " << frame_metadata->frame_index;
         err_msg << " that is too large for ring buffer slot.";
-        err_msg << "Slot size " << slot_size_ << ", but frame bytes size ";
+        err_msg << " Slot size " << slot_size_ << ", but frame bytes size ";
         err_msg << frame_metadata->frame_bytes_size << endl;
 
         throw runtime_error(err_msg.str());
