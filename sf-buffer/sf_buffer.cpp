@@ -55,12 +55,34 @@ int main (int argc, char *argv[]) {
             sizeof(struct timeval));
 
     RingBuffer ring_buffer(config::ring_buffer_n_slots);
+    ring_buffer.initialize(JUNGFRAU_DATA_BYTES_PER_FRAME);
+
     jungfrau_packet packet;
 
     uint64_t last_framenum = -1;
 
     while (true) {
-        recv(socket_fd, &packet, JUNGFRAU_BYTES_PER_PACKET, 0);
+        auto data_len = recv(socket_fd, &packet, JUNGFRAU_BYTES_PER_PACKET, 0);
 
+        if (data_len < 0) {
+            continue;
+        }
+
+        if (data_len != JUNGFRAU_BYTES_PER_PACKET) {
+            cout << "Invalid packet length " << data_len << endl;
+        }
+
+        if (packet.framenum != last_framenum) {
+            FrameMetadata metadata;
+
+            metadata.frame_index = packet.framenum;
+            metadata.endianness = "little";
+            metadata.type = "uint16";
+            metadata.frame_shape = {1024, 512};
+            metadata.header_values = {
+                    {"pulse_id", static_cast<uint64_t>(packet.bunchid)}
+            };
+
+        }
     }
 }
