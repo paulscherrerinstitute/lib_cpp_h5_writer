@@ -95,7 +95,9 @@ void UdpRecvModule::receive_thread(
 
             auto* current_metadata = metadata.get();
 
-            if (packet_buffer.framenum != current_metadata->frame_index) {
+            if (current_metadata == nullptr ||
+                packet_buffer.framenum != current_metadata->frame_index) {
+
                 if (frame_buffer != nullptr) {
                     ring_buffer_.commit(metadata);
                 }
