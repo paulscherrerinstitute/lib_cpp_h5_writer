@@ -66,7 +66,8 @@ int main (int argc, char *argv[]) {
 
         writer.write_data(
                 "image", file_frame_index,
-                data.second, {512,1024}, 2, "uint16", "little");
+                data.second, {512,1024},
+                JUNGFRAU_DATA_BYTES_PER_FRAME, "uint16", "little");
 
         writer.write_data(
                 "pulse_id", file_frame_index,
