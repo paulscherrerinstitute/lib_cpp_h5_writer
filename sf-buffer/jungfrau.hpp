@@ -4,6 +4,7 @@
 #define JUNGFRAU_BYTES_PER_PACKET 8246
 #define JUNGFRAU_DATA_BYTES_PER_PACKET 8192
 #define JUNGFRAU_N_PACKETS_PER_FRAME 128
+#define JUNGFRAU_DATA_BYTES_PER_FRAME 1048576
 
 // 6 bytes + 48 bytes + 8192 bytes = 8246 bytes
 #pragma pack(push)
