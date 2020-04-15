@@ -14,7 +14,7 @@ class UdpRecvModule {
     protected:
         void receive_thread(
                 const uint16_t udp_port,
-                const size_t udp_buffer_n_bytes);
+                const size_t frame_size);
 
     public:
         UdpRecvModule(RingBuffer<UdpFrameMetadata>& ring_buffer);
@@ -23,7 +23,7 @@ class UdpRecvModule {
 
         void start_recv(
                 const uint16_t udp_port,
-                const size_t udp_buffer_n_bytes);
+                const size_t frame_n_bytes);
         void stop_recv();
         bool is_receiving();
 };

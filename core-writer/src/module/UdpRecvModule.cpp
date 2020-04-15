@@ -19,7 +19,7 @@ UdpRecvModule::~UdpRecvModule()
 
 void UdpRecvModule::start_recv(
         const uint16_t udp_port,
-        const size_t udp_buffer_n_bytes)
+        const size_t frame_n_bytes)
 {
     if (is_receiving_ == true) {
         std::stringstream err_msg;
@@ -73,10 +73,10 @@ void UdpRecvModule::stop_recv()
 
 void UdpRecvModule::receive_thread(
         const uint16_t udp_port,
-        const size_t udp_buffer_n_bytes)
+        const size_t frame_size)
 {
     try {
-        ring_buffer_.initialize(udp_buffer_n_bytes);
+        ring_buffer_.initialize(frame_size);
 
         UdpReceiver udp_receiver;
         udp_receiver.bind(udp_port);
