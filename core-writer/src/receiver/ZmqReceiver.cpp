@@ -168,18 +168,19 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
 
         header_data->type = json_header.get<string>("type");
 
+        if (!header_values_type_.empty()) {
+            for (const auto &value_mapping : header_values_type_) {
 
-        for (const auto& value_mapping : header_values_type_) {
+                const auto &name = value_mapping.first;
+                const auto &header_data_type = value_mapping.second;
 
-            const auto& name = value_mapping.first;
-            const auto& header_data_type = value_mapping.second;
+                auto value = get_value_from_json(
+                        json_header, name, header_data_type);
 
-            auto value = get_value_from_json(
-                    json_header, name, header_data_type);
-
-            header_data->header_values.insert(
-                {name, value}
-            );
+                header_data->header_values.insert(
+                        {name, value}
+                );
+            }
         }
         
         return header_data;
