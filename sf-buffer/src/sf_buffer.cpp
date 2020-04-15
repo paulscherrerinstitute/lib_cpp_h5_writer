@@ -13,7 +13,7 @@ using namespace std;
 
 
 int main (int argc, char *argv[]) {
-    if (argc != 6) {
+    if (argc != 4) {
         cout << endl;
         cout << "Usage: sf_buffer [device_name] [udp_port] [root_folder]";
         cout << endl;
