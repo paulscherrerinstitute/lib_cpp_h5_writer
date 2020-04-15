@@ -51,13 +51,15 @@ void WriterUtils::create_destination_folder(const string& output_file)
     if (file_separator_index != string::npos) {
         string output_folder(output_file.substr(0, file_separator_index));
 
-        using namespace date;
-        using namespace chrono;
-        cout << "[" << system_clock::now() << "]";
-        cout << "[WriterUtils::create_destination_folder]";
-        cout << " Creating folder " << output_folder << endl;
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            using namespace chrono;
+            cout << "[" << system_clock::now() << "]";
+            cout << "[WriterUtils::create_destination_folder]";
+            cout << " Creating folder " << output_folder << endl;
 
-        string create_folder_command("mkdir -p " + output_folder);
-        system(create_folder_command.c_str());
+            string create_folder_command("mkdir -p " + output_folder);
+            system(create_folder_command.c_str());
+        #endif
     }
 }
