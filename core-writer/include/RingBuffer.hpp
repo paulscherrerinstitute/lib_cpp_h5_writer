@@ -39,6 +39,8 @@ struct UdpFrameMetadata
 
     uint64_t recv_packets_1;
     uint64_t recv_packets_2;
+
+    uint32_t daq_rec;
 };
 
 template <class T>

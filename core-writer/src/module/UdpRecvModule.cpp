@@ -108,8 +108,9 @@ void UdpRecvModule::receive_thread(
                 current_metadata->frame_index = packet_buffer.framenum;
                 current_metadata->pulse_id = packet_buffer.bunchid;
                 current_metadata->frame_bytes_size = JUNGFRAU_DATA_BYTES_PER_FRAME;
-                current_metadata->recv_packets_1 = 0;
-                current_metadata->recv_packets_2 = 0;
+                current_metadata->recv_packets_1 = ~(uint64_t)0;
+                current_metadata->recv_packets_2 = ~(uint64_t)0;
+                current_metadata->daq_rec = packet_buffer.debug;
 
                 frame_buffer = ring_buffer_.reserve(metadata);
                 memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
