@@ -15,7 +15,7 @@ using namespace std;
 
 H5Writer::H5Writer(const std::string& filename, hsize_t frames_per_file, hsize_t initial_dataset_size, 
     hsize_t dataset_increase_step) :
-        filename(filename), frames_per_file(frames_per_file), 
+        filename_(filename), frames_per_file(frames_per_file),
         initial_dataset_size(initial_dataset_size), dataset_increase_step(dataset_increase_step)
 {
     #ifdef DEBUG_OUTPUT
@@ -191,27 +191,33 @@ void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& 
     datasets_current_size.insert({dataset_name, initial_dataset_size});
 }
 
-void H5Writer::create_file(hsize_t frame_chunk) 
+void H5Writer::create_file(const string& filename, const hsize_t frame_chunk)
+{
+    filename_ = filename;
+    create_file(frame_chunk);
+}
+
+void H5Writer::create_file(hsize_t frame_chunk)
 {
 
     if (file.getId() != -1) {
         close_file();
     }
 
-    auto target_filename = filename;
+    auto target_filename = filename_;
 
     // In case frames_per_file is > 0, the filename variable is a template for the filename.
     if (frames_per_file) {
         #ifdef DEBUG_OUTPUT
             using namespace date;
             cout << "[" << std::chrono::system_clock::now() << "]";
-            cout << "[H5Writer::create_file] Frames per file is defined. Format " << filename << " with frame_chunk " << frame_chunk << endl;
+            cout << "[H5Writer::create_file] Frames per file is defined. Format " << filename_ << " with frame_chunk " << frame_chunk << endl;
         #endif
 
         // Space for 10 digits should be enough.
-        char buffer[filename.length() + 10];
+        char buffer[filename_.length() + 10];
 
-        sprintf(buffer, filename.c_str(), frame_chunk);
+        sprintf(buffer, filename_.c_str(), frame_chunk);
         target_filename = string(buffer);
     }
 

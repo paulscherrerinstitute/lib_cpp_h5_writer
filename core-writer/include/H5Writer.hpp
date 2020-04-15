@@ -12,7 +12,7 @@ class H5Writer
 {
     protected:
         // Initialized in constructor.
-        const std::string filename;
+        std::string filename_;
         hsize_t frames_per_file;
         hsize_t initial_dataset_size;
         hsize_t dataset_increase_step = 0;
@@ -38,6 +38,7 @@ class H5Writer
         virtual ~H5Writer();
         virtual bool is_file_open() const;
         virtual void create_file(const hsize_t frame_chunk=1);
+        virtual void create_file(const std::string& filename, const hsize_t frame_chunk=1);
         virtual void close_file();
         virtual void write_data(const std::string& dataset_name, const size_t data_index, const char* data, const std::vector<size_t>& data_shape, 
             const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
