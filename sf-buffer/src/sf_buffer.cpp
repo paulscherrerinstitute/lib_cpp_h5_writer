@@ -38,6 +38,11 @@ int main (int argc, char *argv[]) {
     string current_file;
     H5Writer writer("");
 
+    uint64_t n_stat_out(0);
+    uint64_t n_frames_with_missing_packets = 0;
+    uint64_t n_missed_frames = 0;
+    uint64_t last_pulse_id = 0;
+
     while (true) {
         auto data = ring_buffer.read();
 
@@ -95,5 +100,23 @@ int main (int argc, char *argv[]) {
                 "uint64", "little");
 
         ring_buffer.release(data.first->buffer_slot_index);
+
+        // TODO: Make real statistics, please.
+        n_stat_out++;
+
+        if (data.first->recv_packets_2 > 0 || data.first->recv_packets_1 > 0) {
+            n_frames_with_missing_packets++;
+        }
+
+        n_missed_frames += (pulse_id - last_pulse_id) - 1;
+
+        if (n_stat_out == 500) {
+            cout << "frames_with_missing_packets " << n_frames_with_missing_packets;
+            cout << " n_missed_frames " << n_missed_frames;
+
+            n_stat_out = 0;
+            n_frames_with_missing_packets = 0;
+            n_missed_frames = 0;
+        }
     }
 }
