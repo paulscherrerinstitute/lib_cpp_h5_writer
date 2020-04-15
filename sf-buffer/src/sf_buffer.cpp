@@ -111,8 +111,10 @@ int main (int argc, char *argv[]) {
         n_missed_frames += (pulse_id - last_pulse_id) - 1;
 
         if (n_stat_out == 500) {
-            cout << "frames_with_missing_packets " << n_frames_with_missing_packets;
+            cout << "pulse_id " << pulse_id;
             cout << " n_missed_frames " << n_missed_frames;
+            cout << " f_with_miss_p " << n_frames_with_missing_packets;
+
 
             n_stat_out = 0;
             n_frames_with_missing_packets = 0;
