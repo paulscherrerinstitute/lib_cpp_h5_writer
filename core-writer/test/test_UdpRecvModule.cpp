@@ -65,7 +65,7 @@ TEST(UdpRecvModule, simple_recv)
     auto result = ring_buffer.read();
     // The slot should be reserved, but not yet committed.
     // Only with next frame packet commit.
-    ASSERT_TRUE(result.first == NULL);
+    ASSERT_TRUE(result.first == nullptr);
 
     // When packet from new frame is received, the previous frame should be
     // committed to the ring buffer.
@@ -86,7 +86,7 @@ TEST(UdpRecvModule, simple_recv)
 
     ASSERT_FALSE(ring_buffer.is_empty());
     auto result2 = ring_buffer.read();
-    ASSERT_TRUE(result2.first != NULL);
+    ASSERT_TRUE(result2.first != nullptr);
 
     ::close(send_socket_fd);
 }
