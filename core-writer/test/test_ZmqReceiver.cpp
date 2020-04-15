@@ -1,5 +1,7 @@
+#include <thread>
 #include "gtest/gtest.h"
 #include "ZmqReceiver.hpp"
+#include "mock/stream.hpp"
 
 using namespace std;
 namespace pt = boost::property_tree;
@@ -146,4 +148,23 @@ TEST(ZmqReceiver, read_json_header)
 
   auto module_number = reinterpret_cast<uint64_t*>(metadata->header_values.at("module_number").get());
   ASSERT_TRUE(module_number[0] == 0);
+}
+
+TEST(ZmqReceiver, simple_recv)
+{
+    size_t n_msg = 10;
+
+    thread sender(generate_stream, n_msg);
+    RingBuffer<FrameMetadata> ring_buffer(n_msg);
+
+    ZmqReceiver receiver({});
+    receiver.connect(MOCK_STREAM_ADDRESS, 100);
+
+    this_thread::sleep_for(chrono::milliseconds(100));
+
+    for (size_t i=0; i<n_msg; i++) {
+        EXPECT_TRUE(receiver.receive().first != nullptr);
+    }
+
+    sender.join();
 }
