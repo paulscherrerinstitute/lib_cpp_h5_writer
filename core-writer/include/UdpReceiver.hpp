@@ -6,7 +6,7 @@
 
 class UdpReceiver {
 
-    int socket_fd_ = -1;
+    int socket_fd_;
 
 public:
     UdpReceiver();

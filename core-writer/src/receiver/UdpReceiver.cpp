@@ -5,6 +5,16 @@
 
 using namespace std;
 
+UdpReceiver::UdpReceiver() :
+    socket_fd_(-1)
+{
+}
+
+UdpReceiver::~UdpReceiver()
+{
+    close();
+}
+
 void UdpReceiver::bind(const uint16_t port, const size_t usec_timeout)
 {
     if (socket_fd_ > -1) {
@@ -56,4 +66,10 @@ bool UdpReceiver::receive(void* buffer, size_t buffer_n_bytes)
     }
 
     return true;
+}
+
+void UdpReceiver::close()
+{
+    ::close(socket_fd_);
+    socket_fd_ = -1;
 }
