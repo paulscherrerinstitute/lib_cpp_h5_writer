@@ -45,6 +45,7 @@ TEST(ProcessManager, basic_interaction)
     thread sender2(generate_stream, 6);
     this_thread::sleep_for(chrono::milliseconds(100));
     sender2.join();
+    this_thread::sleep_for(chrono::milliseconds(100));
 
     // Writer stopped because it received all frames.
     EXPECT_FALSE(write_module.is_writing());
