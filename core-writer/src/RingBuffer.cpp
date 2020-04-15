@@ -310,3 +310,4 @@ size_t RingBuffer<T>::get_slot_size()
 }
 
 template class RingBuffer<FrameMetadata>;
+template class RingBuffer<UdpFrameMetadata>;

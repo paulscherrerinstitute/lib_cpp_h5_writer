@@ -28,6 +28,20 @@ struct FrameMetadata
     std::map<std::string, std::shared_ptr<char>> header_values;
 };
 
+struct UdpFrameMetadata
+{
+    // Ring buffer needed data.
+    size_t buffer_slot_index;
+    size_t frame_bytes_size;
+
+    uint64_t pulse_id;
+    uint64_t frame_index;
+    uint32_t packet_index;
+
+    uint64_t recv_packets_1;
+    uint64_t recv_packets_2;
+};
+
 template <class T>
 class RingBuffer
 {
