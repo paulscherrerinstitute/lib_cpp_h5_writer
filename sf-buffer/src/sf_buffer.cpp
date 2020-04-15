@@ -54,12 +54,12 @@ int main (int argc, char *argv[]) {
                 pulse_id);
 
         if (current_file != frame_file) {
+            current_file = frame_file;
+
             writer.close_file();
 
-            WriterUtils::create_destination_folder(frame_file);
-
-            writer.create_file(frame_file);
-            current_file = frame_file;
+            WriterUtils::create_destination_folder(current_file);
+            writer.create_file(current_file);
         }
 
         auto file_frame_index = get_file_frame_index(pulse_id);
