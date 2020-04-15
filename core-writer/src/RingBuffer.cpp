@@ -6,7 +6,8 @@
 
 using namespace std;
 
-RingBuffer::RingBuffer(size_t n_slots) :
+template <class T>
+RingBuffer<T>::RingBuffer(size_t n_slots) :
         n_slots_(n_slots),
         ringbuffer_slots_(n_slots, 0)
 {
@@ -20,7 +21,8 @@ RingBuffer::RingBuffer(size_t n_slots) :
     #endif
 }
 
-RingBuffer::~RingBuffer() 
+template <class T>
+RingBuffer<T>::~RingBuffer()
 {
     if (frame_data_buffer_ != NULL) {
         free(frame_data_buffer_);
@@ -28,7 +30,8 @@ RingBuffer::~RingBuffer()
     }
 }
 
-void RingBuffer::initialize(const size_t requested_slot_size)
+template <class T>
+void RingBuffer<T>::initialize(const size_t requested_slot_size)
 {
     if (is_initialized()) {
         return;
@@ -75,7 +78,8 @@ void RingBuffer::initialize(const size_t requested_slot_size)
     #endif
 }
 
-char* RingBuffer::reserve(shared_ptr<FrameMetadata> frame_metadata)
+template <class T>
+char* RingBuffer<T>::reserve(shared_ptr<T> frame_metadata)
 {
     if (!is_initialized()) {
         stringstream err_msg;
@@ -145,7 +149,8 @@ char* RingBuffer::reserve(shared_ptr<FrameMetadata> frame_metadata)
     return get_buffer_slot_address(frame_metadata->buffer_slot_index);
 }
 
-void RingBuffer::commit(shared_ptr<FrameMetadata> frame_metadata)
+template <class T>
+void RingBuffer<T>::commit(shared_ptr<T> frame_metadata)
 {
     lock_guard<mutex> lock(frame_metadata_queue_mutex_);
 
@@ -161,7 +166,8 @@ void RingBuffer::commit(shared_ptr<FrameMetadata> frame_metadata)
     #endif
 }
 
-char* RingBuffer::get_buffer_slot_address(size_t buffer_slot_index)
+template <class T>
+char* RingBuffer<T>::get_buffer_slot_address(size_t buffer_slot_index)
 {
     char* slot_memory_address =
             frame_data_buffer_ + (buffer_slot_index * slot_size_);
@@ -182,9 +188,10 @@ char* RingBuffer::get_buffer_slot_address(size_t buffer_slot_index)
     return slot_memory_address;
 }
 
-pair<shared_ptr<FrameMetadata>, char*> RingBuffer::read()
+template <class T>
+pair<shared_ptr<T>, char*> RingBuffer<T>::read()
 {
-    shared_ptr<FrameMetadata> frame_metadata;
+    shared_ptr<T> frame_metadata;
 
     {
         lock_guard<mutex> lock(frame_metadata_queue_mutex_);
@@ -231,7 +238,8 @@ pair<shared_ptr<FrameMetadata>, char*> RingBuffer::read()
             get_buffer_slot_address(frame_metadata->buffer_slot_index)};
 }
 
-void RingBuffer::release(size_t buffer_slot_index)
+template <class T>
+void RingBuffer<T>::release(size_t buffer_slot_index)
 {
     if (buffer_slot_index >= n_slots_) {
         stringstream err_msg;
@@ -269,19 +277,22 @@ void RingBuffer::release(size_t buffer_slot_index)
     }
 }
 
-bool RingBuffer::is_empty()
+template <class T>
+bool RingBuffer<T>::is_empty()
 {
     lock_guard<mutex> lock(ringbuffer_slots_mutex_);
     
     return buffer_used_slots_ == 0;
 }
 
-bool RingBuffer::is_initialized()
+template <class T>
+bool RingBuffer<T>::is_initialized()
 {
     return initialized_.load(memory_order_relaxed);
 }
 
-void RingBuffer::clear()
+template <class T>
+void RingBuffer<T>::clear()
 {
     lock_guard<mutex> lock_slots(ringbuffer_slots_mutex_);
     lock_guard<mutex> lock_metadata(frame_metadata_queue_mutex_);
@@ -292,7 +303,10 @@ void RingBuffer::clear()
     frame_metadata_queue_.clear();
 }
 
-size_t RingBuffer::get_slot_size()
+template <class T>
+size_t RingBuffer<T>::get_slot_size()
 {
     return slot_size_;
 }
+
+template class RingBuffer<FrameMetadata>;

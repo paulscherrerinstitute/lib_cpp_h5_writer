@@ -28,6 +28,7 @@ struct FrameMetadata
     std::map<std::string, std::shared_ptr<char>> header_values;
 };
 
+template <class T>
 class RingBuffer
 {
     // Initialized in constructor.
@@ -42,7 +43,7 @@ class RingBuffer
     size_t buffer_used_slots_ = 0;
     std::atomic_bool initialized_ = false;
 
-    std::list< std::shared_ptr<FrameMetadata> > frame_metadata_queue_;
+    std::list< std::shared_ptr<T> > frame_metadata_queue_;
     std::mutex frame_metadata_queue_mutex_;
     std::mutex ringbuffer_slots_mutex_;
 
@@ -50,12 +51,13 @@ class RingBuffer
 
     public:
         RingBuffer(size_t n_slots);
+
         virtual ~RingBuffer();
         void initialize(size_t slot_size);
         
-        char* reserve(std::shared_ptr<FrameMetadata> metadata);
-        void commit(std::shared_ptr<FrameMetadata> metadata);
-        std::pair<std::shared_ptr<FrameMetadata>, char*> read();
+        char* reserve(std::shared_ptr<T> metadata);
+        void commit(std::shared_ptr<T> metadata);
+        std::pair<std::shared_ptr<T>, char*> read();
         void release(size_t buffer_slot_index);
 
         bool is_empty();
