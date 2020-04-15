@@ -51,7 +51,7 @@ void UdpRecvModule::start_recv(
     receiving_thread_ = thread(
             &UdpRecvModule::receive_thread, this,
             udp_port,
-            udp_buffer_n_bytes);
+            frame_n_bytes);
 }
 
 void UdpRecvModule::stop_recv()
