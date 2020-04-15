@@ -11,7 +11,7 @@ using namespace std;
 // Shape * 2 bytes/value (uint16_t)
 size_t image_n_bytes = 1024*2*2;
 
-void generate_frames(RingBuffer& ring_buffer, int n_frames)
+void generate_frames(RingBuffer<FrameMetadata>& ring_buffer, int n_frames)
 {
     size_t y_length = 2;
     size_t x_length = 1024;
@@ -47,7 +47,7 @@ TEST(H5WriteModule, basic_interaction)
 {
     TestH5Format format("start_dataset");
 
-    RingBuffer ring_buffer(10);
+    RingBuffer<FrameMetadata> ring_buffer(10);
     ring_buffer.initialize(image_n_bytes);
 
     H5WriteModule h5_write_module(ring_buffer, {}, format);

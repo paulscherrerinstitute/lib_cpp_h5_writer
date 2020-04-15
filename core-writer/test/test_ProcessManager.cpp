@@ -7,7 +7,7 @@
 TEST(ProcessManager, basic_interaction)
 {
     TestH5Format format("start_dataset");
-    RingBuffer ring_buffer(10);
+    RingBuffer<FrameMetadata> ring_buffer(10);
 
     ZmqRecvModule recv_module(ring_buffer, {});
     H5WriteModule write_module(ring_buffer, {}, format);

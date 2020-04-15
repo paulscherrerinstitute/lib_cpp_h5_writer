@@ -11,7 +11,7 @@ using namespace std;
 
 TEST(ZmqRecvModule, basic_interaction)
 {
-    RingBuffer ring_buffer(10);
+    RingBuffer<FrameMetadata> ring_buffer(10);
     ZmqRecvModule zmq_recv_module(ring_buffer, {});
 
     uint8_t n_receivers = 4;
@@ -36,11 +36,11 @@ TEST(ZmqRecvModule, simple_recv)
     size_t n_msg = 10;
 
     thread sender(generate_stream, n_msg);
-    RingBuffer ring_buffer(n_msg);
+    RingBuffer<FrameMetadata> ring_buffer(n_msg);
 
     ZmqRecvModule zmq_recv_module(ring_buffer, {});
     zmq_recv_module.start_saving();
-    zmq_recv_module.start_recv("tcp://127.0.0.1:11000", 4);
+    zmq_recv_module.start_recv(MOCK_STREAM_ADDRESS, 4);
 
     sender.join();
     this_thread::sleep_for(chrono::milliseconds(100));
@@ -68,7 +68,7 @@ TEST(ZmqRecvModule, stop_saving_and_clear_buffer)
     size_t n_msg = 10;
 
     thread sender(generate_stream, n_msg);
-    RingBuffer ring_buffer(n_msg);
+    RingBuffer<FrameMetadata> ring_buffer(n_msg);
 
     ZmqRecvModule zmq_recv_module(ring_buffer, {});
     zmq_recv_module.start_saving();

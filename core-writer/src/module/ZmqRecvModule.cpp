@@ -144,8 +144,6 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
                 continue;
             }
 
-            cout <<" Something!!!"<< endl;
-
             if (!is_saving_) {
                 continue;
             }
