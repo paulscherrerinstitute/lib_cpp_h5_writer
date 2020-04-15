@@ -19,7 +19,7 @@ class UdpRecvModule {
     public:
         UdpRecvModule(RingBuffer<UdpFrameMetadata>& ring_buffer);
 
-        virtual ~UdpRecvModule() = default;
+        virtual ~UdpRecvModule();
 
         void start_recv(
                 const uint16_t udp_port,

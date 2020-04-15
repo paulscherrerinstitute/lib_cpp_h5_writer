@@ -12,6 +12,11 @@ UdpRecvModule::UdpRecvModule(RingBuffer<UdpFrameMetadata>& ring_buffer) :
 
 }
 
+UdpRecvModule::~UdpRecvModule()
+{
+    stop_recv();
+}
+
 void UdpRecvModule::start_recv(
         const uint16_t udp_port,
         const size_t udp_buffer_n_bytes)
@@ -47,6 +52,23 @@ void UdpRecvModule::start_recv(
             &UdpRecvModule::receive_thread, this,
             udp_port,
             udp_buffer_n_bytes);
+}
+
+void UdpRecvModule::stop_recv()
+{
+#ifdef DEBUG_OUTPUT
+    using namespace date;
+    using namespace chrono;
+    cout << "[" << system_clock::now() << "]";
+    cout << "UdpRecvModule::stop_recv";
+    cout << " Stop receiving." << endl;
+#endif
+
+    is_receiving_ = false;
+
+    if (receiving_thread_.joinable()) {
+        receiving_thread_.join();
+    }
 }
 
 void UdpRecvModule::receive_thread(
