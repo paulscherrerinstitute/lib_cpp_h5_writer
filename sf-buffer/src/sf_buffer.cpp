@@ -3,6 +3,7 @@
 #include <RingBuffer.hpp>
 #include <UdpRecvModule.hpp>
 #include <H5Writer.hpp>
+#include <WriterUtils.hpp>
 
 #include "config.hpp"
 #include "jungfrau.hpp"
@@ -54,6 +55,9 @@ int main (int argc, char *argv[]) {
 
         if (current_file != frame_file) {
             writer.close_file();
+
+            WriterUtils::create_destination_folder(frame_file);
+
             writer.create_file(frame_file);
             current_file = frame_file;
         }
