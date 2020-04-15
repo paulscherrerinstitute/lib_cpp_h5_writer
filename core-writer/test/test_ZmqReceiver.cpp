@@ -163,7 +163,8 @@ TEST(ZmqReceiver, simple_recv)
     this_thread::sleep_for(chrono::milliseconds(100));
 
     for (size_t i=0; i<n_msg; i++) {
-        EXPECT_TRUE(receiver.receive().first != nullptr);
+        auto data = receiver.receive();
+        EXPECT_TRUE(data.first != nullptr);
     }
 
     sender.join();
