@@ -20,6 +20,8 @@ namespace config
 
     extern uint32_t parameters_read_retry_interval;
     extern size_t recv_saving_wait_ms;
+
+    extern size_t udp_usec_timeout;
 }
 
 #endif

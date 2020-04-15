@@ -25,4 +25,7 @@ namespace config {
 
     // Max time for compress and commit already acquired RB slots.
     size_t recv_saving_wait_ms = 100;
+
+    // Microseconds before the udp socket times out.
+    size_t udp_usec_timeout = 100;
 }
