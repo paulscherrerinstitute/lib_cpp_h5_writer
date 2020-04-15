@@ -11,7 +11,8 @@ void generate_stream(size_t n_messages)
     zmq::socket_t socket(context, ZMQ_PUSH);
     socket.bind(MOCK_STREAM_ADDRESS);
 
-    string header = "{\"frame\": 0, \"shape\": [1,16], \"type\": \"uint8\"}";
+    std::string header =
+            "{\"frame\": 0, \"shape\": [1,16], \"type\": \"uint8\"}";
     zmq::const_buffer header_msg(header.c_str(), header.length());
 
     size_t buffer_size = 16;
