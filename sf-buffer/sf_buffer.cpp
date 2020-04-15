@@ -54,12 +54,13 @@ int main (int argc, char *argv[]) {
             (const char*)&udp_socket_timeout,
             sizeof(struct timeval));
 
-    RingBuffer ring_buffer(config::ring_buffer_n_slots);
+    RingBuffer<UdpFrameMetadata> ring_buffer(config::ring_buffer_n_slots);
     ring_buffer.initialize(JUNGFRAU_DATA_BYTES_PER_FRAME);
 
     jungfrau_packet packet;
 
-    uint64_t last_framenum = -1;
+    shared_ptr<UdpFrameMetadata> metadata = nullptr;
+    char* frame_buffer = nullptr;
 
     while (true) {
         auto data_len = recv(socket_fd, &packet, JUNGFRAU_BYTES_PER_PACKET, 0);
@@ -70,19 +71,44 @@ int main (int argc, char *argv[]) {
 
         if (data_len != JUNGFRAU_BYTES_PER_PACKET) {
             cout << "Invalid packet length " << data_len << endl;
+            continue;
         }
 
-        if (packet.framenum != last_framenum) {
-            FrameMetadata metadata;
+        auto* current_metadata = metadata.get();
 
-            metadata.frame_index = packet.framenum;
-            metadata.endianness = "little";
-            metadata.type = "uint16";
-            metadata.frame_shape = {1024, 512};
-            metadata.header_values = {
-                    {"pulse_id", static_cast<uint64_t>(packet.bunchid)}
-            };
+        if (packet.framenum != current_metadata->frame_index) {
+            if (frame_buffer != nullptr) {
+                ring_buffer.commit(metadata);
+            }
 
+            metadata = make_shared<UdpFrameMetadata>();
+            current_metadata = metadata.get();
+
+            current_metadata->frame_index = packet.framenum;
+            current_metadata->pulse_id = packet.bunchid;
+            current_metadata->frame_bytes_size = JUNGFRAU_DATA_BYTES_PER_FRAME;
+            current_metadata->recv_packets_1 = 0;
+            current_metadata->recv_packets_2 = 0;
+
+            frame_buffer = ring_buffer.reserve(metadata);
+            memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
         }
+
+        size_t frame_buffer_offset =
+                JUNGFRAU_DATA_BYTES_PER_PACKET * packet.packetnum;
+
+        memcpy(
+                (void *)frame_buffer[frame_buffer_offset],
+                packet.data,
+                JUNGFRAU_DATA_BYTES_PER_PACKET);
+
+        if (packet.packetnum < 64) {
+            current_metadata->recv_packets_1 ^=
+                    (uint64_t)1 << packet.packetnum;
+        } else {
+            current_metadata->recv_packets_2 ^=
+                    (uint64_t)1 << (packet.packetnum - 64);
+        }
+
     }
 }
