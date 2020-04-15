@@ -48,27 +48,30 @@ void BufferedWriter::write_metadata_to_file()
 {
     auto header_values_type = metadata_buffer.get_header_values_type();
 
-    for (const auto& header_type : header_values_type) {
-        auto& dataset_name = header_type.first;
-        auto& header_data_type = header_type.second;
+    if (!header_values_type.empty()) {
+        for (const auto &header_type : header_values_type) {
+            auto &dataset_name = header_type.first;
+            auto &header_data_type = header_type.second;
 
-        vector<size_t> data_shape = {header_data_type.value_shape};
+            vector<size_t> data_shape = {header_data_type.value_shape};
 
-        create_dataset(
-                dataset_name,
-                data_shape,
-                header_data_type.type,
-                header_data_type.endianness,
-                false,
-                metadata_buffer.get_n_slots());
+            create_dataset(
+                    dataset_name,
+                    data_shape,
+                    header_data_type.type,
+                    header_data_type.endianness,
+                    false,
+                    metadata_buffer.get_n_slots());
 
-        H5::AtomType dataset_data_type(
-                H5FormatUtils::get_dataset_data_type(header_data_type.type));
-        dataset_data_type.setOrder(H5T_ORDER_LE);
+            H5::AtomType dataset_data_type(
+                    H5FormatUtils::get_dataset_data_type(
+                            header_data_type.type));
+            dataset_data_type.setOrder(H5T_ORDER_LE);
 
-        auto& dataset = datasets.at(dataset_name);
-        dataset.write(
-                metadata_buffer.get_metadata_values(dataset_name).get(),
-                dataset_data_type);
+            auto &dataset = datasets.at(dataset_name);
+            dataset.write(
+                    metadata_buffer.get_metadata_values(dataset_name).get(),
+                    dataset_data_type);
+        }
     }
 }
