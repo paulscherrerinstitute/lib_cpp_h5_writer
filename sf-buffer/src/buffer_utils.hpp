@@ -1,5 +1,5 @@
-#ifndef BUFFER-UTILS_HPP
-#define BUFFER-UTILS_HPP
+#ifndef BUFFER_UTILS_HPP
+#define BUFFER_UTILS_HPP
 
 const size_t FILE_MOD = 1000;
 const size_t FOLDER_MOD = 100000;
@@ -32,4 +32,4 @@ std::size_t get_file_frame_index(uint64_t pulse_id)
     return pulse_id - file_base;
 }
 
-#endif //BUFFER-UTILS_HPP
+#endif //BUFFER_UTILS_HPP
