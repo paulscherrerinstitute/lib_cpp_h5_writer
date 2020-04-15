@@ -1,8 +1,7 @@
-file(GLOB SOURCES
-        *.cpp)
+add_executable(sf-buffer src/sf_buffer.cpp)
 
-add_executable(sf-buffer sf_buffer.cpp)
 set_target_properties(sf-buffer PROPERTIES OUTPUT_NAME sf_buffer)
+target_include_directories(sf-buffer PUBLIC src/)
 
 target_link_libraries(sf-buffer
         core-writer
@@ -13,3 +12,6 @@ target_link_libraries(sf-buffer
         hdf5_cpp
         boost_system
         pthread)
+
+enable_testing()
+add_subdirectory(test/)
