@@ -114,6 +114,7 @@ int main (int argc, char *argv[]) {
             cout << "pulse_id " << pulse_id;
             cout << " n_missed_frames " << n_missed_frames;
             cout << " f_with_miss_p " << n_frames_with_missing_packets;
+            cout << endl;
 
 
             n_stat_out = 0;
