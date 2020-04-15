@@ -93,6 +93,6 @@ int main (int argc, char *argv[]) {
                 (char*)(&data.first->recv_packets_2), {1}, 8,
                 "uint64", "little");
 
-        ring_buffer.reserve(data.first);
+        ring_buffer.release(data.first->buffer_slot_index);
     }
 }
