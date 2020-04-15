@@ -108,7 +108,10 @@ int main (int argc, char *argv[]) {
             n_frames_with_missing_packets++;
         }
 
-        n_missed_frames += (pulse_id - last_pulse_id) - 1;
+        if (last_pulse_id>0) {
+            n_missed_frames += (pulse_id - last_pulse_id) - 1;
+        }
+        last_pulse_id = pulse_id;
 
         if (n_stat_out == 500) {
             cout << "device_name " << device_name;
