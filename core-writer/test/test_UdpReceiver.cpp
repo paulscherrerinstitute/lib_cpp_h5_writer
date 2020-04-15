@@ -7,7 +7,7 @@
 
 TEST(UdpReceiver, simple_recv)
 {
-    uint16_t udp_port = 12000;
+    uint16_t udp_port = MOCK_UDP_PORT;
 
     auto send_socket_fd = socket(AF_INET,SOCK_DGRAM,0);
     ASSERT_TRUE(send_socket_fd >= 0);
@@ -48,7 +48,7 @@ TEST(UdpReceiver, simple_recv)
 
 TEST(UdpReceiver, false_recv)
 {
-    uint16_t udp_port = 12000;
+    uint16_t udp_port = MOCK_UDP_PORT;
 
     auto send_socket_fd = socket(AF_INET,SOCK_DGRAM,0);
     ASSERT_TRUE(send_socket_fd >= 0);

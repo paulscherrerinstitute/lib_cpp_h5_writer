@@ -1,7 +1,7 @@
 #ifndef MOCK_UDP_H
 #define MOCK_UDP_H
 
-const int UDP_PORT(13000);
+const int MOCK_UDP_PORT(13000);
 
 sockaddr_in get_server_address(uint16_t udp_port)
 {
