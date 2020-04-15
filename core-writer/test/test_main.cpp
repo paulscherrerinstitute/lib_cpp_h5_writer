@@ -7,6 +7,7 @@
 #include "test_H5WriteModule.cpp"
 #include "test_ProcessManager.cpp"
 #include "test_UdpReceiver.cpp"
+#include "test_UdpRecvModule.cpp"
 
 using namespace std;
 
