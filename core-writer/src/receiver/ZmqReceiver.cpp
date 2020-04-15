@@ -194,10 +194,12 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
         cout << " Header string: " << header << endl;
 
         cout << "Expected JSON header format: " << endl;
-        for (const auto& value_mapping : header_values_type_) {
-            cout << "\t" << value_mapping.first << ":";
-            cout << value_mapping.second.type;
-            cout << "[" << value_mapping.second.value_shape << "]" << endl;
+        if (!header_values_type_.empty()) {
+            for (const auto &value_mapping : header_values_type_) {
+                cout << "\t" << value_mapping.first << ":";
+                cout << value_mapping.second.type;
+                cout << "[" << value_mapping.second.value_shape << "]" << endl;
+            }
         }
 
         throw;
