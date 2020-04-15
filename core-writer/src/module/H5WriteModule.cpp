@@ -175,15 +175,17 @@ void H5WriteModule::write_thread(
                 auto start_time_metadata = system_clock::now();
             #endif
 
-            for (const auto& header_type : header_values_) {
+            if (!header_values_.empty()) {
+                for (const auto &header_type : header_values_) {
 
-                auto& name = header_type.first;
-                auto value = received_data.first->header_values.at(name);
+                    auto &name = header_type.first;
+                    auto value = received_data.first->header_values.at(name);
 
-                writer.cache_metadata(
-                        name,
-                        received_data.first->frame_index,
-                        value.get());
+                    writer.cache_metadata(
+                            name,
+                            received_data.first->frame_index,
+                            value.get());
+                }
             }
 
             n_written_frames++;
