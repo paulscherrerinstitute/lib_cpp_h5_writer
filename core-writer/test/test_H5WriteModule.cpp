@@ -49,7 +49,9 @@ TEST(H5WriteModule, basic_interaction)
 
     RingBuffer<FrameMetadata> ring_buffer(10);
     ring_buffer.initialize(image_n_bytes);
-    H5WriteModule h5_write_module(ring_buffer, {}, format);
+
+    std::unordered_map<std::string, HeaderDataType> header_map;
+    H5WriteModule h5_write_module(ring_buffer, header_map, format);
 
     ASSERT_FALSE(h5_write_module.is_writing());
     h5_write_module.start_writing("ignore_out.h5", 5);

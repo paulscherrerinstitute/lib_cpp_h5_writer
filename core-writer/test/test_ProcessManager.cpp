@@ -9,8 +9,10 @@ TEST(ProcessManager, basic_interaction)
     TestH5Format format("start_dataset");
     RingBuffer<FrameMetadata> ring_buffer(10);
 
-    ZmqRecvModule recv_module(ring_buffer, {});
-    H5WriteModule write_module(ring_buffer, {}, format);
+    std::unordered_map<std::string, HeaderDataType> header_map;
+
+    ZmqRecvModule recv_module(ring_buffer, header_map);
+    H5WriteModule write_module(ring_buffer, header_map, format);
 
     ProcessManager manager(write_module, recv_module);
 
