@@ -182,7 +182,7 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
                 );
             }
         }
-        
+
         return header_data;
 
     } catch (...) {
