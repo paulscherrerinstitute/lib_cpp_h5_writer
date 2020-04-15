@@ -12,19 +12,23 @@ MetadataBuffer::MetadataBuffer(
             n_slots_(n_slots),
             header_values_type_(header_values_type)
 {
-    for (const auto& header_type : header_values_type_) {
-        auto& name = header_type.first;
-        auto& header_data_type = header_type.second;
+    if (!header_values_type_.empty()) {
+        for (const auto &header_type : header_values_type_) {
+            auto &name = header_type.first;
+            auto &header_data_type = header_type.second;
 
-        size_t bytes_size_per_frame =
-                header_data_type.value_shape * header_data_type.value_bytes_size;
-        size_t buffer_size_bytes = n_slots_ * bytes_size_per_frame;
+            size_t bytes_size_per_frame =
+                    header_data_type.value_shape *
+                    header_data_type.value_bytes_size;
+            size_t buffer_size_bytes = n_slots_ * bytes_size_per_frame;
 
-        shared_ptr<char> buffer(
-                new char[buffer_size_bytes](), std::default_delete<char[]>());
+            shared_ptr<char> buffer(
+                    new char[buffer_size_bytes](),
+                    std::default_delete<char[]>());
 
-        metadata_buffer.insert({name, buffer});
-        metadata_length_bytes.insert({name, bytes_size_per_frame});
+            metadata_buffer.insert({name, buffer});
+            metadata_length_bytes.insert({name, bytes_size_per_frame});
+        }
     }
 }
 
