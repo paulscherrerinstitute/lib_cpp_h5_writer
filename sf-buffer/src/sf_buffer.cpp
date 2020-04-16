@@ -147,4 +147,10 @@ int main (int argc, char *argv[]) {
             n_missed_frames = 0;
         }
     }
+
+    delete [] buffer_pulse_id;
+    delete [] buffer_frame_id;
+    delete [] buffer_daq_rec;
+    delete [] buffer_recv_packets_1;
+    delete [] buffer_recv_packets_2;
 }
