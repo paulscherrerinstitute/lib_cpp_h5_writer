@@ -4,6 +4,8 @@
 #include <UdpRecvModule.hpp>
 #include <H5Writer.hpp>
 #include <WriterUtils.hpp>
+#include "MetadataBuffer.hpp"
+#include "BufferedWriter.hpp"
 
 #include "config.hpp"
 #include "jungfrau.hpp"
@@ -36,7 +38,6 @@ int main (int argc, char *argv[]) {
     udp_module.start_recv(udp_port, JUNGFRAU_DATA_BYTES_PER_FRAME);
 
     string current_file("");
-    H5Writer writer("");
 
     uint64_t n_stat_out(0);
     uint64_t n_frames_with_missing_packets = 0;
@@ -50,23 +51,18 @@ int main (int argc, char *argv[]) {
     latest_filename << "LATEST";
     string str_latest_filename = latest_filename.str();
 
-    auto* buffer_pulse_id = new uint64_t[FILE_MOD];
-    memset((char*) buffer_pulse_id, 0, FILE_MOD * 8);
+    unordered_map<string, HeaderDataType> header_values {
+            {"pulse_id", HeaderDataType("uint64")},
+            {"frame_id", HeaderDataType("uint64")},
+            {"daq_rec", HeaderDataType("uint32")},
+            {"received_packets", HeaderDataType("uint16")},
 
-    auto* buffer_frame_id = new uint64_t[FILE_MOD];
-    memset((char*) buffer_frame_id, 0, FILE_MOD * 8);
+            {"recv_packets_1", HeaderDataType("uint64")},
+            {"recv_packets_2", HeaderDataType("uint64")},
+    };
 
-    auto* buffer_daq_rec = new uint32_t[FILE_MOD];
-    memset((char*) buffer_daq_rec, 0, FILE_MOD * 4);
-
-    auto* buffer_recv_packets_1 = new uint64_t[FILE_MOD];
-    memset((char*) buffer_recv_packets_1, 0, FILE_MOD * 8);
-
-    auto* buffer_recv_packets_2 = new uint64_t[FILE_MOD];
-    memset((char*) buffer_recv_packets_2, 0, FILE_MOD * 8);
-
-    auto* buffer_recv_packets = new uint16_t[FILE_MOD];
-    memset((char*) buffer_recv_packets, 0, FILE_MOD * 2);
+    MetadataBuffer metadata_buffer(FILE_MOD, header_values);
+    BufferedWriter writer("", FILE_MOD, metadata_buffer);
 
     while (true) {
         auto data = ring_buffer.read();
@@ -86,23 +82,8 @@ int main (int argc, char *argv[]) {
         if (current_file != frame_file) {
             // TODO: This executes only in first loop. Fix it.
             if (writer.is_file_open()) {
-                writer.write_data("pulse_id", 0, (char*) buffer_pulse_id,
-                                  {1}, 8*FILE_MOD, "uint64", "little");
 
-                writer.write_data("frame_id", 0, (char*) buffer_frame_id,
-                                  {1}, 8*FILE_MOD, "uint64", "little");
-
-                writer.write_data("daq_rec", 0, (char*) buffer_daq_rec,
-                                  {1}, 4*FILE_MOD, "uint32", "little");
-
-                writer.write_data("recv_packets_1", 0, (char*) buffer_recv_packets_1,
-                                  {1}, 8*FILE_MOD, "uint64", "little");
-
-                writer.write_data("recv_packets_2", 0, (char*) buffer_recv_packets_2,
-                                  {1}, 8*FILE_MOD, "uint64", "little");
-
-                writer.write_data("received_packets", 0, (char*) buffer_recv_packets,
-                                  {1}, 2*FILE_MOD, "uint16", "little");
+                writer.write_metadata_to_file();
 
                 // TODO: Ugly hack from above, part 2.
                 stringstream latest_command;
@@ -117,13 +98,6 @@ int main (int argc, char *argv[]) {
 
             current_file = frame_file;
 
-            memset((char*) buffer_pulse_id, 0, FILE_MOD * 8);
-            memset((char*) buffer_frame_id, 0, FILE_MOD * 8);
-            memset((char*) buffer_daq_rec, 0, FILE_MOD * 4);
-            memset((char*) buffer_recv_packets_1, 0, FILE_MOD * 8);
-            memset((char*) buffer_recv_packets_2, 0, FILE_MOD * 8);
-            memset((char*) buffer_recv_packets, 0, FILE_MOD * 2);
-
             WriterUtils::create_destination_folder(current_file);
             writer.create_file(current_file);
         }
@@ -135,23 +109,18 @@ int main (int argc, char *argv[]) {
                 data.second, {512,1024},
                 JUNGFRAU_DATA_BYTES_PER_FRAME, "uint16", "little");
 
-        memcpy((void*) (buffer_pulse_id + file_frame_index),
-               (void*) &(data.first->pulse_id), 8);
-
-        memcpy((void*) (buffer_frame_id + file_frame_index),
-              (void*) &(data.first->frame_index), 8);
-
-        memcpy((void*) (buffer_daq_rec + file_frame_index),
-              (void*) &(data.first->daq_rec), 8);
-
-        memcpy((void*) (buffer_recv_packets_1 + file_frame_index),
-              (void*) &(data.first->recv_packets_1), 8);
-
-        memcpy((void*) (buffer_recv_packets_2 + file_frame_index),
-              (void*) &(data.first->recv_packets_2), 8);
-
-        memcpy((void*) (buffer_recv_packets + file_frame_index),
-               (void*) &(data.first->n_recv_packets), 2);
+        writer.cache_metadata("pulse_id", file_frame_index,
+                reinterpret_cast<const char *>(data.first->pulse_id));
+        writer.cache_metadata("frame_id", file_frame_index,
+                reinterpret_cast<const char *>(data.first->frame_index));
+        writer.cache_metadata("daq_rec", file_frame_index,
+                reinterpret_cast<const char *>(data.first->daq_rec));
+        writer.cache_metadata("received_packets", file_frame_index,
+                reinterpret_cast<const char *>(data.first->n_recv_packets));
+        writer.cache_metadata("recv_packets_1", file_frame_index,
+                reinterpret_cast<const char *>(data.first->recv_packets_1));
+        writer.cache_metadata("recv_packets_2", file_frame_index,
+                reinterpret_cast<const char *>(data.first->recv_packets_2));
 
         ring_buffer.release(data.first->buffer_slot_index);
 
@@ -180,10 +149,4 @@ int main (int argc, char *argv[]) {
             n_missed_frames = 0;
         }
     }
-
-    delete [] buffer_pulse_id;
-    delete [] buffer_frame_id;
-    delete [] buffer_daq_rec;
-    delete [] buffer_recv_packets_1;
-    delete [] buffer_recv_packets_2;
 }
