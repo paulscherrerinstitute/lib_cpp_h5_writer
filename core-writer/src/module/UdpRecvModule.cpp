@@ -84,6 +84,7 @@ void UdpRecvModule::receive_thread(
         auto metadata = make_shared<UdpFrameMetadata>();
         metadata->frame_bytes_size = JUNGFRAU_DATA_BYTES_PER_FRAME;
         metadata->pulse_id = 0;
+        metadata->n_recv_packets = 0;
 
         char* frame_buffer = ring_buffer_.reserve(metadata);
 
@@ -116,6 +117,7 @@ void UdpRecvModule::receive_thread(
                 metadata = make_shared<UdpFrameMetadata>();
                 metadata->frame_bytes_size = JUNGFRAU_DATA_BYTES_PER_FRAME;
                 metadata->pulse_id = 0;
+                metadata->n_recv_packets = 0;
 
                 frame_buffer = ring_buffer_.reserve(metadata);
                 memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
@@ -135,6 +137,8 @@ void UdpRecvModule::receive_thread(
                     packet_buffer.data,
                     JUNGFRAU_DATA_BYTES_PER_PACKET);
 
+            frame_metadata->n_recv_packets++;
+
             if (packet_buffer.packetnum < 64) {
                 frame_metadata->recv_packets_1 ^=
                         (uint64_t)1 << packet_buffer.packetnum;
@@ -151,6 +155,7 @@ void UdpRecvModule::receive_thread(
                 metadata = make_shared<UdpFrameMetadata>();
                 metadata->frame_bytes_size = JUNGFRAU_DATA_BYTES_PER_FRAME;
                 metadata->pulse_id = 0;
+                metadata->n_recv_packets = 0;
 
                 frame_buffer = ring_buffer_.reserve(metadata);
                 memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
