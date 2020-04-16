@@ -57,9 +57,9 @@ void WriterUtils::create_destination_folder(const string& output_file)
             cout << "[" << system_clock::now() << "]";
             cout << "[WriterUtils::create_destination_folder]";
             cout << " Creating folder " << output_folder << endl;
-
-            string create_folder_command("mkdir -p " + output_folder);
-            system(create_folder_command.c_str());
         #endif
+
+        string create_folder_command("mkdir -p " + output_folder);
+        system(create_folder_command.c_str());
     }
 }
