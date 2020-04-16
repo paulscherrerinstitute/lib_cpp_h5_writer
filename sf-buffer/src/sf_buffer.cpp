@@ -44,19 +44,19 @@ int main (int argc, char *argv[]) {
     uint64_t last_pulse_id = 0;
 
     auto* buffer_pulse_id = new uint64_t[FILE_MOD];
-    memset(buffer_pulse_id, 0, FILE_MOD);
+    memset((char*) buffer_pulse_id, 0, FILE_MOD * 8);
 
     auto* buffer_frame_id = new uint64_t[FILE_MOD];
-    memset(buffer_frame_id, 0, FILE_MOD);
+    memset((char*) buffer_frame_id, 0, FILE_MOD * 8);
 
     auto* buffer_daq_rec = new uint32_t[FILE_MOD];
-    memset(buffer_daq_rec, 0, FILE_MOD);
+    memset((char*) buffer_daq_rec, 0, FILE_MOD * 4);
 
     auto* buffer_recv_packets_1 = new uint64_t[FILE_MOD];
-    memset(buffer_recv_packets_1, 0, FILE_MOD);
+    memset((char*) buffer_recv_packets_1, 0, FILE_MOD * 8);
 
     auto* buffer_recv_packets_2 = new uint64_t[FILE_MOD];
-    memset(buffer_recv_packets_2, 0, FILE_MOD);
+    memset((char*) buffer_recv_packets_2, 0, FILE_MOD * 8);
 
     while (true) {
         auto data = ring_buffer.read();
@@ -96,11 +96,11 @@ int main (int argc, char *argv[]) {
                 writer.close_file();
             }
 
-            memset(buffer_pulse_id, 0, FILE_MOD);
-            memset(buffer_frame_id, 0, FILE_MOD);
-            memset(buffer_daq_rec, 0, FILE_MOD);
-            memset(buffer_recv_packets_1, 0, FILE_MOD);
-            memset(buffer_recv_packets_2, 0, FILE_MOD);
+            memset((char*) buffer_pulse_id, 0, FILE_MOD * 8);
+            memset((char*) buffer_frame_id, 0, FILE_MOD * 8);
+            memset((char*) buffer_daq_rec, 0, FILE_MOD * 4);
+            memset((char*) buffer_recv_packets_1, 0, FILE_MOD * 8);
+            memset((char*) buffer_recv_packets_2, 0, FILE_MOD * 8);
 
             WriterUtils::create_destination_folder(current_file);
             writer.create_file(current_file);
