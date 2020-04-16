@@ -35,7 +35,8 @@ TEST(UdpRecvModule, simple_recv)
 
     this_thread::sleep_for(chrono::milliseconds(100));
 
-    ASSERT_TRUE(ring_buffer.is_empty());
+    // The first slot should be already reserved in the ring buffer.
+    ASSERT_FALSE(ring_buffer.is_empty());
 
     auto send_socket_fd = socket(AF_INET,SOCK_DGRAM,0);
     ASSERT_TRUE(send_socket_fd >= 0);
@@ -45,8 +46,6 @@ TEST(UdpRecvModule, simple_recv)
     jungfrau_packet send_udp_buffer;
     send_udp_buffer.bunchid = 100;
     send_udp_buffer.debug = 1000;
-
-    ASSERT_TRUE(ring_buffer.is_empty());
 
     send_udp_buffer.framenum = 1;
     for (size_t i=0; i<n_msg; i++) {
