@@ -35,7 +35,7 @@ int main (int argc, char *argv[]) {
     UdpRecvModule udp_module(ring_buffer);
     udp_module.start_recv(udp_port, JUNGFRAU_DATA_BYTES_PER_FRAME);
 
-    string current_file;
+    string current_file("");
     H5Writer writer("");
 
     uint64_t n_stat_out(0);
@@ -76,22 +76,25 @@ int main (int argc, char *argv[]) {
         if (current_file != frame_file) {
             current_file = frame_file;
 
-            writer.write_data("pulse_id", 0, (char*) buffer_pulse_id,
-                    {1}, 8*FILE_MOD, "uint64", "little");
+            // TODO: This executes only in first loop. Fix it.
+            if (writer.is_file_open()) {
+                writer.write_data("pulse_id", 0, (char*) buffer_pulse_id,
+                                  {1}, 8*FILE_MOD, "uint64", "little");
 
-            writer.write_data("frame_id", 0, (char*) buffer_frame_id,
-                    {1}, 8*FILE_MOD, "uint64", "little");
+                writer.write_data("frame_id", 0, (char*) buffer_frame_id,
+                                  {1}, 8*FILE_MOD, "uint64", "little");
 
-            writer.write_data("daq_rec", 0, (char*) buffer_daq_rec,
-                    {1}, 8*FILE_MOD, "uint32", "little");
+                writer.write_data("daq_rec", 0, (char*) buffer_daq_rec,
+                                  {1}, 8*FILE_MOD, "uint32", "little");
 
-            writer.write_data("recv_packets_1", 0, (char*) buffer_recv_packets_1,
-                    {1}, 8*FILE_MOD, "uint64", "little");
+                writer.write_data("recv_packets_1", 0, (char*) buffer_recv_packets_1,
+                                  {1}, 8*FILE_MOD, "uint64", "little");
 
-            writer.write_data("recv_packets_2", 0, (char*) buffer_recv_packets_2,
-                              {1}, 8*FILE_MOD, "uint64", "little");
+                writer.write_data("recv_packets_2", 0, (char*) buffer_recv_packets_2,
+                                  {1}, 8*FILE_MOD, "uint64", "little");
 
-            writer.close_file();
+                writer.close_file();
+            }
 
             memset(buffer_pulse_id, 0, FILE_MOD);
             memset(buffer_frame_id, 0, FILE_MOD);
