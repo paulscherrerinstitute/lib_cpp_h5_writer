@@ -43,6 +43,13 @@ int main (int argc, char *argv[]) {
     uint64_t n_missed_frames = 0;
     uint64_t last_pulse_id = 0;
 
+    // TODO: Ugly hack.
+    std::stringstream latest_filename;
+    latest_filename << root_folder << "/";
+    latest_filename << device_name << "/";
+    latest_filename << "LATEST";
+    string str_latest_filename = latest_filename.str();
+
     auto* buffer_pulse_id = new uint64_t[FILE_MOD];
     memset((char*) buffer_pulse_id, 0, FILE_MOD * 8);
 
@@ -74,8 +81,6 @@ int main (int argc, char *argv[]) {
                 pulse_id);
 
         if (current_file != frame_file) {
-            current_file = frame_file;
-
             // TODO: This executes only in first loop. Fix it.
             if (writer.is_file_open()) {
                 writer.write_data("pulse_id", 0, (char*) buffer_pulse_id,
@@ -93,8 +98,18 @@ int main (int argc, char *argv[]) {
                 writer.write_data("recv_packets_2", 0, (char*) buffer_recv_packets_2,
                                   {1}, 8*FILE_MOD, "uint64", "little");
 
+                // TODO: Ugly hack from above, part 2.
+                stringstream latest_command;
+                latest_command << "echo " << current_file;
+                latest_command << " > " << str_latest_filename;
+                auto str_latest_command = latest_command.str();
+
+                system(str_latest_command.c_str());
+
                 writer.close_file();
             }
+
+            current_file = frame_file;
 
             memset((char*) buffer_pulse_id, 0, FILE_MOD * 8);
             memset((char*) buffer_frame_id, 0, FILE_MOD * 8);
