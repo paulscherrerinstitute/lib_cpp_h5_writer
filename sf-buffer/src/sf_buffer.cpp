@@ -110,17 +110,17 @@ int main (int argc, char *argv[]) {
                 JUNGFRAU_DATA_BYTES_PER_FRAME, "uint16", "little");
 
         writer.cache_metadata("pulse_id", file_frame_index,
-                reinterpret_cast<const char *>(data.first->pulse_id));
+                              (char*) &(data.first->pulse_id));
         writer.cache_metadata("frame_id", file_frame_index,
-                reinterpret_cast<const char *>(data.first->frame_index));
+                              (char*) &(data.first->frame_index));
         writer.cache_metadata("daq_rec", file_frame_index,
-                reinterpret_cast<const char *>(data.first->daq_rec));
+                              (char*) &(data.first->daq_rec));
         writer.cache_metadata("received_packets", file_frame_index,
-                reinterpret_cast<const char *>(data.first->n_recv_packets));
+                              (char*) &(data.first->n_recv_packets));
         writer.cache_metadata("recv_packets_1", file_frame_index,
-                reinterpret_cast<const char *>(data.first->recv_packets_1));
+                              (char*) &(data.first->recv_packets_1));
         writer.cache_metadata("recv_packets_2", file_frame_index,
-                reinterpret_cast<const char *>(data.first->recv_packets_2));
+                              (char*) &(data.first->recv_packets_2));
 
         ring_buffer.release(data.first->buffer_slot_index);
 
