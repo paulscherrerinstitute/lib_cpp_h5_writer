@@ -65,6 +65,9 @@ int main (int argc, char *argv[]) {
     auto* buffer_recv_packets_2 = new uint64_t[FILE_MOD];
     memset((char*) buffer_recv_packets_2, 0, FILE_MOD * 8);
 
+    auto* buffer_recv_packets = new uint16_t[FILE_MOD];
+    memset((char*) buffer_recv_packets, 0, FILE_MOD * 2);
+
     while (true) {
         auto data = ring_buffer.read();
 
@@ -90,13 +93,16 @@ int main (int argc, char *argv[]) {
                                   {1}, 8*FILE_MOD, "uint64", "little");
 
                 writer.write_data("daq_rec", 0, (char*) buffer_daq_rec,
-                                  {1}, 8*FILE_MOD, "uint32", "little");
+                                  {1}, 4*FILE_MOD, "uint32", "little");
 
                 writer.write_data("recv_packets_1", 0, (char*) buffer_recv_packets_1,
                                   {1}, 8*FILE_MOD, "uint64", "little");
 
                 writer.write_data("recv_packets_2", 0, (char*) buffer_recv_packets_2,
                                   {1}, 8*FILE_MOD, "uint64", "little");
+
+                writer.write_data("received_packets", 0, (char*) buffer_recv_packets,
+                                  {1}, 2*FILE_MOD, "uint16", "little");
 
                 // TODO: Ugly hack from above, part 2.
                 stringstream latest_command;
@@ -116,6 +122,7 @@ int main (int argc, char *argv[]) {
             memset((char*) buffer_daq_rec, 0, FILE_MOD * 4);
             memset((char*) buffer_recv_packets_1, 0, FILE_MOD * 8);
             memset((char*) buffer_recv_packets_2, 0, FILE_MOD * 8);
+            memset((char*) buffer_recv_packets, 0, FILE_MOD * 2);
 
             WriterUtils::create_destination_folder(current_file);
             writer.create_file(current_file);
@@ -142,6 +149,9 @@ int main (int argc, char *argv[]) {
 
         memcpy((void*) (buffer_recv_packets_2 + file_frame_index),
               (void*) (&data.first->recv_packets_2), 8);
+
+        memcpy((void*) (buffer_recv_packets + file_frame_index),
+               (void*) (&data.first->n_recv_packets), 2);
 
         ring_buffer.release(data.first->buffer_slot_index);
 
