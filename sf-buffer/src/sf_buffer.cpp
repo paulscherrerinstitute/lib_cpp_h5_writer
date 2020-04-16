@@ -108,19 +108,19 @@ int main (int argc, char *argv[]) {
 
         auto file_frame_index = get_file_frame_index(pulse_id);
 
-        memcpy((void*) buffer_pulse_id[file_frame_index],
+        memcpy((void*) (buffer_pulse_id[file_frame_index]),
                (void*) (&data.first->pulse_id), 8);
 
-        memcpy((void*) buffer_frame_id[file_frame_index],
+        memcpy((void*) (buffer_frame_id[file_frame_index]),
               (void*) (&data.first->frame_index), 8);
 
-        memcpy((void*) buffer_daq_rec[file_frame_index],
+        memcpy((void*) (buffer_daq_rec[file_frame_index]),
               (void*) (&data.first->daq_rec), 8);
 
-        memcpy((void*) buffer_recv_packets_1[file_frame_index],
+        memcpy((void*) (buffer_recv_packets_1[file_frame_index]),
               (void*) (&data.first->recv_packets_1), 8);
 
-        memcpy((void*) buffer_recv_packets_2[file_frame_index],
+        memcpy((void*) (buffer_recv_packets_2[file_frame_index]),
               (void*) (&data.first->recv_packets_2), 8);
 
         ring_buffer.release(data.first->buffer_slot_index);
