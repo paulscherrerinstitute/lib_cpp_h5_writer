@@ -43,6 +43,21 @@ int main (int argc, char *argv[]) {
     uint64_t n_missed_frames = 0;
     uint64_t last_pulse_id = 0;
 
+    auto* buffer_pulse_id = new uint64_t[FILE_MOD];
+    memset(buffer_pulse_id, 0, FILE_MOD);
+
+    auto* buffer_frame_id = new uint64_t[FILE_MOD];
+    memset(buffer_frame_id, 0, FILE_MOD);
+
+    auto* buffer_daq_rec = new uint32_t[FILE_MOD];
+    memset(buffer_daq_rec, 0, FILE_MOD);
+
+    auto* buffer_recv_packets_1 = new uint64_t[FILE_MOD];
+    memset(buffer_recv_packets_1, 0, FILE_MOD);
+
+    auto* buffer_recv_packets_2 = new uint64_t[FILE_MOD];
+    memset(buffer_recv_packets_2, 0, FILE_MOD);
+
     while (true) {
         auto data = ring_buffer.read();
 
@@ -61,7 +76,28 @@ int main (int argc, char *argv[]) {
         if (current_file != frame_file) {
             current_file = frame_file;
 
+            writer.write_data("pulse_id", 0, (char*) buffer_pulse_id,
+                    {1}, 8*FILE_MOD, "uint64", "little");
+
+            writer.write_data("frame_id", 0, (char*) buffer_frame_id,
+                    {1}, 8*FILE_MOD, "uint64", "little");
+
+            writer.write_data("daq_rec", 0, (char*) buffer_daq_rec,
+                    {1}, 8*FILE_MOD, "uint32", "little");
+
+            writer.write_data("recv_packets_1", 0, (char*) buffer_recv_packets_1,
+                    {1}, 8*FILE_MOD, "uint64", "little");
+
+            writer.write_data("recv_packets_2", 0, (char*) buffer_recv_packets_2,
+                              {1}, 8*FILE_MOD, "uint64", "little");
+
             writer.close_file();
+
+            memset(buffer_pulse_id, 0, FILE_MOD);
+            memset(buffer_frame_id, 0, FILE_MOD);
+            memset(buffer_daq_rec, 0, FILE_MOD);
+            memset(buffer_recv_packets_1, 0, FILE_MOD);
+            memset(buffer_recv_packets_2, 0, FILE_MOD);
 
             WriterUtils::create_destination_folder(current_file);
             writer.create_file(current_file);
@@ -69,35 +105,20 @@ int main (int argc, char *argv[]) {
 
         auto file_frame_index = get_file_frame_index(pulse_id);
 
-        writer.write_data(
-                "image", file_frame_index,
-                data.second, {512,1024},
-                JUNGFRAU_DATA_BYTES_PER_FRAME, "uint16", "little");
+        memcpy((void*) buffer_pulse_id[file_frame_index],
+               (void*) (&data.first->pulse_id), 8);
 
-        writer.write_data(
-                "pulse_id", file_frame_index,
-                (char*)(&data.first->pulse_id), {1}, 8,
-                "uint64", "little");
+        memcpy((void*) buffer_frame_id[file_frame_index],
+              (void*) (&data.first->frame_index), 8);
 
-        writer.write_data(
-                "frame_id", file_frame_index,
-                (char*)(&data.first->frame_index), {1}, 8,
-                "uint64", "little");
+        memcpy((void*) buffer_daq_rec[file_frame_index],
+              (void*) (&data.first->daq_rec), 8);
 
-        writer.write_data(
-                "daq_rec", file_frame_index,
-                (char*)(&data.first->daq_rec), {1}, 8,
-                "uint32", "little");
+        memcpy((void*) buffer_recv_packets_1[file_frame_index],
+              (void*) (&data.first->recv_packets_1), 8);
 
-        writer.write_data(
-                "recv_packets_1", file_frame_index,
-                (char*)(&data.first->recv_packets_1), {1}, 8,
-                "uint64", "little");
-
-        writer.write_data(
-                "recv_packets_2", file_frame_index,
-                (char*)(&data.first->recv_packets_2), {1}, 8,
-                "uint64", "little");
+        memcpy((void*) buffer_recv_packets_2[file_frame_index],
+              (void*) (&data.first->recv_packets_2), 8);
 
         ring_buffer.release(data.first->buffer_slot_index);
 
