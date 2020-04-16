@@ -27,5 +27,5 @@ namespace config {
     size_t recv_saving_wait_ms = 100;
 
     // Microseconds before the udp socket times out.
-    size_t udp_usec_timeout = 100;
+    size_t udp_usec_timeout = 10 * 1000;
 }
