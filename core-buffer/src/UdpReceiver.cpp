@@ -59,15 +59,6 @@ void UdpReceiver::bind(const uint16_t port, const size_t usec_timeout)
             SO_RCVTIMEO,
             (const char*)&udp_socket_timeout,
             sizeof(struct timeval));
-
-    // 12MB
-    int rcvbuf_n_bytes = 12 * 1024 * 1024;
-    setsockopt(
-            socket_fd_,
-            SOL_SOCKET,
-            SO_RCVBUF,
-            &rcvbuf_n_bytes,
-            sizeof(rcvbuf_n_bytes));
 }
 
 int UdpReceiver::receive_many(mmsghdr* msgs, const size_t n_msgs)
