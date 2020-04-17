@@ -36,12 +36,7 @@ struct UdpFrameMetadata
 
     uint64_t pulse_id;
     uint64_t frame_index;
-
-    uint64_t recv_packets_1;
-    uint64_t recv_packets_2;
-
     uint32_t daq_rec;
-
     uint16_t n_recv_packets;
 };
 

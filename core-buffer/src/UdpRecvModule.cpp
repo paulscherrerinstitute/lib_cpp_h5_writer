@@ -106,8 +106,6 @@ void UdpRecvModule::receive_thread(
             if (frame_metadata->pulse_id == 0) {
                 frame_metadata->frame_index = packet_buffer.framenum;
                 frame_metadata->pulse_id = packet_buffer.bunchid;
-                frame_metadata->recv_packets_1 = ~(uint64_t)0;
-                frame_metadata->recv_packets_2 = ~(uint64_t)0;
                 frame_metadata->daq_rec = packet_buffer.debug;
             // Packet from new frame, while we lost the last packet of
             // previous frame.
@@ -124,8 +122,6 @@ void UdpRecvModule::receive_thread(
 
                 frame_metadata->frame_index = packet_buffer.framenum;
                 frame_metadata->pulse_id = packet_buffer.bunchid;
-                frame_metadata->recv_packets_1 = ~(uint64_t)0;
-                frame_metadata->recv_packets_2 = ~(uint64_t)0;
                 frame_metadata->daq_rec = packet_buffer.debug;
             }
 
@@ -138,14 +134,6 @@ void UdpRecvModule::receive_thread(
                     JUNGFRAU_DATA_BYTES_PER_PACKET);
 
             frame_metadata->n_recv_packets++;
-
-            if (packet_buffer.packetnum < 64) {
-                frame_metadata->recv_packets_1 ^=
-                        (uint64_t)1 << packet_buffer.packetnum;
-            } else {
-                frame_metadata->recv_packets_2 ^=
-                        (uint64_t)1 << (packet_buffer.packetnum - 64);
-            }
 
             // Frame finished with last packet.
             if (packet_buffer.packetnum == JUNGFRAU_N_PACKETS_PER_FRAME-1)
