@@ -14,5 +14,18 @@ target_link_libraries(sf-buffer
         boost_system
         pthread)
 
+add_executable(sf-udprecv src/sf_udprecv.cpp)
+
+target_link_libraries(sf-udprecv
+        core-buffer
+        core-writer
+        external
+        zmq
+        hdf5
+        hdf5_hl
+        hdf5_cpp
+        boost_system
+        pthread)
+
 enable_testing()
 add_subdirectory(test/)
