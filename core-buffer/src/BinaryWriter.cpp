@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cstring>
 #include <buffer_utils.hpp>
+#include <fcntl.h>
 
 using namespace std;
 
@@ -38,7 +39,6 @@ void BinaryWriter::write(uint64_t pulse_id, const JFFileFormat* buffer)
             get_filename(root_folder_, device_name_, pulse_id);
 
     if (current_frame_file != current_output_filename_) {
-        close_current_file();
         open_file(current_frame_file);
     }
 
@@ -49,28 +49,35 @@ void BinaryWriter::write(uint64_t pulse_id, const JFFileFormat* buffer)
         using namespace date;
         using namespace chrono;
         err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[BinaryWriter::write";
+        err_msg << "[BinaryWriter::write]";
         err_msg << " Error while writing to file ";
         err_msg << current_output_filename_ << ": ";
         err_msg << strerror(errno) << endl;
 
         throw runtime_error(err_msg.str());
     }
+}
 
-    auto sync_result = ::fdatasync(output_file_fd_);
-    if (sync_result < 0) {
+void BinaryWriter::open_file(const std::string& filename)
+{
+    close_current_file();
+
+    output_file_fd_ = ::open(filename.c_str(), O_WRONLY | O_CREAT | O_DSYNC);
+    if (output_file_fd_ < 0) {
         stringstream err_msg;
 
         using namespace date;
         using namespace chrono;
         err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[BinaryWriter::write";
-        err_msg << " Error while fdatasync on file ";
-        err_msg << current_output_filename_ << ": ";
+        err_msg << "[BinaryWriter::open_file]";
+        err_msg << " Cannot create file ";
+        err_msg << filename << ": ";
         err_msg << strerror(errno) << endl;
 
         throw runtime_error(err_msg.str());
     }
+
+    current_output_filename_ = filename;
 }
 
 void BinaryWriter::close_current_file()
