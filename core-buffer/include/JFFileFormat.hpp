@@ -1,6 +1,8 @@
 #ifndef JFFILEFORMAT_HPP
 #define JFFILEFORMAT_HPP
 
+#include "jungfrau.hpp"
+
 #pragma pack(push)
 #pragma pack(1)
 struct JFFileFormat {
