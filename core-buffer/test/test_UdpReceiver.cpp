@@ -34,6 +34,8 @@ TEST(UdpReceiver, simple_recv)
             (sockaddr*) &server_address,
             sizeof(server_address));
 
+    this_thread::sleep_for(chrono::milliseconds(100));
+
     jungfrau_packet recv_udp_buffer;
     ASSERT_TRUE(udp_receiver.receive(
             &recv_udp_buffer, JUNGFRAU_BYTES_PER_PACKET));
