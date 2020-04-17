@@ -73,7 +73,7 @@ int main (int argc, char *argv[]) {
         // TODO: Make real statistics, please.
         n_stat_out++;
 
-        if (data.first->n_recv_packets <= JUNGFRAU_N_PACKETS_PER_FRAME) {
+        if (data.first->n_recv_packets < JUNGFRAU_N_PACKETS_PER_FRAME) {
             n_frames_with_missing_packets++;
         }
 
