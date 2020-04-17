@@ -9,7 +9,7 @@
 
 #include "config.hpp"
 #include "jungfrau.hpp"
-#include "buffer_utils.hpp"
+#include "BufferUtils.hpp"
 
 
 using namespace std;

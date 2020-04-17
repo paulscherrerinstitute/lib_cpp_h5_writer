@@ -1,10 +1,12 @@
-#ifndef BUFFER_UTILS_HPP
-#define BUFFER_UTILS_HPP
+using namespace std;
 
-const size_t FILE_MOD = 1000;
-const size_t FOLDER_MOD = 100000;
+#include "BufferUtils.hpp"
+#include <sstream>
 
-std::string get_filename(
+const size_t BufferUtils::FILE_MOD = 1000;
+const size_t BufferUtils::FOLDER_MOD = 100000;
+
+string BufferUtils::get_filename(
         std::string root_folder,
         std::string device_name,
         uint64_t pulse_id)
@@ -15,7 +17,7 @@ std::string get_filename(
     uint64_t file_base = pulse_id / FILE_MOD;
     file_base *= FILE_MOD;
 
-    std::stringstream folder;
+    stringstream folder;
     folder << root_folder << "/";
     folder << device_name << "/";
     folder << folder_base << "/";
@@ -24,12 +26,10 @@ std::string get_filename(
     return folder.str();
 }
 
-std::size_t get_file_frame_index(uint64_t pulse_id)
+size_t BufferUtils::get_file_frame_index(uint64_t pulse_id)
 {
     uint64_t file_base = pulse_id / FILE_MOD;
     file_base *= FILE_MOD;
 
     return pulse_id - file_base;
 }
-
-#endif //BUFFER_UTILS_HPP

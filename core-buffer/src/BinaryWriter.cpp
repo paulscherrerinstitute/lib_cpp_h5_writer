@@ -5,7 +5,7 @@
 #include <cerrno>
 #include <chrono>
 #include <cstring>
-#include <buffer_utils.hpp>
+#include <BufferUtils.hpp>
 #include <fcntl.h>
 
 using namespace std;
@@ -40,14 +40,14 @@ BinaryWriter::~BinaryWriter()
 void BinaryWriter::write(uint64_t pulse_id, const JFFileFormat* buffer)
 {
     auto current_frame_file =
-            get_filename(root_folder_, device_name_, pulse_id);
+            BufferUtils::get_filename(root_folder_, device_name_, pulse_id);
 
     if (current_frame_file != current_output_filename_) {
         open_file(current_frame_file);
     }
 
     size_t n_bytes_offset =
-            get_file_frame_index(pulse_id) * sizeof(JFFileFormat);
+            BufferUtils::get_file_frame_index(pulse_id) * sizeof(JFFileFormat);
 
     auto lseek_result = lseek(output_file_fd_, n_bytes_offset, SEEK_SET);
     if (lseek_result < 0) {
