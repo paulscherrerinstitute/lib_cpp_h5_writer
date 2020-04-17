@@ -4,6 +4,7 @@ set_target_properties(sf-buffer PROPERTIES OUTPUT_NAME sf_buffer)
 target_include_directories(sf-buffer PUBLIC src/)
 
 target_link_libraries(sf-buffer
+        core-buffer
         core-writer
         external
         zmq

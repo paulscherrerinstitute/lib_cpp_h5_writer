@@ -1,4 +1,7 @@
 #include "gtest/gtest.h"
+#include "test_UdpReceiver.cpp"
+#include "test_UdpRecvModule.cpp"
+#include "test_buffer_utils.cpp"
 
 using namespace std;
 

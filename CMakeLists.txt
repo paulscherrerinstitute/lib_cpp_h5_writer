@@ -28,6 +28,7 @@ add_subdirectory(
         ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
         EXCLUDE_FROM_ALL)
 
+add_subdirectory("core-buffer")
 add_subdirectory("core-writer")
 #add_subdirectory("csaxs")
 add_subdirectory("sf-writer")
