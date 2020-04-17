@@ -32,6 +32,11 @@ BinaryWriter::BinaryWriter(
     #endif
 }
 
+BinaryWriter::~BinaryWriter()
+{
+    close_current_file();
+}
+
 void BinaryWriter::write(uint64_t pulse_id, const JFFileFormat* buffer)
 {
     auto current_frame_file =

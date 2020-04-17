@@ -8,10 +8,13 @@ class BinaryWriter {
 
     const std::string device_name_;
     const std::string root_folder_;
-    const std::string latest_filename_;
+    std::string latest_filename_;
 
     std::string current_output_filename_;
     int output_file_fd_;
+
+    void open_file(const std::string& filename);
+    void close_current_file();
 
 
 public:
@@ -19,10 +22,10 @@ public:
             const std::string& device_name,
             const std::string& root_folder);
 
+    virtual ~BinaryWriter();
+
     void write(const uint64_t pulse_id, const JFFileFormat* buffer);
 
-    void open_file(const std::string& filename);
-    void close_current_file();
 };
 
 
