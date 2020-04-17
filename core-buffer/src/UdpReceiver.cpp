@@ -63,7 +63,7 @@ void UdpReceiver::bind(const uint16_t port, const size_t usec_timeout)
 
 int UdpReceiver::receive_many(mmsghdr* msgs, const size_t n_msgs)
 {
-    return recvmmsg(socket_fd_, msgs, n_msgs, MSG_DONTWAIT, 0);
+    return recvmmsg(socket_fd_, msgs, n_msgs, 0, 0);
 }
 
 bool UdpReceiver::receive(void* buffer, size_t buffer_n_bytes)
