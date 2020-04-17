@@ -9,7 +9,7 @@ struct JFFileFormat {
     uint64_t pulse_id;
     uint64_t frame_id;
     uint32_t daq_rec;
-    uint16 n_recv_packets;
+    uint16_t n_recv_packets;
     char* data[JUNGFRAU_DATA_BYTES_PER_FRAME];
 };
 #pragma pack(pop)
