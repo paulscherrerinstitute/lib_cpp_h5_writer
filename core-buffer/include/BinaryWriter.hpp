@@ -11,6 +11,7 @@ class BinaryWriter {
 
     std::string current_filename_;
     int output_fd_;
+    std::string latest_filename_;
 
 public:
     BinaryWriter(
