@@ -112,12 +112,12 @@ TEST(UdpReceiver, receive_many)
 
     for (int i = 0; i < n_msg_buffer; i++) {
         recv_buff_ptr[i].iov_base = (void*) &(recv_buffer[i]);
-        recv_buff_ptr[i].iov_len = USHRT_MAX;
+        recv_buff_ptr[i].iov_len = sizeof(jungfrau_packet);
 
         msgs[i].msg_hdr.msg_iov = &recv_buff_ptr[i];
         msgs[i].msg_hdr.msg_iovlen = 1;
         msgs[i].msg_hdr.msg_name = &sockFrom[i];
-        msgs[i].msg_hdr.msg_namelen = sizeof(struct sockaddr_in );
+        msgs[i].msg_hdr.msg_namelen = sizeof(sockaddr_in);
     }
 
     uint16_t udp_port = MOCK_UDP_PORT;
