@@ -58,13 +58,15 @@ TEST(UdpRecvModule, simple_recv)
                 0,
                 (sockaddr*) &server_address,
                 sizeof(server_address));
+
     }
+
+    this_thread::sleep_for(chrono::milliseconds(100));
 
     ASSERT_FALSE(ring_buffer.is_empty());
     auto result = ring_buffer.read();
-    // The slot should be reserved, but not yet committed.
-    // Only with next frame packet commit.
-    ASSERT_TRUE(result.first == nullptr);
+    // The slot should be committed because the first packet is finished.
+    ASSERT_FALSE(result.first == nullptr);
 
     // When packet from new frame is received, the previous frame should be
     // committed to the ring buffer.
@@ -79,6 +81,7 @@ TEST(UdpRecvModule, simple_recv)
                 0,
                 (sockaddr*) &server_address,
                 sizeof(server_address));
+
     }
 
     this_thread::sleep_for(chrono::milliseconds(100));
