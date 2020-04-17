@@ -3,9 +3,12 @@
 
 #include "jungfrau.hpp"
 
+const char JF_FORMAT_START_BYTE = 0xBE;
+
 #pragma pack(push)
 #pragma pack(1)
 struct JFFileFormat {
+    const char FORMAT_MARKER = JF_FORMAT_START_BYTE;
     uint64_t pulse_id;
     uint64_t frame_id;
     uint32_t daq_rec;
