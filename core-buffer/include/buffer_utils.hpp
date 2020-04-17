@@ -19,7 +19,7 @@ std::string get_filename(
     folder << root_folder << "/";
     folder << device_name << "/";
     folder << folder_base << "/";
-    folder << file_base << ".h5";
+    folder << file_base << ".bin";
 
     return folder.str();
 }
