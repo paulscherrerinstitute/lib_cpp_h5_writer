@@ -46,10 +46,14 @@ int main (int argc, char *argv[]) {
     // TODO: Optimize this away and pass it with the RB.
     auto* jf_file_format_buffer = new JFFileFormat();
 
+    // Wait for 1 event to accumulate.
+    this_thread::sleep_for(chrono::milliseconds(10));
+
     while (true) {
         auto data = ring_buffer.read();
 
         if (data.first == nullptr) {
+            // TODO: Try to sleep at the end of a succesful loop.
             this_thread::sleep_for(chrono::milliseconds(10));
             continue;
         }
