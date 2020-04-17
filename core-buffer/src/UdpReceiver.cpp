@@ -1,7 +1,7 @@
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <iostream>
 #include "UdpReceiver.hpp"
+#include "jungfrau.hpp"
 
 using namespace std;
 
@@ -68,6 +68,11 @@ void UdpReceiver::bind(const uint16_t port, const size_t usec_timeout)
             SO_RCVBUF,
             &rcvbuf_n_bytes,
             sizeof(rcvbuf_n_bytes));
+}
+
+int UdpReceiver::receive_many(mmsghdr* msgs, const size_t n_msgs)
+{
+    return recvmmsg(socket_fd_, msgs, n_msgs, MSG_DONTWAIT, 0);
 }
 
 bool UdpReceiver::receive(void* buffer, size_t buffer_n_bytes)
