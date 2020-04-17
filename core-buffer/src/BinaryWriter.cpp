@@ -7,6 +7,7 @@
 #include <cstring>
 #include <BufferUtils.hpp>
 #include <fcntl.h>
+#include <WriterUtils.hpp>
 
 using namespace std;
 
@@ -85,6 +86,8 @@ void BinaryWriter::write(uint64_t pulse_id, const JFFileFormat* buffer)
 void BinaryWriter::open_file(const std::string& filename)
 {
     close_current_file();
+
+    WriterUtils::create_destination_folder(filename);
 
     output_file_fd_ = ::open(filename.c_str(), O_WRONLY | O_CREAT | O_DSYNC);
     if (output_file_fd_ < 0) {
