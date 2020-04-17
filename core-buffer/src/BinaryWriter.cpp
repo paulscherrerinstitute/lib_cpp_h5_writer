@@ -127,6 +127,7 @@ void BinaryWriter::close_current_file()
         output_file_fd_ = -1;
 
         // TODO: Ugly hack, please please fix it.
+        // TODO: This for now works only if the root_folder is absolute path.
         stringstream latest_command;
         latest_command << "echo " << current_output_filename_;
         latest_command << " > " << latest_filename_;
