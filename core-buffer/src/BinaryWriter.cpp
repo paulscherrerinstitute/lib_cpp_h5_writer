@@ -41,6 +41,26 @@ void BinaryWriter::write(uint64_t pulse_id, const JFFileFormat* buffer)
         open_file(current_frame_file);
     }
 
+    size_t n_bytes_offset =
+            get_file_frame_index(pulse_id) * sizeof(JFFileFormat);
+
+    auto lseek_result = lseek(output_file_fd_, n_bytes_offset, SEEK_SET);
+    if (lseek_result < 0) {
+        stringstream err_msg;
+
+        using namespace date;
+        using namespace chrono;
+        err_msg << "[" << system_clock::now() << "]";
+        err_msg << "[BinaryWriter::write]";
+        err_msg << " Error while lseek on file ";
+        err_msg << current_output_filename_;
+        err_msg << " for n_bytes_offset ";
+        err_msg << n_bytes_offset << ": ";
+        err_msg << strerror(errno) << endl;
+
+        throw runtime_error(err_msg.str());
+    }
+
     auto n_bytes = ::write(output_file_fd_, buffer, sizeof(JFFileFormat));
     if (n_bytes < sizeof(JFFileFormat)) {
         stringstream err_msg;
