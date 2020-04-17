@@ -89,7 +89,7 @@ void BinaryWriter::open_file(const std::string& filename)
 
     WriterUtils::create_destination_folder(filename);
 
-    output_file_fd_ = ::open(filename.c_str(), O_WRONLY | O_CREAT | O_DSYNC,
+    output_file_fd_ = ::open(filename.c_str(), O_WRONLY | O_CREAT,
                              S_IRWXU | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
     if (output_file_fd_ < 0) {
         stringstream err_msg;
