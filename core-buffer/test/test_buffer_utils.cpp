@@ -5,7 +5,7 @@ using namespace std;
 
 TEST(BufferUtils, get_filename)
 {
-    auto expected_file = "/root/device-1/12300000/12345000.h5";
+    auto expected_file = "/root/device-1/12300000/12345000.bin";
 
     auto root_folder = "/root";
     auto device_name = "device-1";
