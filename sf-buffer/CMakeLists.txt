@@ -15,6 +15,7 @@ target_link_libraries(sf-buffer
         pthread)
 
 add_executable(sf-udprecv src/sf_udprecv.cpp)
+set_target_properties(sf-udprecv PROPERTIES OUTPUT_NAME sf_udprecv)
 
 target_link_libraries(sf-udprecv
         core-buffer
