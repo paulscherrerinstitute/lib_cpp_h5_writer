@@ -8,10 +8,11 @@ class BinaryWriter {
 
     const std::string device_name_;
     const std::string root_folder_;
+    const std::string latest_filename_;
 
     std::string current_output_filename_;
     int output_file_fd_;
-    std::string latest_filename_;
+
 
 public:
     BinaryWriter(

@@ -15,11 +15,10 @@ BinaryWriter::BinaryWriter(
         const string& root_folder) :
         device_name_(device_name),
         root_folder_(root_folder),
+        latest_filename_(root_folder + "/" + device_name + "/LATEST"),
         current_output_filename_(""),
         output_file_fd_(-1)
 {
-    latest_filename_ = root_folder + "/" + device_name + "/LATEST";
-
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono;
