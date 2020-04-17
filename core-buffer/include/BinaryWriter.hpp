@@ -9,6 +9,9 @@ class BinaryWriter {
     const std::string device_name_;
     const std::string root_folder_;
 
+    std::string current_filename_;
+    int output_fd_;
+
 public:
     BinaryWriter(
             const std::string& device_name,
@@ -16,7 +19,7 @@ public:
 
     void write(uint64_t pulse_id, const JFFileFormat& buffer);
 
-    void close();
+    void close_current_file();
 };
 
 
