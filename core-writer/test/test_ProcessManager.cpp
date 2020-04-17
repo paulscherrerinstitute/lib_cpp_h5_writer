@@ -66,5 +66,6 @@ TEST(ProcessManager, basic_interaction)
     EXPECT_TRUE(ring_buffer.is_empty());
 
     manager.stop_receiving();
+    this_thread::sleep_for(chrono::milliseconds(100));
     EXPECT_EQ(manager.get_status(), "idle");
 }
