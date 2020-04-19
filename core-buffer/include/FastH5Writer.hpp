@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include <vector>
+#include <string>
+#include <H5Cpp.h>
 
 template <class B>
 class FastH5Writer {
@@ -13,8 +15,10 @@ class FastH5Writer {
     const uint16_t y_frame_size_;
     const uint16_t x_frame_size_;
 
-    std::string current_output_file_;
+    std::string current_output_filename_;
+    H5::H5File current_output_file_;
     H5::DataSet current_image_dataset_;
+    uint64_t current_pulse_id_;
 
     void create_image_dataset();
 
