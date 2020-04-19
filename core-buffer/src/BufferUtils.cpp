@@ -3,7 +3,9 @@
 
 using namespace std;
 
+// Must be power of 10 and <= than FOLDER_MOD
 const size_t BufferUtils::FILE_MOD = 1000;
+// Must be power of 10 and >= than FILE_MOD.
 const size_t BufferUtils::FOLDER_MOD = 100000;
 
 string BufferUtils::get_filename(
