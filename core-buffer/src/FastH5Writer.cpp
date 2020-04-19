@@ -144,6 +144,13 @@ void FastH5Writer::write_data(const char *buffer)
         }
 }
 
+template <class T> void FastH5Writer::write_metadata(
+        const std::string& name, const T* value)
+{
+    auto buffer_ptr = buffers_.at(name);
+    buffer_ptr.get()[current_frame_index_] = value;
+}
+
 template <>
 void FastH5Writer::add_scalar_metadata<uint64_t>(
         const std::string& metadata_name)

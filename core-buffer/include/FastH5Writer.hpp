@@ -51,7 +51,7 @@ public:
 
     void write_data(const char* buffer);
     template <class T> void write_metadata(
-            const std::string& name, const T& value);
+            const std::string& name, const T* value);
 
 };
 
