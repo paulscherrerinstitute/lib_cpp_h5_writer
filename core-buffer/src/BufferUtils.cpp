@@ -33,3 +33,18 @@ size_t BufferUtils::get_file_frame_index(uint64_t pulse_id)
 
     return pulse_id - file_base;
 }
+
+void BufferUtils::update_latest_file(
+        const std::string& latest_filename,
+        const std::string& filename_to_write)
+{
+    // TODO: Ugly hack, please please fix it.
+    // TODO: This for now works only if the root_folder is absolute path.
+
+    stringstream latest_command;
+    latest_command << "echo " << filename_to_write;
+    latest_command << " > " << latest_filename;
+    auto str_latest_command = latest_command.str();
+
+    system(str_latest_command.c_str());
+}
