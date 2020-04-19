@@ -2,11 +2,7 @@
 #include <stdexcept>
 #include <RingBuffer.hpp>
 #include <UdpRecvModule.hpp>
-#include <H5Writer.hpp>
-#include <WriterUtils.hpp>
 #include <FastH5Writer.hpp>
-#include "MetadataBuffer.hpp"
-#include "BufferedWriter.hpp"
 
 #include "config.hpp"
 #include "jungfrau.hpp"
