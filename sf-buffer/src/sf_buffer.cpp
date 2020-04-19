@@ -4,7 +4,9 @@
 #include <UdpRecvModule.hpp>
 #include <H5Writer.hpp>
 #include <WriterUtils.hpp>
-#include "BinaryWriter.hpp"
+#include "MetadataBuffer.hpp"
+#include "BufferedWriter.hpp"
+
 #include "config.hpp"
 #include "jungfrau.hpp"
 #include "BufferUtils.hpp"
@@ -42,35 +44,67 @@ int main (int argc, char *argv[]) {
     uint64_t n_missed_frames = 0;
     uint64_t last_pulse_id = 0;
 
-    BinaryWriter writer(device_name, root_folder);
-    // TODO: Optimize this away and pass it with the RB.
-    auto* jf_file_format_buffer = new JFFileFormat();
+    const string str_latest_filename (
+            root_folder + "/" + device_name + "/LATEST");
 
-    // Wait for 1 event to accumulate.
-    this_thread::sleep_for(chrono::milliseconds(10));
+    unordered_map<string, HeaderDataType> header_values {
+            {"pulse_id", HeaderDataType("uint64")},
+            {"frame_id", HeaderDataType("uint64")},
+            {"daq_rec", HeaderDataType("uint32")},
+            {"received_packets", HeaderDataType("uint16")},
+    };
+
+    MetadataBuffer metadata_buffer(BufferUtils::FILE_MOD, header_values);
+    BufferedWriter writer("", BufferUtils::FILE_MOD, metadata_buffer);
 
     while (true) {
         auto data = ring_buffer.read();
 
         if (data.first == nullptr) {
-            // TODO: Try to sleep at the end of a succesful loop.
             this_thread::sleep_for(chrono::milliseconds(10));
             continue;
         }
 
-        auto* metadata = data.first.get();
-        auto pulse_id = metadata->pulse_id;
+        auto pulse_id = data.first->pulse_id;
 
-        jf_file_format_buffer->pulse_id = pulse_id;
-        jf_file_format_buffer->frame_id = metadata->frame_index;
-        jf_file_format_buffer->daq_rec = metadata->daq_rec;
-        jf_file_format_buffer->n_recv_packets = metadata->n_recv_packets;
+        auto frame_file = BufferUtils::get_filename(
+                root_folder,
+                device_name,
+                pulse_id);
 
-        memcpy(&(jf_file_format_buffer->data),
-                data.second,
-                JUNGFRAU_DATA_BYTES_PER_FRAME);
+        if (current_file != frame_file) {
+            // TODO: This executes only in first loop. Fix it.
+            if (writer.is_file_open()) {
 
-        writer.write(pulse_id, jf_file_format_buffer);
+                writer.write_metadata_to_file();
+
+                BufferUtils::update_latest_file(
+                        str_latest_filename, current_file);
+
+                writer.close_file();
+            }
+
+            current_file = frame_file;
+
+            WriterUtils::create_destination_folder(current_file);
+            writer.create_file(current_file);
+        }
+
+        auto file_frame_index = BufferUtils::get_file_frame_index(pulse_id);
+
+        writer.write_data(
+                "image", file_frame_index,
+                data.second, {512,1024},
+                JUNGFRAU_DATA_BYTES_PER_FRAME, "uint16", "little");
+
+        writer.cache_metadata("pulse_id", file_frame_index,
+                              (char*) &(data.first->pulse_id));
+        writer.cache_metadata("frame_id", file_frame_index,
+                              (char*) &(data.first->frame_index));
+        writer.cache_metadata("daq_rec", file_frame_index,
+                              (char*) &(data.first->daq_rec));
+        writer.cache_metadata("received_packets", file_frame_index,
+                              (char*) &(data.first->n_recv_packets));
 
         ring_buffer.release(data.first->buffer_slot_index);
 
@@ -78,6 +112,7 @@ int main (int argc, char *argv[]) {
         n_stat_out++;
 
         if (data.first->n_recv_packets < JUNGFRAU_N_PACKETS_PER_FRAME) {
+            // TODO: Why not print the actual number of lost packets?!
             n_frames_with_missing_packets++;
         }
 
@@ -99,6 +134,4 @@ int main (int argc, char *argv[]) {
             n_missed_frames = 0;
         }
     }
-
-    delete jf_file_format_buffer;
 }
