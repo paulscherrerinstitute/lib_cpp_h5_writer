@@ -50,7 +50,7 @@ public:
     void set_pulse_id(const uint64_t pulse_id);
 
     void write_data(const char* buffer);
-    template <class T> void write_metadata(
+    template <class T> void write_scalar_metadata(
             const std::string& name, const T* value);
 
 };

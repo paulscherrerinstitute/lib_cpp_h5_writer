@@ -144,7 +144,7 @@ void FastH5Writer::write_data(const char *buffer)
         }
 }
 
-template <class T> void FastH5Writer::write_metadata(
+template <class T> void FastH5Writer::write_scalar_metadata(
         const std::string& name, const T* value)
 {
     auto buffer_ptr = buffers_.at(name);
