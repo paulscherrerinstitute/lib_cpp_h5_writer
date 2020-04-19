@@ -1,7 +1,7 @@
-using namespace std;
-
 #include "BufferUtils.hpp"
 #include <sstream>
+
+using namespace std;
 
 const size_t BufferUtils::FILE_MOD = 1000;
 const size_t BufferUtils::FOLDER_MOD = 100000;
