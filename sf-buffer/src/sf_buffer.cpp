@@ -34,8 +34,6 @@ int main (int argc, char *argv[]) {
     UdpRecvModule udp_module(ring_buffer);
     udp_module.start_recv(udp_port, JUNGFRAU_DATA_BYTES_PER_FRAME);
 
-    string current_file("");
-
     uint64_t n_stat_out(0);
     uint64_t n_frames_with_missing_packets = 0;
     uint64_t n_missed_frames = 0;
