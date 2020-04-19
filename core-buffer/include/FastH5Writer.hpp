@@ -6,7 +6,6 @@
 #include <string>
 #include <H5Cpp.h>
 
-template <class B>
 class FastH5Writer {
 
     const uint16_t CHUNKING_FACTOR = 1;
@@ -14,11 +13,13 @@ class FastH5Writer {
     const size_t n_frames_per_file_;
     const uint16_t y_frame_size_;
     const uint16_t x_frame_size_;
+    const size_t frame_bytes_size_;
 
     std::string current_output_filename_;
     H5::H5File current_output_file_;
     H5::DataSet current_image_dataset_;
     uint64_t current_pulse_id_;
+    size_t current_frame_index_;
 
     void create_image_dataset();
 
