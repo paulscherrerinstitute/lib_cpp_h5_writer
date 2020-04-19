@@ -75,6 +75,8 @@ void FastH5Writer::create_file(const string& filename)
 
 void FastH5Writer::close_file()
 {
+    flush_metadata();
+
     current_output_filename_ = "";
     current_output_file_.close();
     current_image_dataset_.close();
@@ -100,7 +102,6 @@ void FastH5Writer::set_pulse_id(const uint64_t pulse_id)
     if (new_output_filename != current_output_filename_){
 
         if (current_output_file_.getId() != -1) {
-            flush_metadata();
             close_file();
         }
 
