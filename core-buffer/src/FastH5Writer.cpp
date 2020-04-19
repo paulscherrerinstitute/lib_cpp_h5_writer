@@ -3,6 +3,7 @@
 #include "date.h"
 #include <chrono>
 #include <sstream>
+#include <WriterUtils.hpp>
 
 extern "C"
 {
@@ -22,20 +23,18 @@ FastH5Writer::FastH5Writer(
             x_frame_size_(y_frame_size),
             device_name_(device_name),
             root_folder_(root_folder),
+            latest_filename_(root_folder + "/" + device_name + "/LATEST"),
             frame_bytes_size_(2 * y_frame_size * y_frame_size),
             current_output_filename_(""),
             current_output_file_(),
             current_image_dataset_(),
             current_pulse_id_(0)
 {
-//    // Each element in uint16_t has 2 bytes.
-//    size_t n_bytes = 2 * y_frame_size * x_frame_size;
-//    auto file = H5::H5File(target_filename.c_str(), H5F_ACC_TRUNC);
 }
 
 void FastH5Writer::create_file(const string& filename)
 {
-    auto file = H5::H5File(filename.c_str(), H5F_ACC_TRUNC);
+    current_output_file_ = H5::H5File(filename.c_str(), H5F_ACC_TRUNC);
 
     hsize_t dataset_dimension[3]  =
             {n_frames_per_file_, y_frame_size_, x_frame_size_};
@@ -94,17 +93,24 @@ void FastH5Writer::set_pulse_id(const uint64_t pulse_id)
     current_pulse_id_ = pulse_id;
     current_frame_index_ = BufferUtils::get_file_frame_index(pulse_id);
 
-    auto filename = BufferUtils::get_filename(
+    auto new_output_filename = BufferUtils::get_filename(
             root_folder_, device_name_, pulse_id);
 
-    if (filename != current_output_filename_){
+    if (new_output_filename != current_output_filename_){
+
         if (current_output_file_.getId() != -1) {
             flush_metadata();
             close_file();
         }
-    }
 
-    create_file(filename);
+        WriterUtils::create_destination_folder(new_output_filename);
+        create_file(new_output_filename);
+        BufferUtils::update_latest_file(
+                latest_filename_, new_output_filename);
+
+        current_output_filename_ = new_output_filename;
+
+    }
 }
 
 void FastH5Writer::flush_metadata()
