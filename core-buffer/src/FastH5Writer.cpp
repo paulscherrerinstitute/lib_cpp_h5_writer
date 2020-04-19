@@ -4,6 +4,7 @@
 #include <chrono>
 #include <sstream>
 #include <WriterUtils.hpp>
+#include <cstring>
 
 extern "C"
 {
@@ -109,7 +110,6 @@ void FastH5Writer::set_pulse_id(const uint64_t pulse_id)
                 latest_filename_, new_output_filename);
 
         current_output_filename_ = new_output_filename;
-
     }
 }
 
@@ -144,11 +144,16 @@ void FastH5Writer::write_data(const char *buffer)
         }
 }
 
-template <class T> void FastH5Writer::write_scalar_metadata(
-        const std::string& name, const T* value)
+void FastH5Writer::write_scalar_metadata(
+        const std::string& name,
+        const void* value,
+        const size_t value_n_bytes)
 {
-    auto buffer_ptr = buffers_.at(name);
-    buffer_ptr.get()[current_frame_index_] = value;
+    char* buffer_ptr = (buffers_.at(name)).get();
+    ::memcpy(
+            buffer_ptr+(current_frame_index_*value_n_bytes),
+            value,
+            value_n_bytes);
 }
 
 template <>
