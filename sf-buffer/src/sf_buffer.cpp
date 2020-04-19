@@ -45,9 +45,6 @@ int main (int argc, char *argv[]) {
     uint64_t n_missed_frames = 0;
     uint64_t last_pulse_id = 0;
 
-    const string str_latest_filename (
-            root_folder + "/" + device_name + "/LATEST");
-
     FastH5Writer writer(
             BufferUtils::FILE_MOD, 512, 1024, device_name, root_folder);
 
@@ -75,34 +72,6 @@ int main (int argc, char *argv[]) {
                 "received_packets", data.first->n_recv_packets);
 
         ring_buffer.release(data.first->buffer_slot_index);
-
-
-        // TODO: This is my writer problem.
-//        {
-//            auto frame_file = BufferUtils::get_filename(
-//                    root_folder,
-//                    device_name,
-//                    pulse_id);
-//
-//            if (current_file != frame_file) {
-//                // TODO: This executes only in first loop. Fix it.
-//                if (writer.is_file_open()) {
-//
-//                    writer.write_metadata_to_file();
-//
-//                    BufferUtils::update_latest_file(
-//                            str_latest_filename, current_file);
-//
-//                    writer.close_file();
-//                }
-//
-//                current_file = frame_file;
-//
-//                WriterUtils::create_destination_folder(current_file);
-//                writer.create_file(current_file);
-//            }
-//            auto file_frame_index = BufferUtils::get_file_frame_index(pulse_id);
-//        }
 
         // TODO: Make real statistics, please.
         n_stat_out++;
