@@ -29,7 +29,7 @@ FastH5Writer::FastH5Writer(
 //    auto file = H5::H5File(target_filename.c_str(), H5F_ACC_TRUNC);
 }
 
-void FastH5Writer::create_image_dataset()
+void FastH5Writer::create_datasets()
 {
     hsize_t dataset_dimension[3]  =
             {n_frames_per_file_, y_frame_size_, x_frame_size_};
@@ -80,4 +80,10 @@ void FastH5Writer::write_data(const char *buffer)
 
             throw runtime_error(err_msg.str());
         }
+}
+
+template <>
+void FastH5Writer::add_metadata<uint64_t>(const std::string& metadata_name)
+{
+
 }

@@ -21,7 +21,7 @@ class FastH5Writer {
     uint64_t current_pulse_id_;
     size_t current_frame_index_;
 
-    void create_image_dataset();
+    void create_datasets();
 
 public:
     FastH5Writer(
