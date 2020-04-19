@@ -58,14 +58,29 @@ int main (int argc, char *argv[]) {
         }
 
         auto pulse_id = data.first->pulse_id;
-
         writer.set_pulse_id(pulse_id);
+
         writer.write_data(data.second);
-        writer.write_metadata("pulse_id", data.first->pulse_id);
-        writer.write_metadata("frame_id", data.first->frame_index);
-        writer.write_metadata("daq_rec", data.first->daq_rec);
-        writer.write_metadata(
-                "received_packets", data.first->n_recv_packets);
+
+        writer.write_scalar_metadata(
+                "pulse_id",
+                &(data.first->pulse_id),
+                sizeof(uint64_t));
+
+        writer.write_scalar_metadata(
+                "frame_id",
+                &(data.first->frame_index),
+                sizeof(uint64_t));
+
+        writer.write_scalar_metadata(
+                "daq_rec",
+                &(data.first->daq_rec),
+                sizeof(uint32_t));
+
+        writer.write_scalar_metadata(
+                "received_packets",
+                &(data.first->n_recv_packets),
+                sizeof(uint16_t));
 
         ring_buffer.release(data.first->buffer_slot_index);
 
