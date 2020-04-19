@@ -48,10 +48,7 @@ int main (int argc, char *argv[]) {
     const string str_latest_filename (
             root_folder + "/" + device_name + "/LATEST");
 
-    FastH5Writer<uint16_t> writer(
-            BufferUtils::FILE_MOD,
-            {512,1024}
-            );
+    FastH5Writer writer(BufferUtils::FILE_MOD, 512, 1024);
 
     writer.add_metadata<uint64_t>("pulse_id");
     writer.add_metadata<uint64_t>("frame_id");
