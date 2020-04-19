@@ -1,15 +1,28 @@
 #ifndef FASTH5WRITER_HPP
 #define FASTH5WRITER_HPP
 
+#include <cstdint>
 #include <vector>
 
 template <class B>
 class FastH5Writer {
+
+    const uint16_t CHUNKING_FACTOR = 1;
+
+    const size_t n_frames_per_file_;
+    const uint16_t y_frame_size_;
+    const uint16_t x_frame_size_;
+
+    std::string current_output_file_;
+    H5::DataSet current_image_dataset_;
+
+    void create_image_dataset();
+
 public:
     FastH5Writer(
-            const uint16_t n_frames_per_file,
-            const std::vector<uint16_t>& frame_size
-            );
+            const size_t n_frames_per_file,
+            const uint16_t y_frame_size,
+            const uint16_t x_frame_size);
 
     template <class T> void add_metadata(const std::string& metadata_name);
 
