@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 #include <H5Cpp.h>
+#include <memory>
+#include <unordered_map>
 
 class FastH5Writer {
 
@@ -14,6 +16,8 @@ class FastH5Writer {
     const uint16_t y_frame_size_;
     const uint16_t x_frame_size_;
     const size_t frame_bytes_size_;
+    const std::string device_name_;
+    const std::string root_folder_;
 
     std::string current_output_filename_;
     H5::H5File current_output_file_;
@@ -21,15 +25,24 @@ class FastH5Writer {
     uint64_t current_pulse_id_;
     size_t current_frame_index_;
 
+    std::unordered_map<std::string, std::shared_ptr<char[]>> buffers_;
+    std::unordered_map<std::string, H5::DataSet> datasets_;
+
+    std::unordered_map<std::string, H5::PredType> scalar_metadata_;
+
     void create_datasets();
+    void close_file();
 
 public:
     FastH5Writer(
             const size_t n_frames_per_file,
             const uint16_t y_frame_size,
-            const uint16_t x_frame_size);
+            const uint16_t x_frame_size,
+            const std::string& device_name,
+            const std::string& root_folder);
 
-    template <class T> void add_metadata(const std::string& metadata_name);
+    template <class T> void add_scalar_metadata(
+            const std::string& metadata_name);
 
     void set_pulse_id(const uint64_t pulse_id);
 

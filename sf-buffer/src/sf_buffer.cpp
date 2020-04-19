@@ -48,12 +48,13 @@ int main (int argc, char *argv[]) {
     const string str_latest_filename (
             root_folder + "/" + device_name + "/LATEST");
 
-    FastH5Writer writer(BufferUtils::FILE_MOD, 512, 1024);
+    FastH5Writer writer(
+            BufferUtils::FILE_MOD, 512, 1024, device_name, root_folder);
 
-    writer.add_metadata<uint64_t>("pulse_id");
-    writer.add_metadata<uint64_t>("frame_id");
-    writer.add_metadata<uint32_t>("daq_rec");
-    writer.add_metadata<uint16_t>("received_packets");
+    writer.add_scalar_metadata<uint64_t>("pulse_id");
+    writer.add_scalar_metadata<uint64_t>("frame_id");
+    writer.add_scalar_metadata<uint32_t>("daq_rec");
+    writer.add_scalar_metadata<uint16_t>("received_packets");
 
     while (true) {
         auto data = ring_buffer.read();
