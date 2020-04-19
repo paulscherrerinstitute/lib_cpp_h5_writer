@@ -4,6 +4,7 @@
 #include <UdpRecvModule.hpp>
 #include <H5Writer.hpp>
 #include <WriterUtils.hpp>
+#include <FastH5Writer.hpp>
 #include "MetadataBuffer.hpp"
 #include "BufferedWriter.hpp"
 
@@ -47,15 +48,15 @@ int main (int argc, char *argv[]) {
     const string str_latest_filename (
             root_folder + "/" + device_name + "/LATEST");
 
-    unordered_map<string, HeaderDataType> header_values {
-            {"pulse_id", HeaderDataType("uint64")},
-            {"frame_id", HeaderDataType("uint64")},
-            {"daq_rec", HeaderDataType("uint32")},
-            {"received_packets", HeaderDataType("uint16")},
-    };
+    FastH5Writer<uint16_t> writer(
+            BufferUtils::FILE_MOD,
+            {512,1024}
+            );
 
-    MetadataBuffer metadata_buffer(BufferUtils::FILE_MOD, header_values);
-    BufferedWriter writer("", BufferUtils::FILE_MOD, metadata_buffer);
+    writer.add_metadata<uint64_t>("pulse_id");
+    writer.add_metadata<uint64_t>("frame_id");
+    writer.add_metadata<uint32_t>("daq_rec");
+    writer.add_metadata<uint16_t>("received_packets");
 
     while (true) {
         auto data = ring_buffer.read();
@@ -67,46 +68,43 @@ int main (int argc, char *argv[]) {
 
         auto pulse_id = data.first->pulse_id;
 
-        auto frame_file = BufferUtils::get_filename(
-                root_folder,
-                device_name,
-                pulse_id);
-
-        if (current_file != frame_file) {
-            // TODO: This executes only in first loop. Fix it.
-            if (writer.is_file_open()) {
-
-                writer.write_metadata_to_file();
-
-                BufferUtils::update_latest_file(
-                        str_latest_filename, current_file);
-
-                writer.close_file();
-            }
-
-            current_file = frame_file;
-
-            WriterUtils::create_destination_folder(current_file);
-            writer.create_file(current_file);
-        }
-
-        auto file_frame_index = BufferUtils::get_file_frame_index(pulse_id);
-
-        writer.write_data(
-                "image", file_frame_index,
-                data.second, {512,1024},
-                JUNGFRAU_DATA_BYTES_PER_FRAME, "uint16", "little");
-
-        writer.cache_metadata("pulse_id", file_frame_index,
-                              (char*) &(data.first->pulse_id));
-        writer.cache_metadata("frame_id", file_frame_index,
-                              (char*) &(data.first->frame_index));
-        writer.cache_metadata("daq_rec", file_frame_index,
-                              (char*) &(data.first->daq_rec));
-        writer.cache_metadata("received_packets", file_frame_index,
-                              (char*) &(data.first->n_recv_packets));
+        writer.set_pulse_id(pulse_id);
+        writer.write_data(data.second);
+        writer.write_metadata("pulse_id", data.first->pulse_id);
+        writer.write_metadata("frame_id", data.first->frame_index);
+        writer.write_metadata("daq_rec", data.first->daq_rec);
+        writer.write_metadata(
+                "received_packets", data.first->n_recv_packets);
 
         ring_buffer.release(data.first->buffer_slot_index);
+
+
+        // TODO: This is my writer problem.
+//        {
+//            auto frame_file = BufferUtils::get_filename(
+//                    root_folder,
+//                    device_name,
+//                    pulse_id);
+//
+//            if (current_file != frame_file) {
+//                // TODO: This executes only in first loop. Fix it.
+//                if (writer.is_file_open()) {
+//
+//                    writer.write_metadata_to_file();
+//
+//                    BufferUtils::update_latest_file(
+//                            str_latest_filename, current_file);
+//
+//                    writer.close_file();
+//                }
+//
+//                current_file = frame_file;
+//
+//                WriterUtils::create_destination_folder(current_file);
+//                writer.create_file(current_file);
+//            }
+//            auto file_frame_index = BufferUtils::get_file_frame_index(pulse_id);
+//        }
 
         // TODO: Make real statistics, please.
         n_stat_out++;
