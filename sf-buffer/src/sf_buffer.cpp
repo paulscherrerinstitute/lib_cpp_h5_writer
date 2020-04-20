@@ -177,5 +177,7 @@ int main (int argc, char *argv[]) {
             n_frames_with_missing_packets = 0;
             n_missed_frames = 0;
         }
+
+        this_thread::yield();
     }
 }
