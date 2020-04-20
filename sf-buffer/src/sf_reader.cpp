@@ -4,6 +4,7 @@
 #include <fstream>
 #include <thread>
 #include "jungfrau.hpp"
+#include "BufferUtils.hpp"
 
 
 using namespace std;
@@ -30,14 +31,7 @@ int main (int argc, char *argv[]) {
     uint64_t last_pulse_id = 0;
 
     while (true) {
-        std::ifstream latest_input_file;
-        latest_input_file.open(current_filename);
-
-        std::stringstream strStream;
-        strStream << latest_input_file.rdbuf();
-        std::string filename = strStream.str();
-
-        filename = filename.substr(0, filename.size()-1);
+        auto filename = BufferUtils::get_latest_file(current_filename);
 
         if (last_open_file == filename) {
             this_thread::sleep_for(chrono::milliseconds(100));
@@ -47,6 +41,7 @@ int main (int argc, char *argv[]) {
 
         std::cout << "Opening " << filename << endl;
         last_open_file = filename;
+        last_pulse_id = 0;
 
         H5::H5File input_file(filename, H5F_ACC_RDONLY |  H5F_ACC_SWMR_READ);
         auto image_dataset = input_file.openDataSet("image");
@@ -62,16 +57,20 @@ int main (int argc, char *argv[]) {
                     pulse_id_buffer,
                     H5::PredType::NATIVE_UINT64);
 
-            bool changed(false);
-            for (size_t i=0; i<1000; i++) {
+            auto file_frame_index =
+                    BufferUtils::get_file_frame_index(last_pulse_id);
+
+            size_t n_new_pulses = 0;
+            for (size_t i=file_frame_index; i<1000; i++) {
                 if (pulse_id_buffer[i] > last_pulse_id) {
                     last_pulse_id = pulse_id_buffer[i];
-                    changed = true;
+                    n_new_pulses++;
                 }
             }
 
-            if (changed) {
-                cout << last_pulse_id << endl;
+            if (n_new_pulses > 0) {
+                cout << last_pulse_id << " and n_new_pulses ";
+                cout << n_new_pulses << endl;
             }
 
             if (pulse_id_buffer[999] != 0) {
