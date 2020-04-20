@@ -8,7 +8,7 @@
 using namespace std;
 
 int main (int argc, char *argv[]) {
-    if (argc != 4) {
+    if (argc != 3) {
         cout << endl;
         cout << "Usage: sf_reader [device_name] [root_folder]";
         cout << endl;
