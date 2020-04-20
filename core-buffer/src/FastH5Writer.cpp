@@ -209,6 +209,8 @@ void FastH5Writer::write_scalar_metadata(
             data_type,
             buffer_space,
             disk_space);
+
+    H5Dflush(dataset.getId());
 }
 
 template <>
