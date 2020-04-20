@@ -87,50 +87,59 @@ TEST(FastH5Writer, SWMR)
 
     auto output_buffer = make_unique<char[]>(512 * 1024 * 2);
     auto input_buffer = make_unique<uint16_t[]>(1000*512*1024);
+    auto pulse_id_buffer = make_unique<uint64_t[]>(1000);
 
     auto input_ptr = (uint16_t*)(input_buffer.get());
     auto output_ptr = (uint16_t*)(output_buffer.get());
+    auto pulse_id_ptr = (uint64_t*)(pulse_id_buffer.get());
 
     for (size_t i=0; i<512*1024; i++) {
         uint16_t* image_ptr = (uint16_t*)(output_buffer.get());
         image_ptr[i] = 99;
     }
 
-    UdpFrameMetadata metadata;
-    metadata.pulse_id = pulse_id;
-    metadata.frame_index = 2;
-    metadata.daq_rec = 3;
-    metadata.n_recv_packets = 128;
-
     FastH5Writer writer(
             BufferUtils::FILE_MOD, 512, 1024, device_name, root_folder);
-    writer.set_pulse_id(0);
-
     writer.add_scalar_metadata<uint64_t>("pulse_id");
-    writer.add_scalar_metadata<uint64_t>("frame_id");
-    writer.add_scalar_metadata<uint32_t>("daq_rec");
-    writer.add_scalar_metadata<uint16_t>("received_packets");
+    writer.set_pulse_id(0);
 
     auto filename = BufferUtils::get_filename(
             root_folder, device_name, pulse_id);
-    auto file_frame_index = BufferUtils::get_file_frame_index(pulse_id);
     H5::H5File input_file(filename, H5F_ACC_RDONLY |  H5F_ACC_SWMR_READ);
     auto image_dataset = input_file.openDataSet("image");
+    auto pulse_id_dataset = input_file.openDataSet("pulse_id");
 
     image_dataset.read(input_ptr, H5::PredType::NATIVE_UINT16);
     EXPECT_EQ(input_ptr[0], 0);
     EXPECT_EQ(input_ptr[512*1024], 0);
 
-    writer.set_pulse_id(0);
+    pulse_id_dataset.read(pulse_id_ptr, H5::PredType::NATIVE_UINT64);
+    EXPECT_EQ(pulse_id_ptr[0], 0);
+    EXPECT_EQ(pulse_id_ptr[1], 0);
+
+    pulse_id = 0;
+    writer.set_pulse_id(pulse_id);
     writer.write_data(output_buffer.get());
+    writer.write_scalar_metadata<uint64_t>("pulse_id", &pulse_id);
 
     image_dataset.read(input_ptr, H5::PredType::NATIVE_UINT16);
     EXPECT_EQ(input_ptr[0], 99);
     EXPECT_EQ(input_ptr[512*1024], 0);
 
-    writer.set_pulse_id(1);
+    pulse_id_dataset.read(pulse_id_ptr, H5::PredType::NATIVE_UINT64);
+    EXPECT_EQ(pulse_id_ptr[0], 0);
+    EXPECT_EQ(pulse_id_ptr[1], 0);
+
+    pulse_id = 1;
+    writer.set_pulse_id(pulse_id);
     writer.write_data(output_buffer.get());
+    writer.write_scalar_metadata<uint64_t>("pulse_id", &pulse_id);
+
     image_dataset.read(input_ptr, H5::PredType::NATIVE_UINT16);
     EXPECT_EQ(input_ptr[0], 99);
     EXPECT_EQ(input_ptr[512*1024], 99);
+
+    pulse_id_dataset.read(pulse_id_ptr, H5::PredType::NATIVE_UINT64);
+    EXPECT_EQ(pulse_id_ptr[0], 0);
+    EXPECT_EQ(pulse_id_ptr[1], 1);
 }
