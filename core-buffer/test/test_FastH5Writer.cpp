@@ -27,25 +27,17 @@ TEST(FastH5Writer, basic_interaction)
 
     writer.write_data(buffer.get());
 
-    writer.write_scalar_metadata(
-        "pulse_id",
-        &(metadata.pulse_id),
-        sizeof(uint64_t));
+    writer.write_scalar_metadata<uint64_t>(
+        "pulse_id", &(metadata.pulse_id));
 
-    writer.write_scalar_metadata(
-        "frame_id",
-        &(metadata.frame_index),
-        sizeof(uint64_t));
+    writer.write_scalar_metadata<uint64_t>(
+        "frame_id", &(metadata.frame_index));
 
-    writer.write_scalar_metadata(
-        "daq_rec",
-        &(metadata.daq_rec),
-        sizeof(uint32_t));
+    writer.write_scalar_metadata<uint32_t>(
+        "daq_rec", &(metadata.daq_rec));
 
-    writer.write_scalar_metadata(
-        "received_packets",
-        &(metadata.n_recv_packets),
-        sizeof(uint16_t));
+    writer.write_scalar_metadata<uint16_t>(
+        "received_packets", &(metadata.n_recv_packets));
 
     writer.close_file();
 
