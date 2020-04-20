@@ -116,7 +116,15 @@ void FastH5Writer::set_pulse_id(const uint64_t pulse_id)
 
 void FastH5Writer::flush_metadata()
 {
-    // TODO: Actually flush this metadata.
+    for (auto& metadata:buffers_) {
+        auto& dataset_name = metadata.first;
+        char* buffer = metadata.second.get();
+
+        auto& dataset = datasets_.at(dataset_name);
+        auto dataset_type = scalar_metadata_.at(dataset_name);
+
+        dataset.write(buffer, dataset_type);
+    }
 }
 
 void FastH5Writer::write_data(const char *buffer)
