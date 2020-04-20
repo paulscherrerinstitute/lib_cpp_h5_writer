@@ -27,7 +27,7 @@ int main (int argc, char *argv[]) {
     string current_filename = root_folder + "/" + device_name + "/CURRENT";
 
     uint64_t pulse_id_buffer[1000];
-    uint16_t image_buffer[100*2*512*1024];
+    uint16_t* image_buffer = new uint16_t[100*512*1024];
 
     string last_open_file = "";
     uint64_t last_pulse_id = 0;
@@ -99,6 +99,10 @@ int main (int argc, char *argv[]) {
                         disk_space);
 
                 current_file_last_processed = end_pulse_id;
+
+                cout << "Read n_new_pulses=" << n_new_pulses;
+                cout << " current_file_last_processed ";
+                cout << current_file_last_processed << endl;
             }
 
             // Time for next file.
