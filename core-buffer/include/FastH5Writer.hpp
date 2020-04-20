@@ -33,6 +33,10 @@ class FastH5Writer {
     std::unordered_map<std::string, H5::PredType> scalar_metadata_;
 
     void create_file(const std::string& filename);
+    void write_scalar_metadata(
+            const std::string& name,
+            const void* value,
+            const H5::DataType data_type);
 
 public:
     FastH5Writer(
@@ -53,11 +57,6 @@ public:
     template <class T> void write_scalar_metadata(
             const std::string& name,
             const void* value);
-
-    void write_scalar_metadata(
-            const std::string& name,
-            const void* value,
-            const H5::DataType data_type);
 
     void close_file();
 };
