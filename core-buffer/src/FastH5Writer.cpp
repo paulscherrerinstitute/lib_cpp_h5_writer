@@ -35,7 +35,9 @@ FastH5Writer::FastH5Writer(
 
 void FastH5Writer::create_file(const string& filename)
 {
-    current_output_file_ = H5::H5File(filename.c_str(), H5F_ACC_TRUNC);
+
+    auto new_output_file =
+            H5::H5File(filename, H5F_ACC_TRUNC|H5F_ACC_SWMR_WRITE);
 
     hsize_t dataset_dimension[3]  =
             {n_frames_per_file_, y_frame_size_, x_frame_size_};
@@ -49,7 +51,7 @@ void FastH5Writer::create_file(const string& filename)
     H5::DSetCreatPropList dataset_properties;
     dataset_properties.setChunk(3, dataset_chunking);
 
-    current_image_dataset_ = current_output_file_.createDataSet(
+    new_output_file.createDataSet(
             "image",
             H5::PredType::NATIVE_UINT16,
             dataspace,
@@ -61,10 +63,22 @@ void FastH5Writer::create_file(const string& filename)
 
         hsize_t dataset_dimension[2] = {n_frames_per_file_, 1};
         H5::DataSpace dataspace(2, dataset_dimension);
-        auto dataset = current_output_file_.createDataSet(
-                dataset_name,
-                dataset_type,
-                dataspace);
+        new_output_file.createDataSet(dataset_name, dataset_type, dataspace);
+    }
+
+    new_output_file.close();
+
+    // Open newly created file.
+    current_output_file_ = H5::H5File(filename.c_str(),
+            H5F_ACC_RDWR | H5F_ACC_SWMR_WRITE);
+    current_image_dataset_ = current_output_file_.openDataSet("image");
+
+    for (auto& metadata:scalar_metadata_) {
+        auto dataset_name = metadata.first;
+        auto dataset_type = metadata.second;
+
+        auto dataset = current_output_file_.openDataSet(dataset_name);
+
         datasets_.insert({dataset_name, dataset});
 
         size_t n_buffer_bytes =
@@ -72,6 +86,7 @@ void FastH5Writer::create_file(const string& filename)
         buffers_.insert(
                 {dataset_name, new char[n_buffer_bytes]});
     }
+
 }
 
 FastH5Writer::~FastH5Writer()
