@@ -86,8 +86,8 @@ int main (int argc, char *argv[]) {
         n_stat_out++;
 
         if (data.first->n_recv_packets < JUNGFRAU_N_PACKETS_PER_FRAME) {
-            // TODO: Why not print the actual number of lost packets?!
-            n_frames_with_missing_packets++;
+            n_frames_with_missing_packets +=
+                    JUNGFRAU_N_PACKETS_PER_FRAME - data.first->n_recv_packets;
         }
 
         if (last_pulse_id>0) {
