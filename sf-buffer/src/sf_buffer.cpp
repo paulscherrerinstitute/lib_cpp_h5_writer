@@ -55,11 +55,6 @@ int main (int argc, char *argv[]) {
     int udp_port = atoi(argv[2]);
     string root_folder = string(argv[3]);
 
-    RingBuffer<UdpFrameMetadata> ring_buffer(config::ring_buffer_n_slots);
-
-    UdpRecvModule udp_module(ring_buffer);
-    udp_module.start_recv(udp_port, JUNGFRAU_DATA_BYTES_PER_FRAME);
-
     uint64_t n_stat_out(0);
     uint64_t n_frames_with_missing_packets = 0;
     uint64_t n_missed_frames = 0;
