@@ -86,3 +86,55 @@ TEST(FastH5Writer, basic_interaction)
             received_packets_buffer.get(), H5::PredType::NATIVE_UINT16);
     EXPECT_EQ(received_packets_buffer[file_frame_index], 128);
 }
+
+TEST(FastH5Writer, SWMR)
+{
+    auto root_folder = ".";
+    auto device_name = "fast_device";
+    size_t pulse_id = 0;
+
+    auto output_buffer = make_unique<char[]>(512 * 1024 * 2);
+    auto image_buffer = make_unique<uint16_t[]>(1000*512*1024);
+    auto image_ptr = (uint16_t*)(image_buffer.get());
+
+    for (size_t i=0; i<512*1024; i++) {
+        uint16_t* image_ptr = (uint16_t*)(output_buffer.get());
+        image_ptr[i] = 99;
+    }
+
+    UdpFrameMetadata metadata;
+    metadata.pulse_id = pulse_id;
+    metadata.frame_index = 2;
+    metadata.daq_rec = 3;
+    metadata.n_recv_packets = 128;
+
+    FastH5Writer writer(
+            BufferUtils::FILE_MOD, 512, 1024, device_name, root_folder);
+
+    writer.add_scalar_metadata<uint64_t>("pulse_id");
+    writer.add_scalar_metadata<uint64_t>("frame_id");
+    writer.add_scalar_metadata<uint32_t>("daq_rec");
+    writer.add_scalar_metadata<uint16_t>("received_packets");
+
+    writer.set_pulse_id(pulse_id);
+
+    auto filename = BufferUtils::get_filename(
+            root_folder, device_name, pulse_id);
+    auto file_frame_index = BufferUtils::get_file_frame_index(pulse_id);
+
+    H5::H5File input_file(filename, H5F_ACC_RDONLY |  H5F_ACC_SWMR_READ);
+
+    auto image_dataset = input_file.openDataSet("image");
+
+    image_dataset.read(
+            image_buffer.get(), H5::PredType::NATIVE_UINT16);
+
+    EXPECT_EQ(image_ptr[0], 0);
+
+    writer.write_data(output_buffer.get());
+
+    image_dataset.read(
+            image_buffer.get(), H5::PredType::NATIVE_UINT16);
+
+    EXPECT_EQ(image_ptr[0], 99);
+}
