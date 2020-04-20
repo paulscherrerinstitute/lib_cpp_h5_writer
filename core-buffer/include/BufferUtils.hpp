@@ -7,6 +7,7 @@ namespace BufferUtils
 {
     extern const size_t FILE_MOD;
     extern const size_t FOLDER_MOD;
+    extern const std::string FILE_EXTENSION;
 
     std::string get_filename(
             std::string root_folder,
