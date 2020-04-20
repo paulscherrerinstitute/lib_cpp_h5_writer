@@ -2,9 +2,9 @@
 #include "FastH5Writer.hpp"
 #include "date.h"
 #include <chrono>
-#include <sstream>
 #include <WriterUtils.hpp>
 #include <cstring>
+#include <iostream>
 
 extern "C"
 {
@@ -36,45 +36,47 @@ FastH5Writer::FastH5Writer(
 
 void FastH5Writer::create_file(const string& filename)
 {
+    {
+        current_output_file_ = H5::H5File(filename,
+                H5F_ACC_TRUNC | H5F_ACC_SWMR_WRITE);
 
-    auto new_output_file =
-            H5::H5File(filename, H5F_ACC_TRUNC|H5F_ACC_SWMR_WRITE);
+        current_output_filename_ = filename;
 
-    hsize_t dataset_dimension[3]  =
-            {n_frames_per_file_, y_frame_size_, x_frame_size_};
-    hsize_t max_dataset_dimension[3] =
-            {n_frames_per_file_, y_frame_size_, x_frame_size_};
-    H5::DataSpace dataspace(
-            3, dataset_dimension, max_dataset_dimension);
+        hsize_t dataset_dimension[3] =
+                {n_frames_per_file_, y_frame_size_, x_frame_size_};
+        hsize_t max_dataset_dimension[3] =
+                {n_frames_per_file_, y_frame_size_, x_frame_size_};
+        H5::DataSpace dataspace(
+                3, dataset_dimension, max_dataset_dimension);
 
-    hsize_t dataset_chunking[3] =
-            {CHUNKING_FACTOR, y_frame_size_, x_frame_size_};
-    H5::DSetCreatPropList dataset_properties;
-    dataset_properties.setChunk(3, dataset_chunking);
+        hsize_t dataset_chunking[3] =
+                {CHUNKING_FACTOR, y_frame_size_, x_frame_size_};
+        H5::DSetCreatPropList dataset_properties;
+        dataset_properties.setChunk(3, dataset_chunking);
 
-    new_output_file.createDataSet(
-            "image",
-            H5::PredType::NATIVE_UINT16,
-            dataspace,
-            dataset_properties);
+        current_output_file_.createDataSet(
+                "image",
+                H5::PredType::NATIVE_UINT16,
+                dataspace,
+                dataset_properties);
 
-    for (auto& metadata:scalar_metadata_) {
-        auto dataset_name = metadata.first;
-        auto dataset_type = metadata.second;
+        for (auto &metadata:scalar_metadata_) {
+            auto dataset_name = metadata.first;
+            auto dataset_type = metadata.second;
 
-        hsize_t dataset_dimension[2] = {n_frames_per_file_, 1};
-        H5::DataSpace dataspace(2, dataset_dimension);
-        new_output_file.createDataSet(dataset_name, dataset_type, dataspace);
+            hsize_t dataset_dimension[2] = {n_frames_per_file_, 1};
+            H5::DataSpace dataspace(2, dataset_dimension);
+            current_output_file_.createDataSet(
+                    dataset_name, dataset_type, dataspace);
+        }
     }
 
-    new_output_file.close();
+    current_output_file_.close();
 
-    // Open newly created file.
-    current_output_filename_ = filename;
-    current_output_file_ = H5::H5File(filename.c_str(),
-            H5F_ACC_RDWR | H5F_ACC_SWMR_WRITE);
+    current_output_file_ =
+            H5::H5File(filename, H5F_ACC_RDWR |H5F_ACC_SWMR_WRITE);
+
     current_image_dataset_ = current_output_file_.openDataSet("image");
-
 
     for (auto& metadata:scalar_metadata_) {
         auto dataset_name = metadata.first;
