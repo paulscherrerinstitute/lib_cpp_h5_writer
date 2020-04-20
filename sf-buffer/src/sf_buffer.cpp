@@ -60,25 +60,20 @@ int main (int argc, char *argv[]) {
 
         writer.write_data(data.second);
 
-        writer.write_scalar_metadata(
-                "pulse_id",
-                &(data.first->pulse_id),
-                sizeof(uint64_t));
+        writer.write_scalar_metadata<uint64_t>(
+                "pulse_id", &(data.first->pulse_id));
 
-        writer.write_scalar_metadata(
+        writer.write_scalar_metadata<uint64_t>(
                 "frame_id",
-                &(data.first->frame_index),
-                sizeof(uint64_t));
+                &(data.first->frame_index));
 
-        writer.write_scalar_metadata(
+        writer.write_scalar_metadata<uint32_t>(
                 "daq_rec",
-                &(data.first->daq_rec),
-                sizeof(uint32_t));
+                &(data.first->daq_rec));
 
-        writer.write_scalar_metadata(
+        writer.write_scalar_metadata<uint16_t>(
                 "received_packets",
-                &(data.first->n_recv_packets),
-                sizeof(uint16_t));
+                &(data.first->n_recv_packets));
 
         ring_buffer.release(data.first->buffer_slot_index);
 
