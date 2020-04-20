@@ -26,7 +26,7 @@ class FastH5Writer {
     uint64_t current_pulse_id_;
     size_t current_frame_index_;
 
-    std::unordered_map<std::string, std::unique_ptr<char>> buffers_;
+    std::unordered_map<std::string, char*> buffers_;
     std::unordered_map<std::string, H5::DataSet> datasets_;
 
     std::unordered_map<std::string, H5::PredType> scalar_metadata_;

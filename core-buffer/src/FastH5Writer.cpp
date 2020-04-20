@@ -70,7 +70,7 @@ void FastH5Writer::create_file(const string& filename)
         size_t n_buffer_bytes =
                 dataset.getDataType().getSize() * n_frames_per_file_;
         buffers_.insert(
-                {dataset_name, make_unique<char>(n_buffer_bytes)});
+                {dataset_name, new char[n_buffer_bytes]});
     }
 }
 
@@ -79,8 +79,7 @@ FastH5Writer::~FastH5Writer()
     close_file();
 }
 
-void FastH5Writer::close_file()
-{
+void FastH5Writer::close_file() {
     flush_metadata();
 
     current_output_filename_ = "";
@@ -89,11 +88,14 @@ void FastH5Writer::close_file()
     current_pulse_id_ = 0;
     current_frame_index_ = 0;
 
-    for (auto& dataset:datasets_) {
+    for (auto &dataset:datasets_) {
         dataset.second.close();
     }
     datasets_.clear();
 
+    for (auto &buffer:buffers_) {
+        delete [] buffer.second;
+    }
     buffers_.clear();
 }
 
@@ -124,7 +126,7 @@ void FastH5Writer::flush_metadata()
 {
     for (auto& metadata:buffers_) {
         auto& dataset_name = metadata.first;
-        char* buffer = metadata.second.get();
+        char* buffer = metadata.second;
 
         auto& dataset = datasets_.at(dataset_name);
         auto dataset_type = scalar_metadata_.at(dataset_name);
@@ -164,7 +166,8 @@ void FastH5Writer::write_scalar_metadata(
         const void* value,
         const size_t value_n_bytes)
 {
-    char* buffer_ptr = (buffers_.at(name)).get();
+    auto& buffer_ptr = buffers_.at(name);
+
     ::memcpy(
             buffer_ptr+(current_frame_index_*value_n_bytes),
             value,
