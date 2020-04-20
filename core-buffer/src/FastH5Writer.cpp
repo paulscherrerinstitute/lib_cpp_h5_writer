@@ -21,7 +21,7 @@ FastH5Writer::FastH5Writer(
         const string& root_folder) :
             n_frames_per_file_(n_frames_per_file),
             y_frame_size_(y_frame_size),
-            x_frame_size_(y_frame_size),
+            x_frame_size_(x_frame_size),
             device_name_(device_name),
             root_folder_(root_folder),
             latest_filename_(root_folder + "/" + device_name + "/LATEST"),
