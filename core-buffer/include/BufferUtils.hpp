@@ -19,6 +19,8 @@ namespace BufferUtils
     void update_latest_file(
             const std::string& latest_filename,
             const std::string& filename_to_write);
+
+    std::string get_latest_file(const std::string& latest_filename);
 }
 
 #endif //BUFFER_UTILS_HPP

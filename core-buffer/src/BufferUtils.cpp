@@ -1,5 +1,6 @@
 #include "BufferUtils.hpp"
 #include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -50,4 +51,16 @@ void BufferUtils::update_latest_file(
     auto str_latest_command = latest_command.str();
 
     system(str_latest_command.c_str());
+}
+
+string BufferUtils::get_latest_file(const string& latest_filename)
+{
+    std::ifstream latest_input_file;
+    latest_input_file.open(latest_filename);
+
+    std::stringstream strStream;
+    strStream << latest_input_file.rdbuf();
+    std::string filename = strStream.str();
+
+    return filename.substr(0, filename.size()-1);
 }
