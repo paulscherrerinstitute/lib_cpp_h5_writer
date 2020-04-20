@@ -67,7 +67,9 @@ int main (int argc, char *argv[]) {
                 }
             }
 
-            cout << last_pulse_id << endl;
+            if (last_pulse_id != 0) {
+                cout << last_pulse_id << endl;
+            }
 
             if (pulse_id_buffer[999] != 0) {
                 break;
