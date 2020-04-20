@@ -27,6 +27,7 @@ int main (int argc, char *argv[]) {
 
     uint64_t pulse_id_buffer[1000];
     string last_open_file = "";
+    uint64_t last_pulse_id = 0;
 
     while (true) {
         std::ifstream latest_input_file;
@@ -60,14 +61,15 @@ int main (int argc, char *argv[]) {
                     pulse_id_buffer,
                     H5::PredType::NATIVE_UINT64);
 
-            uint64_t last_pulse_id = 0;
+            bool changed(false);
             for (size_t i=0; i<1000; i++) {
                 if (pulse_id_buffer[i] > last_pulse_id) {
                     last_pulse_id = pulse_id_buffer[i];
+                    changed = true;
                 }
             }
 
-            if (last_pulse_id != 0) {
+            if (changed) {
                 cout << last_pulse_id << endl;
             }
 
