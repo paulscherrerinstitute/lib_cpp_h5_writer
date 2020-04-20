@@ -69,8 +69,14 @@ void FastH5Writer::create_file(const string& filename)
 
         size_t n_buffer_bytes =
                 dataset.getDataType().getSize() * n_frames_per_file_;
-        buffers_.insert({dataset_name, make_shared<char[]>(n_buffer_bytes)});
+        buffers_.insert(
+                {dataset_name, make_unique<char>(n_buffer_bytes)});
     }
+}
+
+FastH5Writer::~FastH5Writer()
+{
+    close_file();
 }
 
 void FastH5Writer::close_file()
@@ -129,28 +135,28 @@ void FastH5Writer::flush_metadata()
 
 void FastH5Writer::write_data(const char *buffer)
 {
-        hsize_t offset[3] = {current_frame_index_, 0, 0};
+    hsize_t offset[3] = {current_frame_index_, 0, 0};
 
-        if(H5DOwrite_chunk(
-                current_image_dataset_.getId(),
-                H5P_DEFAULT,
-                0, // Filters
-                offset, // Offset
-                frame_bytes_size_,
-                buffer))
-        {
-            stringstream err_msg;
+    if(H5DOwrite_chunk(
+            current_image_dataset_.getId(),
+            H5P_DEFAULT,
+            0, // Filters
+            offset, // Offset
+            frame_bytes_size_,
+            buffer))
+    {
+        stringstream err_msg;
 
-            using namespace date;
-            using namespace chrono;
-            err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[FastH5Writer::write_data]";
-            // TODO: This error message is bad. Extract the real error from lib.
-            err_msg << " Error when writing to ";
-            err_msg << current_output_filename_;
+        using namespace date;
+        using namespace chrono;
+        err_msg << "[" << system_clock::now() << "]";
+        err_msg << "[FastH5Writer::write_data]";
+        // TODO: This error message is bad. Extract the real error from lib.
+        err_msg << " Error when writing to ";
+        err_msg << current_output_filename_;
 
-            throw runtime_error(err_msg.str());
-        }
+        throw runtime_error(err_msg.str());
+    }
 }
 
 void FastH5Writer::write_scalar_metadata(
