@@ -34,6 +34,8 @@ int main (int argc, char *argv[]) {
         strStream << latest_input_file.rdbuf();
         std::string filename = strStream.str();
 
+        filename = filename.substr(0, filename.size()-1);
+
         std::cout << "Opening " << filename << endl;
 
         H5::H5File input_file(filename, H5F_ACC_RDONLY |  H5F_ACC_SWMR_READ);
