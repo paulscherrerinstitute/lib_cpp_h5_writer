@@ -74,6 +74,8 @@ int main (int argc, char *argv[]) {
                     n_new_pulses = 100;
                 }
 
+                H5Drefresh(image_dataset.getId());
+
                 uint64_t start_pulse_id = current_file_last_processed+1;
                 uint64_t end_pulse_id =
                         current_file_last_processed + n_new_pulses;
