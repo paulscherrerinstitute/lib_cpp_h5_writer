@@ -34,9 +34,6 @@ class FastH5Writer {
 
     void create_file(const std::string& filename);
 
-
-    void flush_metadata();
-
 public:
     FastH5Writer(
             const size_t n_frames_per_file,
@@ -56,6 +53,11 @@ public:
     template <class T> void write_scalar_metadata(
             const std::string& name,
             const void* value);
+
+    void write_scalar_metadata(
+            const std::string& name,
+            const void* value,
+            const H5::DataType data_type);
 
     void close_file();
 };

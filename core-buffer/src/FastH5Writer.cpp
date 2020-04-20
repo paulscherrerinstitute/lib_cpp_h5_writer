@@ -100,8 +100,6 @@ FastH5Writer::~FastH5Writer()
 }
 
 void FastH5Writer::close_file() {
-    flush_metadata();
-
     current_output_filename_ = "";
     current_output_file_.close();
     current_image_dataset_.close();
@@ -144,19 +142,6 @@ void FastH5Writer::set_pulse_id(const uint64_t pulse_id)
     }
 }
 
-void FastH5Writer::flush_metadata()
-{
-    for (auto& metadata:buffers_) {
-        auto& dataset_name = metadata.first;
-        char* buffer = metadata.second;
-
-        auto& dataset = datasets_.at(dataset_name);
-        auto dataset_type = scalar_metadata_.at(dataset_name);
-
-        dataset.write(buffer, dataset_type);
-    }
-}
-
 void FastH5Writer::write_data(const char *buffer)
 {
     hsize_t buff_dim[2] = {y_frame_size_, x_frame_size_};
@@ -183,23 +168,7 @@ void FastH5Writer::write_scalar_metadata<uint64_t>(
         const std::string& name,
         const void* value)
 {
-    auto dataset = datasets_.at(name);
-
-    hsize_t buff_dim[1] = {1};
-    H5::DataSpace buffer_space (1, buff_dim);
-
-    hsize_t disk_dim[2] = {n_frames_per_file_, 1};
-    H5::DataSpace disk_space(1, disk_dim);
-
-    hsize_t count[] = {1, 1};
-    hsize_t start[] = {current_frame_index_, 0};
-    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
-
-    dataset.write(
-            value,
-            H5::PredType::NATIVE_UINT64,
-            buffer_space,
-            disk_space);
+    write_scalar_metadata(name, value, H5::PredType::NATIVE_UINT64);
 }
 
 template <>
@@ -207,29 +176,21 @@ void FastH5Writer::write_scalar_metadata<uint32_t>(
         const std::string& name,
         const void* value)
 {
-    auto dataset = datasets_.at(name);
-
-    hsize_t buff_dim[1] = {1};
-    H5::DataSpace buffer_space (1, buff_dim);
-
-    hsize_t disk_dim[2] = {n_frames_per_file_, 1};
-    H5::DataSpace disk_space(1, disk_dim);
-
-    hsize_t count[] = {1, 1};
-    hsize_t start[] = {current_frame_index_, 0};
-    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
-
-    dataset.write(
-            value,
-            H5::PredType::NATIVE_UINT32,
-            buffer_space,
-            disk_space);
+    write_scalar_metadata(name, value, H5::PredType::NATIVE_UINT32);
 }
 
 template <>
 void FastH5Writer::write_scalar_metadata<uint16_t>(
         const std::string& name,
         const void* value)
+{
+    write_scalar_metadata(name, value, H5::PredType::NATIVE_UINT16);
+}
+
+void FastH5Writer::write_scalar_metadata(
+        const std::string& name,
+        const void* value,
+        const H5::DataType data_type)
 {
     auto dataset = datasets_.at(name);
 
@@ -245,7 +206,7 @@ void FastH5Writer::write_scalar_metadata<uint16_t>(
 
     dataset.write(
             value,
-            H5::PredType::NATIVE_UINT16,
+            data_type,
             buffer_space,
             disk_space);
 }
