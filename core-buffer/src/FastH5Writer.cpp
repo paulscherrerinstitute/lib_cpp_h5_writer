@@ -25,7 +25,7 @@ FastH5Writer::FastH5Writer(
             device_name_(device_name),
             root_folder_(root_folder),
             latest_filename_(root_folder + "/" + device_name + "/LATEST"),
-            frame_bytes_size_(2 * y_frame_size * y_frame_size),
+            frame_bytes_size_(2 * y_frame_size * x_frame_size),
             current_output_filename_(""),
             current_output_file_(),
             current_image_dataset_(),
