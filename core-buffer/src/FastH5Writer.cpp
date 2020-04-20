@@ -159,28 +159,21 @@ void FastH5Writer::flush_metadata()
 
 void FastH5Writer::write_data(const char *buffer)
 {
-    hsize_t offset[3] = {current_frame_index_, 0, 0};
+    hsize_t buff_dim[2] = {y_frame_size_, x_frame_size_};
+    H5::DataSpace buffer_space (2, buff_dim);
 
-    if(H5DOwrite_chunk(
-            current_image_dataset_.getId(),
-            H5P_DEFAULT,
-            0, // Filters
-            offset, // Offset
-            frame_bytes_size_,
-            buffer))
-    {
-        stringstream err_msg;
+    hsize_t disk_dim[3] = {n_frames_per_file_, y_frame_size_, x_frame_size_};
+    H5::DataSpace disk_space(3, disk_dim);
 
-        using namespace date;
-        using namespace chrono;
-        err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[FastH5Writer::write_data]";
-        // TODO: This error message is bad. Extract the real error from lib.
-        err_msg << " Error when writing to ";
-        err_msg << current_output_filename_;
+    hsize_t count[] = {1, y_frame_size_, x_frame_size_};
+    hsize_t start[] = {current_frame_index_, 0, 0};
+    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
 
-        throw runtime_error(err_msg.str());
-    }
+    current_image_dataset_.write(
+            buffer,
+            H5::PredType::NATIVE_UINT16,
+            buffer_space,
+            disk_space);
 }
 
 void FastH5Writer::write_scalar_metadata(
