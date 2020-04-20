@@ -2,6 +2,7 @@
 #include <chrono>
 #include <UdpReceiver.hpp>
 #include <fstream>
+#include <thread>
 #include "jungfrau.hpp"
 
 
@@ -25,6 +26,7 @@ int main (int argc, char *argv[]) {
     string current_filename = root_folder + "/" + device_name + "/CURRENT";
 
     uint64_t pulse_id_buffer[1000];
+    string last_open_file = "";
 
     while (true) {
         std::ifstream latest_input_file;
@@ -36,7 +38,14 @@ int main (int argc, char *argv[]) {
 
         filename = filename.substr(0, filename.size()-1);
 
+        if (last_open_file == filename) {
+            this_thread::sleep_for(chrono::milliseconds(100));
+            cout << "Waiting for CURRENT to change." << endl;
+            continue;
+        }
+
         std::cout << "Opening " << filename << endl;
+        last_open_file = filename;
 
         H5::H5File input_file(filename, H5F_ACC_RDONLY |  H5F_ACC_SWMR_READ);
         auto image_dataset = input_file.openDataSet("image");
