@@ -174,19 +174,80 @@ void FastH5Writer::write_data(const char *buffer)
             H5::PredType::NATIVE_UINT16,
             buffer_space,
             disk_space);
+
+    H5Dflush(current_image_dataset_.getId());
 }
 
-void FastH5Writer::write_scalar_metadata(
+template <>
+void FastH5Writer::write_scalar_metadata<uint64_t>(
         const std::string& name,
-        const void* value,
-        const size_t value_n_bytes)
+        const void* value)
 {
-    auto& buffer_ptr = buffers_.at(name);
+    auto dataset = datasets_.at(name);
 
-    ::memcpy(
-            buffer_ptr+(current_frame_index_*value_n_bytes),
+    hsize_t buff_dim[1] = {1};
+    H5::DataSpace buffer_space (1, buff_dim);
+
+    hsize_t disk_dim[2] = {n_frames_per_file_, 1};
+    H5::DataSpace disk_space(1, disk_dim);
+
+    hsize_t count[] = {1, 1};
+    hsize_t start[] = {current_frame_index_, 0};
+    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
+
+    dataset.write(
             value,
-            value_n_bytes);
+            H5::PredType::NATIVE_UINT64,
+            buffer_space,
+            disk_space);
+}
+
+template <>
+void FastH5Writer::write_scalar_metadata<uint32_t>(
+        const std::string& name,
+        const void* value)
+{
+    auto dataset = datasets_.at(name);
+
+    hsize_t buff_dim[1] = {1};
+    H5::DataSpace buffer_space (1, buff_dim);
+
+    hsize_t disk_dim[2] = {n_frames_per_file_, 1};
+    H5::DataSpace disk_space(1, disk_dim);
+
+    hsize_t count[] = {1, 1};
+    hsize_t start[] = {current_frame_index_, 0};
+    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
+
+    dataset.write(
+            value,
+            H5::PredType::NATIVE_UINT32,
+            buffer_space,
+            disk_space);
+}
+
+template <>
+void FastH5Writer::write_scalar_metadata<uint16_t>(
+        const std::string& name,
+        const void* value)
+{
+    auto dataset = datasets_.at(name);
+
+    hsize_t buff_dim[1] = {1};
+    H5::DataSpace buffer_space (1, buff_dim);
+
+    hsize_t disk_dim[2] = {n_frames_per_file_, 1};
+    H5::DataSpace disk_space(1, disk_dim);
+
+    hsize_t count[] = {1, 1};
+    hsize_t start[] = {current_frame_index_, 0};
+    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
+
+    dataset.write(
+            value,
+            H5::PredType::NATIVE_UINT16,
+            buffer_space,
+            disk_space);
 }
 
 template <>

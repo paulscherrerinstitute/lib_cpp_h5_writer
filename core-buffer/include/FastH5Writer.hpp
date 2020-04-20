@@ -53,10 +53,9 @@ public:
     void set_pulse_id(const uint64_t pulse_id);
 
     void write_data(const char* buffer);
-    void write_scalar_metadata(
+    template <class T> void write_scalar_metadata(
             const std::string& name,
-            const void* value,
-            const size_t value_n_bytes);
+            const void* value);
 
     void close_file();
 };
