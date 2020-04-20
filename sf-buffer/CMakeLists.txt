@@ -28,5 +28,19 @@ target_link_libraries(sf-udprecv
         boost_system
         pthread)
 
+add_executable(sf-reader src/sf_reader.cpp)
+set_target_properties(sf-reader PROPERTIES OUTPUT_NAME sf_reader)
+
+target_link_libraries(sf-reader
+        core-buffer
+        core-writer
+        external
+        zmq
+        hdf5
+        hdf5_hl
+        hdf5_cpp
+        boost_system
+        pthread)
+
 enable_testing()
 add_subdirectory(test/)
