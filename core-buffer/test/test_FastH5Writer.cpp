@@ -94,8 +94,10 @@ TEST(FastH5Writer, SWMR)
     size_t pulse_id = 0;
 
     auto output_buffer = make_unique<char[]>(512 * 1024 * 2);
-    auto image_buffer = make_unique<uint16_t[]>(1000*512*1024);
-    auto image_ptr = (uint16_t*)(image_buffer.get());
+    auto input_buffer = make_unique<uint16_t[]>(1000*512*1024);
+
+    auto input_ptr = (uint16_t*)(input_buffer.get());
+    auto output_ptr = (uint16_t*)(output_buffer.get());
 
     for (size_t i=0; i<512*1024; i++) {
         uint16_t* image_ptr = (uint16_t*)(output_buffer.get());
@@ -110,31 +112,33 @@ TEST(FastH5Writer, SWMR)
 
     FastH5Writer writer(
             BufferUtils::FILE_MOD, 512, 1024, device_name, root_folder);
+    writer.set_pulse_id(0);
 
     writer.add_scalar_metadata<uint64_t>("pulse_id");
     writer.add_scalar_metadata<uint64_t>("frame_id");
     writer.add_scalar_metadata<uint32_t>("daq_rec");
     writer.add_scalar_metadata<uint16_t>("received_packets");
 
-    writer.set_pulse_id(pulse_id);
-
     auto filename = BufferUtils::get_filename(
             root_folder, device_name, pulse_id);
     auto file_frame_index = BufferUtils::get_file_frame_index(pulse_id);
-
     H5::H5File input_file(filename, H5F_ACC_RDONLY |  H5F_ACC_SWMR_READ);
-
     auto image_dataset = input_file.openDataSet("image");
 
-    image_dataset.read(
-            image_buffer.get(), H5::PredType::NATIVE_UINT16);
+    image_dataset.read(input_ptr, H5::PredType::NATIVE_UINT16);
+    EXPECT_EQ(input_ptr[0], 0);
+    EXPECT_EQ(input_ptr[512*1024], 0);
 
-    EXPECT_EQ(image_ptr[0], 0);
-
+    writer.set_pulse_id(0);
     writer.write_data(output_buffer.get());
 
-    image_dataset.read(
-            image_buffer.get(), H5::PredType::NATIVE_UINT16);
+    image_dataset.read(input_ptr, H5::PredType::NATIVE_UINT16);
+    EXPECT_EQ(input_ptr[0], 99);
+    EXPECT_EQ(input_ptr[512*1024], 0);
 
-    EXPECT_EQ(image_ptr[0], 99);
+    writer.set_pulse_id(1);
+    writer.write_data(output_buffer.get());
+    image_dataset.read(input_ptr, H5::PredType::NATIVE_UINT16);
+    EXPECT_EQ(input_ptr[0], 99);
+    EXPECT_EQ(input_ptr[512*1024], 99);
 }
