@@ -55,6 +55,7 @@ int main (int argc, char *argv[]) {
         ::memset(pulse_id_buffer, 0, sizeof(pulse_id_buffer));
 
         while (true) {
+            this_thread::sleep_for(chrono::milliseconds(100));
             H5Drefresh(pulse_id_dataset.getId());
 
             pulse_id_dataset.read(
