@@ -19,6 +19,7 @@ class FastH5Writer {
     const std::string device_name_;
     const std::string root_folder_;
     const std::string latest_filename_;
+    const std::string current_filename_;
 
     std::string current_output_filename_;
     H5::H5File current_output_file_;

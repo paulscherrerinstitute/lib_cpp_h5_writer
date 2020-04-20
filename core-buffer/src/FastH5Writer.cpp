@@ -25,6 +25,7 @@ FastH5Writer::FastH5Writer(
             device_name_(device_name),
             root_folder_(root_folder),
             latest_filename_(root_folder + "/" + device_name + "/LATEST"),
+            current_filename_(root_folder + "/" + device_name + "/CURRENT"),
             frame_bytes_size_(2 * y_frame_size * x_frame_size),
             current_output_filename_(""),
             current_output_file_(),
@@ -69,9 +70,11 @@ void FastH5Writer::create_file(const string& filename)
     new_output_file.close();
 
     // Open newly created file.
+    current_output_filename_ = filename;
     current_output_file_ = H5::H5File(filename.c_str(),
             H5F_ACC_RDWR | H5F_ACC_SWMR_WRITE);
     current_image_dataset_ = current_output_file_.openDataSet("image");
+
 
     for (auto& metadata:scalar_metadata_) {
         auto dataset_name = metadata.first;
@@ -125,15 +128,17 @@ void FastH5Writer::set_pulse_id(const uint64_t pulse_id)
     if (new_output_filename != current_output_filename_){
 
         if (current_output_file_.getId() != -1) {
+            auto latest = current_output_filename_;
             close_file();
+            BufferUtils::update_latest_file(
+                    latest_filename_, latest);
         }
 
         WriterUtils::create_destination_folder(new_output_filename);
         create_file(new_output_filename);
-        BufferUtils::update_latest_file(
-                latest_filename_, current_output_filename_);
 
-        current_output_filename_ = new_output_filename;
+        BufferUtils::update_latest_file(
+                current_filename_, current_output_filename_);
     }
 }
 
