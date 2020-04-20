@@ -131,7 +131,7 @@ void FastH5Writer::set_pulse_id(const uint64_t pulse_id)
         WriterUtils::create_destination_folder(new_output_filename);
         create_file(new_output_filename);
         BufferUtils::update_latest_file(
-                latest_filename_, new_output_filename);
+                latest_filename_, current_output_filename_);
 
         current_output_filename_ = new_output_filename;
     }
