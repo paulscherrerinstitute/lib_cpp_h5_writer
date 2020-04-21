@@ -2,7 +2,9 @@
 #include <stdexcept>
 #include <H5Writer.hpp>
 #include <BufferUtils.hpp>
+#include <RingBuffer.hpp>
 #include "BufferMultiReader.hpp"
+#include <thread>
 
 #include "config.hpp"
 #include "SfFormat.cpp"
@@ -29,21 +31,6 @@ int main (int argc, char *argv[])
     string output_file = string(argv[2]);
     uint64_t start_pulse_id = (uint64_t) atoll(argv[3]);
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[4]);
-
-    struct FileBufferMetadata {
-        // Needed by RingBuffer
-        size_t buffer_slot_index;
-        const size_t frame_bytes_size = 2*512*1024*1000;
-
-        uint64_t start_pulse_id;
-        uint64_t stop_pulse_id;
-        uint16_t module_id;
-
-        uint64_t pulse_id[1000];
-        uint64_t frame_id[1000];
-        uint32_t daq_rec[1000];
-        uint16_t n_received_packets[1000];
-    };
 
     size_t n_modules = 32;
 
@@ -95,7 +82,7 @@ int main (int argc, char *argv[])
 
                 auto frame_id_dataset = input_file.openDataSet("frame_id");
                 frame_id_dataset.read(
-                        file_metadata->frame_id, H5::PredType::NATIVE_UINT64);
+                        file_metadata->frame_index, H5::PredType::NATIVE_UINT64);
 
                 auto daq_rec_dataset = input_file.openDataSet("daq_rec");
                 daq_rec_dataset.read(
