@@ -67,6 +67,12 @@ void BufferMultiReader::read_thread(uint8_t module_number)
     string current_filename = "";
     uint64_t last_pulse_id = 0;
 
+    auto image_buffer = new uint16_t[1000*512*1024];
+    auto pulse_id_buffer = new uint64_t[1000];
+    auto frame_id_buffer = new uint64_t[1000];
+    auto daq_rec_buffer = new uint32_t[1000];
+    auto received_packets_buffer = new uint16_t[1000];
+
     while (is_running_) {
         if (last_pulse_id == pulse_id_) {
             this_thread::sleep_for(chrono::milliseconds(1));
@@ -99,7 +105,7 @@ void BufferMultiReader::read_thread(uint8_t module_number)
             daq_rec_dataset.read(
                     daq_rec_buffer, H5::PredType::NATIVE_UINT32);
             received_packets_dataset.read(
-                    received_packets, H5::PredType::NATIVE_UINT16);
+                    received_packets_buffer, H5::PredType::NATIVE_UINT16);
 
             current_filename = pulse_filename;
         }
@@ -109,12 +115,14 @@ void BufferMultiReader::read_thread(uint8_t module_number)
 
         memcpy(
                 (char*) (frame_buffer_ + buffer_offset),
-                image_buffer,
+                (char*)(image_buffer + (file_frame_index*512*1024)),
                 512*1024*2);
 
         UdpFrameMetadata metadata;
-        metadata.pulse_id = last_pulse_id;
-        // TODO: Actually fill this.
+        metadata.pulse_id = pulse_id_buffer[file_frame_index];
+        metadata.frame_index = frame_id_buffer[file_frame_index];
+        metadata.daq_rec = daq_rec_buffer[file_frame_index];
+        metadata.n_recv_packets = received_packets_buffer[file_frame_index];
 
         memcpy(
                 (char*) (frame_metadata_buffer_ + module_number),
