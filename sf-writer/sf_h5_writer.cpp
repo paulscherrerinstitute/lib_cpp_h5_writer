@@ -115,6 +115,7 @@ int main (int argc, char *argv[])
         cout << "Got from " << data.first->start_pulse_id;
         cout << " to " << data.first->stop_pulse_id << endl;
 
+        ring_buffer.release(data.first->buffer_slot_index);
     }
 
     read_thread.join();
