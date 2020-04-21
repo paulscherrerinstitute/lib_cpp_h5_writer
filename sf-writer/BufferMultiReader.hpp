@@ -6,16 +6,17 @@
 
 class BufferMultiReader
 {
-    const std::string device_name;
-    const std::string root_folder;
-
+    const std::string device_name_;
+    const std::string root_folder_;
     std::atomic_bool is_running_;
+    uint16_t* frame_buffer_;
+
     std::atomic_int n_modules_left_;
     std::atomic_uint64_t pulse_id_;
     std::vector<std::thread> receiving_threads_;
 
 protected:
-    void read_thread();
+    void read_thread(uint8_t module_number);
 
 public:
     BufferMultiReader(
@@ -24,7 +25,9 @@ public:
 
     virtual ~BufferMultiReader();
 
-    UdpFrameMetadata get_frame(const uint64_t pulse_id, void* frame_buffer);
+    char* get_buffer();
+
+    UdpFrameMetadata load_frame_to_buffer(const uint64_t pulse_id);
 };
 
 #endif

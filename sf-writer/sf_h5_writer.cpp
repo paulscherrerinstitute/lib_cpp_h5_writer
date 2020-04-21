@@ -37,7 +37,7 @@ int main (int argc, char *argv[])
 
     BufferMultiReader reader(device_name, root_folder);
     UdpFrameMetadata metadata;
-    uint16_t* frame_buffer = new uint16_t[32*512*1024];
+    char* frame_buffer = reader.get_buffer();
 
     H5Writer writer(output_file);
 
@@ -45,7 +45,11 @@ int main (int argc, char *argv[])
             pulse_id <= stop_pulse_id;
             pulse_id++) {
 
-        metadata = reader.get(pulse_id, (void*) frame_buffer);
+        metadata = reader.load_frame_to_buffer(pulse_id);
+
+        writer.write_data("frame", pulse_id,
+                          frame_buffer,
+                          {32*512, 1024}, 2, "uint16", "little");
 
         writer.write_data("pulse_id", pulse_id,
                           (char*)&(metadata.pulse_id),
@@ -68,8 +72,6 @@ int main (int argc, char *argv[])
                           (char*)&(is_good_frame),
                           {1}, 8, "uint64", "little");
     }
-
-    reader.close();
 
     return 0;
 }
