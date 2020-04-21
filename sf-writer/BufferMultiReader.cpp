@@ -1,5 +1,6 @@
 #include <ZmqRecvModule.hpp>
 #include "BufferMultiReader.hpp"
+#include "BufferUtils.hpp"
 
 using namespace std;
 
@@ -8,7 +9,8 @@ BufferMultiReader::BufferMultiReader(
         const std::string& root_folder) :
             device_name_(device_name),
             root_folder_(root_folder),
-            is_running_(true)
+            is_running_(true),
+            pulse_id_(0)
 {
     frame_buffer_ = new uint16_t[32*512*1024];
     frame_metadata_buffer_ = new UdpFrameMetadata[32];
@@ -60,5 +62,43 @@ UdpFrameMetadata BufferMultiReader::load_frame_to_buffer(
 
 void BufferMultiReader::read_thread(uint8_t module_number)
 {
+    size_t buffer_offset = 512*1024*module_number;
 
+    string current_filename = "";
+    uint64_t last_pulse_id = 0;
+
+    while (is_running_) {
+        if (last_pulse_id == pulse_id_) {
+            this_thread::sleep_for(chrono::milliseconds(1));
+            continue;
+        }
+        last_pulse_id = pulse_id_;
+
+        auto pulse_filename = BufferUtils::get_filename(
+                root_folder_, device_name_, last_pulse_id);
+
+        if (pulse_filename != current_filename) {
+            // TODO: Load buffers with new file.
+            current_filename = pulse_filename;
+        }
+
+        auto file_frame_index =
+                BufferUtils::get_file_frame_index(last_pulse_id);
+
+        memcpy(
+                (char*) (frame_buffer_ + buffer_offset),
+                image_dataset_buffer[file_frame_index],
+                512*1024*2);
+
+        UdpFrameMetadata metadata;
+        // TODO: Fill metadata;
+
+        memcpy(
+                (char*) (frame_metadata_buffer_ + module_number),
+                &metadata,
+                sizeof(UdpFrameMetadata));
+
+
+        n_modules_left_--;
+    }
 }
