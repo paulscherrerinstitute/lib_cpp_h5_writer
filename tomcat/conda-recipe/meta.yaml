@@ -3,19 +3,12 @@ package:
     version: 0.0.1
 
 build:
-    noarch: python
     number: 0
-    entry_points:
-        - tomcat_h5_writer = tomcat_h5_writer.tomcat_h5_writer:main
 
 source:
     path: ..
 
 requirements:
-    channels:
-        - anaconda
-        - paulscherrerinstitute
-        - conda-forge/label/cf201901
 
     build:
         - make

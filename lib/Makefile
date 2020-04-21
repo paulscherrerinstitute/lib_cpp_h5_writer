@@ -3,9 +3,11 @@ OBJ_DIR = ./obj
 BIN_DIR = ./bin
 MKDIR = mkdir -p
 
+# include_directories(${HDF5_INCLUDE_DIRS})
+
 CC = g++
-CFLAGS = -Wall -Wfatal-errors -fPIC -pthread -std=c++11 -I./include -I${CONDA_PREFIX}/include
-LDFLAGS = -L${CONDA_PREFIX}/lib -L/usr/lib64 -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex -lboost_thread -lpthread
+CFLAGS = -DLIBCXX_CXX_ABI=libstdc++ -Wall -Wfatal-errors -fPIC -pthread -std=c++11 -I./include -I${CONDA_PREFIX}/include -I/usr/include/hdf5/serial
+LDFLAGS = -L${CONDA_PREFIX}/lib -L${CONDA_PREFIX}/lib64  -lzmq -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lboost_system -lboost_regex -lboost_thread -lpthread -lboost_chrono
 
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
