@@ -42,5 +42,19 @@ target_link_libraries(sf-reader
         boost_system
         pthread)
 
+add_executable(sf-replay src/sf_replay.cpp)
+set_target_properties(sf-replay PROPERTIES OUTPUT_NAME sf_replay)
+
+target_link_libraries(sf-replay
+        core-buffer
+        core-writer
+        external
+        zmq
+        hdf5
+        hdf5_hl
+        hdf5_cpp
+        boost_system
+        pthread)
+
 enable_testing()
 add_subdirectory(test/)
