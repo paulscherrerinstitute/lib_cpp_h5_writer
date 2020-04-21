@@ -29,47 +29,106 @@ int main (int argc, char *argv[])
     uint64_t start_pulse_id = (uint64_t) atoll(argv[3]);
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[4]);
 
-    BufferMultiReader reader(root_folder);
-    UdpFrameMetadata metadata;
-    char* frame_buffer = reader.get_buffer();
+    struct FileBufferMetadata {
+        // Needed by RingBuffer
+        size_t buffer_slot_index;
+        const size_t frame_bytes_size = 2*512*1024*1000;
 
-    H5Writer writer(output_file);
+        uint64_t start_pulse_id;
+        uint64_t stop_pulse_id;
+        uint16_t module_id;
 
-    size_t output_file_position = 0;
+        uint64_t pulse_id[1000];
+        uint64_t frame_id[1000];
+        uint32_t daq_rec[1000];
+        uint16_t n_received_packets[1000];
+    };
 
-    for (size_t pulse_id=start_pulse_id;
-            pulse_id <= stop_pulse_id;
-            pulse_id++) {
+    size_t n_modules = 32;
 
-        metadata = reader.load_frame_to_buffer(pulse_id);
+    RingBuffer<FileBufferMetadata> ring_buffer(3);
 
-        writer.write_data("image", output_file_position,
-                          frame_buffer,
-                          {32*512, 1024}, 32*512*1024*2, "uint16", "little");
+    auto path_suffixes = BufferUtils::get_path_suffixes(
+            start_pulse_id, stop_pulse_id);
 
-        writer.write_data("pulse_id", output_file_position,
-                          (char*)&(metadata.pulse_id),
-                          {1}, 8, "uint64", "little");
+    size_t n_reads = path_suffixes.size() * n_modules;
 
-        writer.write_data("frame", output_file_position,
-                          (char*)&(metadata.frame_index),
-                          {1}, 8, "uint64", "little");
+    auto read_buffer = [=, &ring_buffer]() {
 
-        writer.write_data("daq_rec", output_file_position,
-                          (char*)&(metadata.daq_rec),
-                          {1}, 4, "uint32", "little");
+        for (size_t i_module=0; i_module<n_modules; i_module++) {
+            // TODO: This is ugly. Remove it.
+            stringstream name;
+            name << "M";
+            if (i_module < 10) name << "0";
+            name << (int) i_module;
+            string device_name = name.str();
 
-        uint64_t is_good_frame = 0;
-        if (metadata.n_recv_packets == 4096) {
-            is_good_frame = 1;
+            for (const auto& suffix:path_suffixes) {
+                auto file_metadata = make_shared<FileBufferMetadata>();
+                file_metadata->module_id = i_module;
+                file_metadata->start_pulse_id = suffix.start_pulse_id;
+                file_metadata->stop_pulse_id = suffix.stop_pulse_id;
+
+                char* buffer = ring_buffer.reserve(file_metadata);
+                while (buffer == nullptr) {
+                    this_thread::sleep_for(chrono::milliseconds(10));
+                    buffer = ring_buffer.reserve(file_metadata);
+                }
+
+                string filename =
+                        root_folder + "/" +
+                        device_name + "/" +
+                        suffix.path;
+
+                cout << "Reading file " << filename << endl;
+
+                H5::H5File input_file(filename, H5F_ACC_RDONLY);
+
+                auto image_dataset = input_file.openDataSet("image");
+                image_dataset.read(
+                        buffer, H5::PredType::NATIVE_UINT16);
+
+                auto pulse_id_dataset = input_file.openDataSet("pulse_id");
+                pulse_id_dataset.read(
+                        file_metadata->pulse_id, H5::PredType::NATIVE_UINT64);
+
+                auto frame_id_dataset = input_file.openDataSet("frame_id");
+                frame_id_dataset.read(
+                        file_metadata->frame_id, H5::PredType::NATIVE_UINT64);
+
+                auto daq_rec_dataset = input_file.openDataSet("daq_rec");
+                daq_rec_dataset.read(
+                        file_metadata->daq_rec, H5::PredType::NATIVE_UINT32);
+
+                auto received_packets_dataset =
+                        input_file.openDataSet("received_packets");
+                received_packets_dataset.read(
+                        file_metadata->n_received_packets,
+                        H5::PredType::NATIVE_UINT16);
+
+                input_file.close();
+
+                ring_buffer.commit(file_metadata);
+            }
+        }
+    };
+    auto read_thread = thread(read_buffer);
+
+    for (size_t i_read=0; i_read<n_reads; i_read++) {
+
+        auto data = ring_buffer.read();
+        while (data.first == nullptr) {
+            this_thread::sleep_for(chrono::milliseconds(10));
+            data = ring_buffer.read();
         }
 
-        writer.write_data("is_good_frame", output_file_position,
-                          (char*)&(is_good_frame),
-                          {1}, 8, "uint64", "little");
+        // TODO: Have data, write it down.
+        cout << "Got from " << data.first->start_pulse_id;
+        cout << " to " << data.first->stop_pulse_id << endl;
 
-        output_file_position++;
     }
+
+    read_thread.join();
 
     return 0;
 }
