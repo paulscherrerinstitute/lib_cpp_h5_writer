@@ -35,6 +35,7 @@ int main (int argc, char *argv[])
     size_t n_modules = 32;
 
     RingBuffer<FileBufferMetadata> ring_buffer(3);
+    ring_buffer.initialize(BufferUtils::FILE_MOD * 2 * 512 *1024);
 
     auto path_suffixes = BufferUtils::get_path_suffixes(
             start_pulse_id, stop_pulse_id);
