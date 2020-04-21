@@ -57,7 +57,7 @@ int main (int argc, char *argv[])
 
         writer.write_data("daq_rec", output_file_position,
                           (char*)&(metadata.daq_rec),
-                          {1}, 8, "uint64", "little");
+                          {1}, 4, "uint32", "little");
 
         uint64_t is_good_frame = 0;
         if (metadata.n_recv_packets == 4096) {
