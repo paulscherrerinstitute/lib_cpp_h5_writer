@@ -45,7 +45,7 @@ int main (int argc, char *argv[])
 
         writer.write_data("frame", output_file_position,
                           frame_buffer,
-                          {32*512, 1024}, 2, "uint16", "little");
+                          {32*512, 1024}, 32*512*1024*2, "uint16", "little");
 
         writer.write_data("pulse_id", output_file_position,
                           (char*)&(metadata.pulse_id),
