@@ -1,13 +1,12 @@
 #include <ZmqRecvModule.hpp>
 #include "BufferMultiReader.hpp"
 #include "BufferUtils.hpp"
+#include <sstream>
 
 using namespace std;
 
 BufferMultiReader::BufferMultiReader(
-        const std::string& device_name,
         const std::string& root_folder) :
-            device_name_(device_name),
             root_folder_(root_folder),
             is_running_(true),
             pulse_id_(0)
@@ -62,6 +61,12 @@ UdpFrameMetadata BufferMultiReader::load_frame_to_buffer(
 
 void BufferMultiReader::read_thread(uint8_t module_number)
 {
+    stringstream name;
+    name << "M";
+    if (module_number < 10) name << "0";
+    name << module_number;
+
+    string device_name = name.str();
     size_t buffer_offset = 512*1024*module_number;
 
     string current_filename = "";
@@ -81,7 +86,7 @@ void BufferMultiReader::read_thread(uint8_t module_number)
         last_pulse_id = pulse_id_;
 
         auto pulse_filename = BufferUtils::get_filename(
-                root_folder_, device_name_, last_pulse_id);
+                root_folder_, device_name, last_pulse_id);
 
         if (pulse_filename != current_filename) {
 

@@ -6,7 +6,6 @@
 
 class BufferMultiReader
 {
-    const std::string device_name_;
     const std::string root_folder_;
     std::atomic_bool is_running_;
     uint16_t* frame_buffer_;
@@ -20,9 +19,7 @@ protected:
     void read_thread(uint8_t module_number);
 
 public:
-    BufferMultiReader(
-            const std::string& device_name,
-            const std::string& root_folder);
+    BufferMultiReader(const std::string& root_folder);
 
     virtual ~BufferMultiReader();
 

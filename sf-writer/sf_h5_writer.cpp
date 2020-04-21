@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
     uint64_t start_pulse_id = (uint64_t) atoi(argv[4]);
     uint64_t stop_pulse_id = (uint64_t) atoi(argv[5]);
 
-    BufferMultiReader reader(device_name, root_folder);
+    BufferMultiReader reader(root_folder);
     UdpFrameMetadata metadata;
     char* frame_buffer = reader.get_buffer();
 
