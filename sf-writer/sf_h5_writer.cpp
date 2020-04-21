@@ -10,12 +10,11 @@ using namespace std;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 6) {
+    if (argc != 5) {
         cout << endl;
-        cout << "Usage: sf_h5_writer [device_name] [root_folder]";
+        cout << "Usage: sf_h5_writer [root_folder]";
         cout << " [output_file] [start_pulse_id] [stop_pulse_id]";
         cout << endl;
-        cout << "\tdevice_name: Name of detector to write." << endl;
         cout << "\troot_folder: Base of the buffer." << endl;
         cout << "\toutput_file: Complete path to the output file." << endl;
         cout << "\tstart_pulse_id: Start pulse_id of retrieval." << endl;
@@ -25,11 +24,10 @@ int main (int argc, char *argv[])
         exit(-1);
     }
 
-    string device_name = string(argv[1]);
-    string root_folder = string(argv[2]);
-    string output_file = string(argv[3]);
-    uint64_t start_pulse_id = (uint64_t) atoi(argv[4]);
-    uint64_t stop_pulse_id = (uint64_t) atoi(argv[5]);
+    string root_folder = string(argv[1]);
+    string output_file = string(argv[2]);
+    uint64_t start_pulse_id = (uint64_t) atoi(argv[3]);
+    uint64_t stop_pulse_id = (uint64_t) atoi(argv[4]);
 
     BufferMultiReader reader(root_folder);
     UdpFrameMetadata metadata;
