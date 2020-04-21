@@ -43,7 +43,7 @@ int main (int argc, char *argv[])
 
         metadata = reader.load_frame_to_buffer(pulse_id);
 
-        writer.write_data("frame", output_file_position,
+        writer.write_data("image", output_file_position,
                           frame_buffer,
                           {32*512, 1024}, 32*512*1024*2, "uint16", "little");
 
