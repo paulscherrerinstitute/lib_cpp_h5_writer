@@ -8,6 +8,7 @@ target_include_directories(sf-writer PRIVATE ${MPI_CXX_INCLUDE_PATH})
 
 
 target_link_libraries(sf-writer
+        core-buffer
         core-writer
         external
         zmq
