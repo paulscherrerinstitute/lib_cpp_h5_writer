@@ -35,25 +35,27 @@ int main (int argc, char *argv[])
 
     H5Writer writer(output_file);
 
+    size_t output_file_position = 0;
+
     for (size_t pulse_id=start_pulse_id;
             pulse_id <= stop_pulse_id;
             pulse_id++) {
 
         metadata = reader.load_frame_to_buffer(pulse_id);
 
-        writer.write_data("frame", pulse_id,
+        writer.write_data("frame", output_file_position,
                           frame_buffer,
                           {32*512, 1024}, 2, "uint16", "little");
 
-        writer.write_data("pulse_id", pulse_id,
+        writer.write_data("pulse_id", output_file_position,
                           (char*)&(metadata.pulse_id),
                           {1}, 8, "uint64", "little");
 
-        writer.write_data("frame", pulse_id,
+        writer.write_data("frame", output_file_position,
                           (char*)&(metadata.frame_index),
                           {1}, 8, "uint64", "little");
 
-        writer.write_data("daq_rec", pulse_id,
+        writer.write_data("daq_rec", output_file_position,
                           (char*)&(metadata.daq_rec),
                           {1}, 8, "uint64", "little");
 
@@ -62,9 +64,11 @@ int main (int argc, char *argv[])
             is_good_frame = 1;
         }
 
-        writer.write_data("is_good_frame", pulse_id,
+        writer.write_data("is_good_frame", output_file_position,
                           (char*)&(is_good_frame),
                           {1}, 8, "uint64", "little");
+
+        output_file_position++;
     }
 
     return 0;
