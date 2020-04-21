@@ -10,8 +10,9 @@ class BufferMultiReader
     const std::string root_folder_;
     std::atomic_bool is_running_;
     uint16_t* frame_buffer_;
+    UdpFrameMetadata* frame_metadata_buffer_;
 
-    std::atomic_int n_modules_left_;
+    std::atomic_uint n_modules_left_;
     std::atomic_uint64_t pulse_id_;
     std::vector<std::thread> receiving_threads_;
 
