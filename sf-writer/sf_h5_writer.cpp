@@ -1,9 +1,5 @@
 #include <iostream>
 #include <stdexcept>
-#include <ZmqReceiver.hpp>
-#include <ZmqRecvModule.hpp>
-#include <H5WriteModule.hpp>
-#include <ProcessManager.hpp>
 #include <H5Writer.hpp>
 #include "BufferMultiReader.hpp"
 
