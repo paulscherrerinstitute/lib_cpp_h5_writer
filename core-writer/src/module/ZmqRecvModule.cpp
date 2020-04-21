@@ -185,6 +185,19 @@ void ZmqRecvModule::receive_thread(const string& connect_address)
             }
 
             char* buffer = ring_buffer_.reserve(frame_metadata);
+            if (buffer == nullptr) {
+                stringstream err_msg;
+
+                using namespace date;
+                using namespace chrono;
+                err_msg << "[" << system_clock::now() << "]";
+                err_msg << "[UdpRecvModule::receive_thread]";
+                err_msg << " Ring buffer is full.";
+                err_msg << endl;
+
+                throw runtime_error(err_msg.str());
+            }
+
             memcpy(
                     buffer,
                     static_cast<const char*>(frame_data),

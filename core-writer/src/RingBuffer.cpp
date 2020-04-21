@@ -132,17 +132,7 @@ char* RingBuffer<T>::reserve(shared_ptr<T> frame_metadata)
             buffer_used_slots_++;
 
         } else {
-            stringstream err_msg;
-
-            using namespace date;
-            using namespace chrono; 
-            err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[RingBuffer::reserve]";
-            err_msg << " Ring buffer is full.";
-            err_msg << " Collision at write_index = " << write_index_;
-            err_msg << endl;
-
-            throw runtime_error(err_msg.str());
+            return nullptr;
         }
     }
 

@@ -87,6 +87,18 @@ void UdpRecvModule::receive_thread(
         metadata->n_recv_packets = 0;
 
         char* frame_buffer = ring_buffer_.reserve(metadata);
+        if (frame_buffer == nullptr) {
+            stringstream err_msg;
+
+            using namespace date;
+            using namespace chrono;
+            err_msg << "[" << system_clock::now() << "]";
+            err_msg << "[UdpRecvModule::receive_thread]";
+            err_msg << " Ring buffer is full.";
+            err_msg << endl;
+
+            throw runtime_error(err_msg.str());
+        }
 
         jungfrau_packet packet_buffer;
 
@@ -118,6 +130,18 @@ void UdpRecvModule::receive_thread(
                 metadata->n_recv_packets = 0;
 
                 frame_buffer = ring_buffer_.reserve(metadata);
+                if (frame_buffer == nullptr) {
+                    stringstream err_msg;
+
+                    using namespace date;
+                    using namespace chrono;
+                    err_msg << "[" << system_clock::now() << "]";
+                    err_msg << "[UdpRecvModule::receive_thread]";
+                    err_msg << " Ring buffer is full.";
+                    err_msg << endl;
+
+                    throw runtime_error(err_msg.str());
+                }
                 memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
 
                 frame_metadata->frame_index = packet_buffer.framenum;
@@ -146,6 +170,18 @@ void UdpRecvModule::receive_thread(
                 metadata->n_recv_packets = 0;
 
                 frame_buffer = ring_buffer_.reserve(metadata);
+                if (frame_buffer == nullptr) {
+                    stringstream err_msg;
+
+                    using namespace date;
+                    using namespace chrono;
+                    err_msg << "[" << system_clock::now() << "]";
+                    err_msg << "[UdpRecvModule::receive_thread]";
+                    err_msg << " Ring buffer is full.";
+                    err_msg << endl;
+
+                    throw runtime_error(err_msg.str());
+                }
                 memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
             }
         }
