@@ -50,15 +50,20 @@ int main (int argc, char *argv[]) {
 
     //TODO: Use ipc?
     if (zmq_connect(socket, "tcp://localhost:50000") != 0) {
-        throw runtime_error("Cannot connect.");
+        throw runtime_error(strerror (errno));
     }
 
     int status = 0;
-    status += zmq_setsockopt(socket, ZMQ_SNDHWM, 10);
-    status += zmq_setsockopt(socket, ZMQ_LINGER, 1000);
-    status += zmq_setsockopt(socket, ZMQ_SNDTIMEO, 1000);
+
+    int sndhwm = 10;
+    status += zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm));
+    int linger_ms = 10000;
+    status += zmq_setsockopt(socket, ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
+
+    //status += zmq_setsockopt(socket, ZMQ_SNDTIMEO, 1000);
+
     if (status != 0) {
-        throw runtime_error("Cannot set socket options.");
+        throw runtime_error(strerror (errno));
     }
 
     for (const auto& suffix:path_suffixes) {
@@ -66,8 +71,8 @@ int main (int argc, char *argv[]) {
         metadata_buffer->stop_pulse_id = suffix.stop_pulse_id;
 
         string filename =
-                root_folder + "/" +
-                device_name + "/" +
+                device + "/" +
+                channel_name + "/" +
                 suffix.path;
 
         cout << "Reading file " << filename << endl;
@@ -98,8 +103,15 @@ int main (int argc, char *argv[]) {
 
         input_file.close();
 
-        zmq_send(sock, metadata_buffer.get(), XXX, ZMQ_SNDMORE);
-        zmq_send(sock, image_buffer.get(), XXX, 0);
+        zmq_send(socket,
+                metadata_buffer.get(),
+                sizeof(FileBufferMetadata),
+                ZMQ_SNDMORE);
+
+        zmq_send(socket,
+                image_buffer.get(),
+                BufferUtils::FILE_MOD * 512 * 1024 * 2,
+                0);
     }
 
     zmq_close(socket);
