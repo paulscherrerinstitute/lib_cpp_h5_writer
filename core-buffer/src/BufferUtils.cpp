@@ -64,3 +64,34 @@ string BufferUtils::get_latest_file(const string& latest_filename)
 
     return filename.substr(0, filename.size()-1);
 }
+
+vector<BufferUtils::path_sufix> BufferUtils::get_path_suffixes (
+        const uint64_t start_pulse_id,
+        const uint64_t stop_pulse_id)
+{
+    vector<BufferUtils::path_sufix> result;
+
+    uint64_t start_file_base = start_pulse_id / FILE_MOD;
+    start_file_base *= FILE_MOD;
+
+    for (
+            uint64_t first_pulse_id=start_file_base;
+            first_pulse_id <= stop_pulse_id;
+            first_pulse_id += FILE_MOD) {
+
+        uint64_t folder_base = first_pulse_id / FOLDER_MOD;
+        folder_base *= FOLDER_MOD;
+
+        uint64_t file_base = first_pulse_id / FILE_MOD;
+        file_base *= FILE_MOD;
+
+        stringstream folder;
+        folder << folder_base << "/";
+        folder << file_base << FILE_EXTENSION;
+
+        result.emplace_back<BufferUtils::path_sufix>(
+                {first_pulse_id,
+                 first_pulse_id+FILE_MOD+1,
+                 folder.str()});
+    }
+}
