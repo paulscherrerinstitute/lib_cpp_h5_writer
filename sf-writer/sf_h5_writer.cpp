@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <H5Writer.hpp>
+#include <BufferUtils.hpp>
 #include "BufferMultiReader.hpp"
 
 #include "config.hpp"
