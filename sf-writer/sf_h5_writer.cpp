@@ -26,8 +26,8 @@ int main (int argc, char *argv[])
 
     string root_folder = string(argv[1]);
     string output_file = string(argv[2]);
-    uint64_t start_pulse_id = (uint64_t) atoi(argv[3]);
-    uint64_t stop_pulse_id = (uint64_t) atoi(argv[4]);
+    uint64_t start_pulse_id = (uint64_t) atoll(argv[3]);
+    uint64_t stop_pulse_id = (uint64_t) atoll(argv[4]);
 
     BufferMultiReader reader(root_folder);
     UdpFrameMetadata metadata;
