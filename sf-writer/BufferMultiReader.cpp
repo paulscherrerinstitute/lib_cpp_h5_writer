@@ -64,7 +64,7 @@ void BufferMultiReader::read_thread(uint8_t module_number)
     stringstream name;
     name << "M";
     if (module_number < 10) name << "0";
-    name << module_number;
+    name << (int) module_number;
 
     string device_name = name.str();
     size_t buffer_offset = 512*1024*module_number;
