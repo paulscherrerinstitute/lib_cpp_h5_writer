@@ -29,7 +29,7 @@ namespace BufferUtils
         std::string path;
     };
 
-    std::vector<path_sufix> BufferUtils::get_path_suffixes(
+    std::vector<path_sufix> get_path_suffixes(
             const uint64_t start_pulse_id,
             const uint64_t stop_pulse_id);
 }

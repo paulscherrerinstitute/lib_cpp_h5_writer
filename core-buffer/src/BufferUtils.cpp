@@ -91,7 +91,9 @@ vector<BufferUtils::path_sufix> BufferUtils::get_path_suffixes (
 
         result.emplace_back<BufferUtils::path_sufix>(
                 {first_pulse_id,
-                 first_pulse_id+FILE_MOD+1,
+                 first_pulse_id+FILE_MOD-1,
                  folder.str()});
     }
+
+    return result;
 }
