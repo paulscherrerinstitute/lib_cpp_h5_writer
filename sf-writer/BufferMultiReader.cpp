@@ -78,7 +78,29 @@ void BufferMultiReader::read_thread(uint8_t module_number)
                 root_folder_, device_name_, last_pulse_id);
 
         if (pulse_filename != current_filename) {
-            // TODO: Load buffers with new file.
+
+            H5::H5File input_file(pulse_filename,
+                    H5F_ACC_RDONLY |  H5F_ACC_SWMR_READ);
+
+
+            auto image_dataset = input_file.openDataSet("image");
+            auto pulse_id_dataset = input_file.openDataSet("pulse_id");
+            auto frame_id_dataset = input_file.openDataSet("frame_id");
+            auto daq_rec_dataset = input_file.openDataSet("daq_rec");
+            auto received_packets_dataset =
+                    input_file.openDataSet("received_packets");
+
+            image_dataset.read(
+                    image_buffer, H5::PredType::NATIVE_UINT16);
+            pulse_id_dataset.read(
+                    pulse_id_buffer, H5::PredType::NATIVE_UINT64);
+            frame_id_dataset.read(
+                    frame_id_buffer, H5::PredType::NATIVE_UINT64);
+            daq_rec_dataset.read(
+                    daq_rec_buffer, H5::PredType::NATIVE_UINT32);
+            received_packets_dataset.read(
+                    received_packets, H5::PredType::NATIVE_UINT16);
+
             current_filename = pulse_filename;
         }
 
@@ -87,17 +109,17 @@ void BufferMultiReader::read_thread(uint8_t module_number)
 
         memcpy(
                 (char*) (frame_buffer_ + buffer_offset),
-                image_dataset_buffer[file_frame_index],
+                image_buffer,
                 512*1024*2);
 
         UdpFrameMetadata metadata;
-        // TODO: Fill metadata;
+        metadata.pulse_id = last_pulse_id;
+        // TODO: Actually fill this.
 
         memcpy(
                 (char*) (frame_metadata_buffer_ + module_number),
                 &metadata,
                 sizeof(UdpFrameMetadata));
-
 
         n_modules_left_--;
     }
