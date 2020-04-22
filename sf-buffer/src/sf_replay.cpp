@@ -112,6 +112,8 @@ int main (int argc, char *argv[]) {
                 image_buffer.get(),
                 BufferUtils::FILE_MOD * 512 * 1024 * 2,
                 0);
+
+        this_thread::sleep_for(chrono::milliseconds(5));
     }
 
     zmq_close(socket);
