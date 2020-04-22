@@ -103,17 +103,30 @@ int main (int argc, char *argv[]) {
 
         input_file.close();
 
-        zmq_send(socket,
-                metadata_buffer.get(),
-                sizeof(FileBufferMetadata),
-                ZMQ_SNDMORE);
+        for (size_t i_frame=0; i_frame<BufferUtils::FILE_MOD; i_frame++) {
+            ModuleFrame module_frame = {
+                    metadata_buffer->pulse_id[i_frame],
+                    metadata_buffer->frame_index[i_frame],
+                    metadata_buffer->daq_rec[i_frame],
+                    metadata_buffer->n_received_packets[i_frame],
+                    module_id
+            };
 
-        zmq_send(socket,
-                image_buffer.get(),
-                BufferUtils::FILE_MOD * 512 * 1024 * 2,
-                0);
+            zmq_send(socket,
+                     &module_frame,
+                     sizeof(ModuleFrame),
+                     ZMQ_SNDMORE);
 
-        this_thread::sleep_for(chrono::milliseconds(1000));
+            zmq_send(socket,
+                     metadata_buffer.get(),
+                     sizeof(FileBufferMetadata),
+                     ZMQ_SNDMORE);
+
+            zmq_send(socket,
+                     (char*) (image_buffer.get() + (i_frame * 512 * 1024)),
+                     512 * 1024 * 2,
+                     0);
+        }
     }
 
     zmq_close(socket);

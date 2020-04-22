@@ -5,6 +5,7 @@
 #include <string>
 #include <RingBuffer.hpp>
 #include <BufferUtils.hpp>
+#include <jungfrau.hpp>
 
 using namespace std;
 
@@ -45,34 +46,33 @@ int main (int argc, char *argv[])
         throw runtime_error(strerror (errno));
     }
 
-    auto metadata_buffer = make_unique<FileBufferMetadata>();
+    auto metadata_buffer = make_unique<ModuleFrame>();
 
-    auto image_buffer = make_unique<uint16_t[]>(
-            BufferUtils::FILE_MOD * 512 * 1024);
+    auto image_buffer = make_unique<uint16_t[]>(512 * 1024);
 
     while (true) {
         auto n_bytes_metadata = zmq_recv(
                 socket,
                 metadata_buffer.get(),
-                sizeof(FileBufferMetadata),
+                sizeof(ModuleFrame),
                 0);
 
-        if (n_bytes_metadata != sizeof(FileBufferMetadata)) {
+        if (n_bytes_metadata != sizeof(ModuleFrame)) {
             throw runtime_error("Unexpected number of bytes in metadata.");
         }
 
         auto n_bytes_image = zmq_recv(
                 socket,
                 image_buffer.get(),
-                BufferUtils::FILE_MOD * 512 * 1024 * 2,
+                512 * 1024 * 2,
                 0);
 
-        if (n_bytes_image != BufferUtils::FILE_MOD * 512 * 1024 * 2) {
+        if (n_bytes_image != 512 * 1024 * 2) {
             throw runtime_error("Unexpected number of bytes in image.");
         }
 
-        cout << "Received " << metadata_buffer->start_pulse_id;
-        cout << " to " << metadata_buffer->stop_pulse_id;
+        cout << "Received " << metadata_buffer->pulse_id;
+        cout << " from " << metadata_buffer->module_id;
         cout << endl;
     }
 
