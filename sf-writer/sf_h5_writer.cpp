@@ -42,7 +42,7 @@ int main (int argc, char *argv[])
     auto image_buffer = make_unique<uint16_t[]>(n_modules*512*1024);
 
     uint32_t all_modules_ready = 0;
-    for (size_t i=0; i<32; i++) {
+    for (size_t i=0; i<n_modules; i++) {
         all_modules_ready |= 1 << i;
     }
 
@@ -50,6 +50,8 @@ int main (int argc, char *argv[])
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, 16);
+
+    vector<thread> threads;
 
     auto read_thread = [&](int module_id) {
         auto socket = zmq_socket(ctx, ZMQ_PULL);
@@ -97,6 +99,10 @@ int main (int argc, char *argv[])
             modules_ready ^= 1 << module_id;
         }
     };
+
+    for (size_t i=0; i<n_modules; i++) {
+        thread test(read_thread, i);
+    }
 
     int i_write = 0;
     size_t total_ms = 0;
