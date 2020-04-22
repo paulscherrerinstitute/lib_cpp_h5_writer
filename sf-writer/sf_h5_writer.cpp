@@ -41,8 +41,12 @@ int main (int argc, char *argv[])
     }
 
     int rcvhwm = 10000;
-    int status = zmq_setsockopt(socket, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm));
-    if (status != 0) {
+    if (zmq_setsockopt(socket, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
+        throw runtime_error(strerror (errno));
+    }
+
+    int linger = 0;
+    if (zmq_setsockopt(socket, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
         throw runtime_error(strerror (errno));
     }
 
