@@ -6,7 +6,7 @@
 
 namespace BufferUtils
 {
-    const size_t STREAM_BLOCK_SIZE = 100;
+    const size_t STREAM_BLOCK_SIZE = 200;
     extern const size_t FILE_MOD;
     extern const size_t FOLDER_MOD;
     extern const std::string FILE_EXTENSION;
