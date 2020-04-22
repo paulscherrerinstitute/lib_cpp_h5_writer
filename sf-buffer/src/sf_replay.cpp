@@ -47,6 +47,7 @@ int main (int argc, char *argv[]) {
 
     auto ctx = zmq_ctx_new();
     auto socket = zmq_socket(ctx, ZMQ_PUSH);
+    auto meta_socket = zmq_socket(ctx, ZMQ_SUB);
 
     int status = 0;
 
@@ -65,6 +66,16 @@ int main (int argc, char *argv[]) {
     if (zmq_connect(socket, "ipc://writer") != 0) {
         throw runtime_error(strerror (errno));
     }
+
+    //TODO: Use ipc?
+    if (zmq_connect(socket, "ipc://writer_metad") != 0) {
+        throw runtime_error(strerror (errno));
+    }
+
+    cout << "receiving " << endl;
+    uint64_t response;
+    zmq_recv(meta_socket, &response, sizeof(response), 0);
+    cout << "Done!! " << response << endl;
 
     for (const auto& suffix:path_suffixes) {
         metadata_buffer->start_pulse_id = suffix.start_pulse_id;

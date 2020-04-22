@@ -7,6 +7,7 @@
 #include <BufferUtils.hpp>
 #include <jungfrau.hpp>
 #include <unordered_map>
+#include <thread>
 
 using namespace std;
 
@@ -35,6 +36,7 @@ int main (int argc, char *argv[])
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, 16);
 
     auto socket = zmq_socket(ctx, ZMQ_PULL);
+    auto meta_socket = zmq_socket(ctx, ZMQ_PUB);
 
     int rcvhwm = 1000;
     if (zmq_setsockopt(socket, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
@@ -46,13 +48,19 @@ int main (int argc, char *argv[])
         throw runtime_error(strerror (errno));
     }
 
-    //TODO: Use ipc?
     if (zmq_bind(socket, "ipc://writer") != 0) {
         throw runtime_error(strerror (errno));
     }
 
+    if (zmq_bind(meta_socket, "ipc://writer_meta") != 0) {
+        throw runtime_error(strerror (errno));
+    }
 
+    this_thread::sleep_for(chrono::milliseconds(5000));
 
+    uint64_t test = 12;
+    zmq_send(meta_socket, &test, sizeof(test),0);
+    cout << "sent pub" << endl;
 
     auto metadata_buffer = make_unique<ModuleFrame>();
 
