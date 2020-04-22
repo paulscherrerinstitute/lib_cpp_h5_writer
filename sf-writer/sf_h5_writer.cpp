@@ -10,6 +10,7 @@
 #include <thread>
 #include <sstream>
 #include <chrono>
+#include <H5Writer.hpp>
 
 using namespace std;
 
@@ -31,6 +32,9 @@ int main (int argc, char *argv[])
     string output_file = string(argv[1]);
     uint64_t start_pulse_id = (uint64_t) atoll(argv[2]);
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[3]);
+
+    H5Writer writer(output_file);
+    writer.create_file();
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, 16);
@@ -60,7 +64,9 @@ int main (int argc, char *argv[])
 
 
     auto metadata_buffer = make_unique<ModuleFrame>();
-    auto image_buffer = make_unique<uint16_t[]>(512 * 1024);
+    auto image_buffer = make_unique<uint16_t[]>(32*512*1024);
+
+    int i_write = 0;
 
     while (true) {
         uint64_t pulse_id = 0;
@@ -90,7 +96,7 @@ int main (int argc, char *argv[])
 
             auto n_bytes_image = zmq_recv(
                     sockets[i],
-                    image_buffer.get(),
+                    (image_buffer.get() + (512*1024*i)),
                     512 * 1024 * 2,
                     0);
 
@@ -100,12 +106,18 @@ int main (int argc, char *argv[])
             }
         }
 
+        writer.write_data("image", i_write, (char*) (image_buffer.get()),
+                {32*512, 1024}, 32*512*1024*2, "uint16", "little");
+        i_write++;
+
         auto end_time = chrono::steady_clock::now();
 
         cout << pulse_id << " took ";
         cout << chrono::duration_cast<chrono::milliseconds>(end_time-start_time).count();
         cout << " ms" << endl;
     }
+
+    writer.close_file();
 
     for (size_t i=0; i<n_modules; i++) {
         zmq_close(sockets[i]);
