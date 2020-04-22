@@ -47,20 +47,10 @@ int main (int argc, char *argv[]) {
 
     auto ctx = zmq_ctx_new();
     auto socket = zmq_socket(ctx, ZMQ_PUSH);
-    auto more_socket = zmq_socket(ctx, ZMQ_SUB);
-
-    //TODO: Use ipc?
-    if (zmq_connect(socket, "tcp://localhost:50000") != 0) {
-        throw runtime_error(strerror (errno));
-    }
-
-    if (zmq_connect(more_socket, "tcp://localhost:50001") != 0) {
-        throw runtime_error(strerror (errno));
-    }
 
     int status = 0;
 
-    int sndhwm = 1000;
+    int sndhwm = 100;
     status += zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm));
     int linger_ms = 0;
     status += zmq_setsockopt(socket, ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
@@ -68,6 +58,11 @@ int main (int argc, char *argv[]) {
     //status += zmq_setsockopt(socket, ZMQ_SNDTIMEO, 1000);
 
     if (status != 0) {
+        throw runtime_error(strerror (errno));
+    }
+
+    //TODO: Use ipc?
+    if (zmq_connect(socket, "ipc://writer") != 0) {
         throw runtime_error(strerror (errno));
     }
 
@@ -126,12 +121,6 @@ int main (int argc, char *argv[]) {
                      (char*) (image_buffer.get() + (i_frame * 512 * 1024)),
                      512 * 1024 * 2,
                      0);
-
-            if ((i_frame>0) && (i_frame % 100 == 0)) {
-                // Waiting to send more.
-                uint64_t test = 0;
-                zmq_recv(more_socket, &test, sizeof(test), 0);
-            }
         }
     }
 

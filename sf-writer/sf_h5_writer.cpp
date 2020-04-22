@@ -35,18 +35,8 @@ int main (int argc, char *argv[])
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, 16);
 
     auto socket = zmq_socket(ctx, ZMQ_PULL);
-    auto more_socket = zmq_socket(ctx, ZMQ_PUB);
 
-    //TODO: Use ipc?
-    if (zmq_bind(socket, "tcp://127.0.0.1:50000") != 0) {
-        throw runtime_error(strerror (errno));
-    }
-
-    if (zmq_bind(more_socket, "tcp://127.0.0.1:50001") != 0) {
-        throw runtime_error(strerror (errno));
-    }
-
-    int rcvhwm = 10000;
+    int rcvhwm = 1000;
     if (zmq_setsockopt(socket, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
         throw runtime_error(strerror (errno));
     }
@@ -55,6 +45,14 @@ int main (int argc, char *argv[])
     if (zmq_setsockopt(socket, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
         throw runtime_error(strerror (errno));
     }
+
+    //TODO: Use ipc?
+    if (zmq_bind(socket, "ipc://writer") != 0) {
+        throw runtime_error(strerror (errno));
+    }
+
+
+
 
     auto metadata_buffer = make_unique<ModuleFrame>();
 
@@ -96,12 +94,6 @@ int main (int argc, char *argv[])
 
         size_t n_in_progress_frames = received_counter.size();
         cout << "n frames in progress " << n_in_progress_frames << endl;
-
-        if (n_in_progress_frames == 0) {
-            uint64_t test = 0;
-            zmq_send(more_socket, &test, sizeof(test), 0);
-            cout << "SENT!!!" << endl;
-        }
     }
 
     zmq_close(socket);
