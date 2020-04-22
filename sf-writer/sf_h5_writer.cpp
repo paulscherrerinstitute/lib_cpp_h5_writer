@@ -34,7 +34,7 @@ int main (int argc, char *argv[])
 
     //TODO: Use ipc?
     if (zmq_bind(socket, "tcp://localhost:50000") != 0) {
-        throw runtime_error("not binding");
+        throw runtime_error(strerror (errno));
     }
 
     int rcvhwm = 3;
