@@ -46,28 +46,19 @@ int main (int argc, char *argv[]) {
             start_pulse_id, stop_pulse_id);
 
     auto ctx = zmq_ctx_new();
+
     auto socket = zmq_socket(ctx, ZMQ_PUSH);
-
-
-    int status = 0;
-
     int sndhwm = 1;
-    status += zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm));
+    if (zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
+        throw runtime_error(strerror (errno));
+    };
     int linger_ms = 0;
-    status += zmq_setsockopt(socket, ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
-
-    //status += zmq_setsockopt(socket, ZMQ_SNDTIMEO, 1000);
-
-    if (status != 0) {
+    if (zmq_setsockopt(socket, ZMQ_LINGER, &linger_ms, sizeof(linger_ms))) {
         throw runtime_error(strerror (errno));
     }
-
-    //TODO: Use ipc?
     if (zmq_connect(socket, "ipc://writer") != 0) {
         throw runtime_error(strerror (errno));
     }
-    //TODO: Use ipc?
-
 
     auto meta_socket = zmq_socket(ctx, ZMQ_SUB);
     if (zmq_connect(meta_socket, "ipc://metadata") != 0) {
@@ -75,12 +66,6 @@ int main (int argc, char *argv[]) {
     }
     if (zmq_setsockopt(meta_socket, ZMQ_SUBSCRIBE, "", 0) != 0) {
         throw runtime_error(strerror (errno));
-    }
-    while (true) {
-        cout << "receiving " << endl;
-        uint64_t response;
-        zmq_recv(meta_socket, &response, sizeof(response), 0);
-        cout << "Done!! " << response << endl;
     }
 
     for (const auto& suffix:path_suffixes) {
@@ -138,6 +123,11 @@ int main (int argc, char *argv[]) {
                      (char*) (image_buffer.get() + (i_frame * 512 * 1024)),
                      512 * 1024 * 2,
                      0);
+
+            if ((i_frame > 0) && (i_frame%100 == 0)) {
+                // Wait for the sync message.
+                zmq_recv(meta_socket, nullptr, 0, 0);
+            }
         }
     }
 

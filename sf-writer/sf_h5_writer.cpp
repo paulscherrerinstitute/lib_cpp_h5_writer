@@ -36,38 +36,22 @@ int main (int argc, char *argv[])
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, 16);
 
     auto socket = zmq_socket(ctx, ZMQ_PULL);
-
-
     int rcvhwm = 1000;
     if (zmq_setsockopt(socket, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
         throw runtime_error(strerror (errno));
     }
-
     int linger = 0;
     if (zmq_setsockopt(socket, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
         throw runtime_error(strerror (errno));
     }
-
     if (zmq_bind(socket, "ipc://writer") != 0) {
         throw runtime_error(strerror (errno));
     }
-
-
 
     auto meta_socket = zmq_socket(ctx, ZMQ_PUB);
     if (zmq_bind(meta_socket, "ipc://metadata") != 0) {
         throw runtime_error(strerror (errno));
     }
-
-    while(true) {
-        string test = "test";
-        auto c_test = test.c_str();
-        zmq_send(meta_socket, c_test, strlen(c_test), 0);
-        cout << "sent test" << endl;
-        this_thread::sleep_for(chrono::milliseconds(100));
-    }
-
-
 
     uint64_t test = 12;
     zmq_send(meta_socket, &test, sizeof(test),0);
@@ -112,6 +96,9 @@ int main (int argc, char *argv[])
 
         size_t n_in_progress_frames = received_counter.size();
         cout << "n frames in progress " << n_in_progress_frames << endl;
+        if (n_in_progress_frames == 0) {
+            zmq_send(meta_socket, "", strlen(""), 0);
+        }
     }
 
     zmq_close(socket);
