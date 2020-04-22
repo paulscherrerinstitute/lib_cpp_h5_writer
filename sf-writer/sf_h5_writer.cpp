@@ -30,10 +30,12 @@ int main (int argc, char *argv[])
     size_t n_modules = 32;
 
     auto ctx = zmq_ctx_new();
+    zmq_ctx_set (ctx, ZMQ_IO_THREADS, 4);
+
     auto socket = zmq_socket(ctx, ZMQ_PULL);
 
     //TODO: Use ipc?
-    if (zmq_bind(socket, "tcp://localhost:50000") != 0) {
+    if (zmq_bind(socket, "tcp://0.0.0.0:50000") != 0) {
         throw runtime_error(strerror (errno));
     }
 
