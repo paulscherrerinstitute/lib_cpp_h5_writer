@@ -68,6 +68,7 @@ int main (int argc, char *argv[])
 
     int i_write = 0;
     size_t total_ms = 0;
+    size_t max_ms = 0;
 
     while (true) {
         uint64_t pulse_id = 0;
@@ -117,11 +118,16 @@ int main (int argc, char *argv[])
 
         auto ms_duration = chrono::duration_cast<chrono::milliseconds>(end_time-start_time).count();
         total_ms += ms_duration;
+        if (ms_duration > max_ms) {
+            max_ms = ms_duration;
+        }
 
         if (i_write==100) {
-            cout << "assembly_ms " << total_ms / 100 << endl;
+            cout << "assembly_ms " << total_ms / 100;
+            cout << "max_ms " << max_ms << endl;
             i_write = 0;
             total_ms = 0;
+            max_ms = 0;
         }
     }
 
