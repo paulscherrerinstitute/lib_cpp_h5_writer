@@ -121,6 +121,7 @@ int main (int argc, char *argv[])
         if (i_write==100) {
             cout << "assembly_ms " << total_ms / 100 << endl;
             i_write = 0;
+            total_ms = 0;
         }
     }
 
