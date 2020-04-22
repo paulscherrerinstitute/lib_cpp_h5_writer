@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
     auto image_buffer = make_unique<uint16_t[]>(512 * 1024);
     unordered_map<uint64_t, int> received_counter;
 
-    size_t n_recv_modules = 0;
+    size_t n_frames_left = 32*50;
 
     while (true) {
         auto n_bytes_metadata = zmq_recv(
@@ -85,6 +85,8 @@ int main (int argc, char *argv[])
             throw runtime_error("Unexpected number of bytes in image.");
         }
 
+        n_frames_left--;
+
         if (received_counter.find(metadata_buffer->pulse_id) ==
                 received_counter.end()) {
             received_counter.insert({metadata_buffer->pulse_id, 31});
@@ -93,17 +95,15 @@ int main (int argc, char *argv[])
 
             if (received_counter[metadata_buffer->pulse_id] == 0) {
                 received_counter.erase(metadata_buffer->pulse_id);
-                n_recv_modules++;
             }
         }
 
-        cout << "n_recv_modules " << n_recv_modules << endl;
-        if (n_recv_modules == 32) {
+        if (n_frames_left == 0) {
             for(auto& data:received_counter) {
-                cout << data.first << ": " << data.second;
+                cout << data.first << ": " << data.second << endl;
             }
-            zmq_send(meta_socket, "", strlen(""), 0);
-            n_recv_modules = 0;
+//            zmq_send(meta_socket, "", strlen(""), 0);
+            n_frames_left = 32*50;
         }
     }
 
