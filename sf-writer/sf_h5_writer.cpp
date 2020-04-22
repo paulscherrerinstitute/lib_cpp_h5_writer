@@ -35,7 +35,7 @@ int main (int argc, char *argv[])
     auto socket = zmq_socket(ctx, ZMQ_PULL);
 
     //TODO: Use ipc?
-    if (zmq_bind(socket, "tcp://0.0.0.0:50000") != 0) {
+    if (zmq_bind(socket, "tcp://127.0.0.1:50000") != 0) {
         throw runtime_error(strerror (errno));
     }
 
