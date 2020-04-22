@@ -61,6 +61,8 @@ int main (int argc, char *argv[])
     auto image_buffer = make_unique<uint16_t[]>(512 * 1024);
     unordered_map<uint64_t, int> received_counter;
 
+    size_t n_recv_modules = 0;
+
     while (true) {
         auto n_bytes_metadata = zmq_recv(
                 socket,
@@ -91,13 +93,16 @@ int main (int argc, char *argv[])
 
             if (received_counter[metadata_buffer->pulse_id] == 0) {
                 received_counter.erase(metadata_buffer->pulse_id);
+                n_recv_modules++;
             }
         }
 
         size_t n_in_progress_frames = received_counter.size();
-        cout << "n frames in progress " << n_in_progress_frames << endl;
-        if (n_in_progress_frames == 0) {
+        cout << "n frames in progress " << n_in_progress_frames;
+        cout << "n_recv_modules " << n_recv_modules << endl;
+        if (n_recv_modules == 32) {
             zmq_send(meta_socket, "", strlen(""), 0);
+            n_recv_modules = 0;
         }
     }
 
