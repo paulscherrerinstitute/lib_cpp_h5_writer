@@ -101,7 +101,7 @@ int main (int argc, char *argv[])
     };
 
     for (size_t i=0; i<n_modules; i++) {
-        thread test(read_thread, i);
+        threads.emplace_back(read_thread, i);
     }
 
     int i_write = 0;
