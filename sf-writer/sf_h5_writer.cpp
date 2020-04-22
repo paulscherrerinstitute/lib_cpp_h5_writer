@@ -68,6 +68,7 @@ int main (int argc, char *argv[])
                 0);
 
         if (n_bytes_image != 512 * 1024 * 2) {
+            cout << "n_bytes_image " << n_bytes_image << endl;
             throw runtime_error("Unexpected number of bytes in image.");
         }
 
