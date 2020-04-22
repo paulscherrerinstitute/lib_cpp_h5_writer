@@ -36,7 +36,7 @@ int main (int argc, char *argv[])
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, 16);
 
     auto socket = zmq_socket(ctx, ZMQ_PULL);
-    auto meta_socket = zmq_socket(ctx, ZMQ_PUB);
+    auto meta_socket = zmq_socket(ctx, ZMQ_PUSH);
 
     int rcvhwm = 1000;
     if (zmq_setsockopt(socket, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {

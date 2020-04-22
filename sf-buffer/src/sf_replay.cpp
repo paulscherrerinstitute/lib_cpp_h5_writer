@@ -47,11 +47,11 @@ int main (int argc, char *argv[]) {
 
     auto ctx = zmq_ctx_new();
     auto socket = zmq_socket(ctx, ZMQ_PUSH);
-    auto meta_socket = zmq_socket(ctx, ZMQ_SUB);
-
-    if (zmq_setsockopt(meta_socket, ZMQ_SUBSCRIBE, nullptr, 0) != 0) {
-        throw runtime_error(strerror (errno));
-    }
+    auto meta_socket = zmq_socket(ctx, ZMQ_PULL);
+//
+//    if (zmq_setsockopt(meta_socket, ZMQ_SUBSCRIBE, nullptr, 0) != 0) {
+//        throw runtime_error(strerror (errno));
+//    }
 
     int status = 0;
 
