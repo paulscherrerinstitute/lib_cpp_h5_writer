@@ -49,7 +49,7 @@ int main (int argc, char *argv[]) {
     auto socket = zmq_socket(ctx, ZMQ_PUSH);
 
     //TODO: Use ipc?
-    if (zmq_connect(socket, "tcp://localhost:50000") != 0) {
+    if (zmq_connect(socket, "tcp://localhost:49000") != 0) {
         throw runtime_error(strerror (errno));
     }
 
