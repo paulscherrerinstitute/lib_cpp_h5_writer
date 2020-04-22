@@ -97,10 +97,11 @@ int main (int argc, char *argv[])
             }
         }
 
-        size_t n_in_progress_frames = received_counter.size();
-        cout << "n frames in progress " << n_in_progress_frames;
         cout << "n_recv_modules " << n_recv_modules << endl;
         if (n_recv_modules == 32) {
+            for(auto& data:received_counter) {
+                cout << data.first << ": " << data.second;
+            }
             zmq_send(meta_socket, "", strlen(""), 0);
             n_recv_modules = 0;
         }
