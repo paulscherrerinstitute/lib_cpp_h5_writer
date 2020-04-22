@@ -1,13 +1,9 @@
 #include <iostream>
-#include <chrono>
 #include <UdpReceiver.hpp>
-#include <fstream>
 #include <thread>
 #include "jungfrau.hpp"
 #include "BufferUtils.hpp"
 #include "zmq.h"
-
-const int STREAM_BLOCK_SIZE = 50;
 
 using namespace std;
 
@@ -37,11 +33,11 @@ int main (int argc, char *argv[]) {
     // TODO: If stop_pulse_id not in LATEST_filename file path throw exception.
     // string LATEST_filename = root_folder + "/" + device_name + "/LATEST";
 
-    auto metadata_buffer = make_unique<FileBufferMetadata>();
+    auto metadata_buffer = make_unique<BufferUtils::FileBufferMetadata>();
     metadata_buffer->module_id = module_id;
 
     auto image_buffer = make_unique<uint16_t[]>(
-            STREAM_BLOCK_SIZE * 512 * 1024);
+            BufferUtils::STREAM_BLOCK_SIZE * 512 * 1024);
 
     auto path_suffixes = BufferUtils::get_path_suffixes(
             start_pulse_id, stop_pulse_id);
@@ -93,7 +89,7 @@ int main (int argc, char *argv[]) {
 
         hsize_t file_dim[3] = {BufferUtils::FILE_MOD, 512, 1024};
         H5::DataSpace file_space (3, file_dim);
-        hsize_t b_count[] = {STREAM_BLOCK_SIZE, 512, 1024};
+        hsize_t b_count[] = {BufferUtils::STREAM_BLOCK_SIZE, 512, 1024};
         hsize_t b_start[] = {0, 0, 0};
         file_space.selectHyperslab(H5S_SELECT_SET, b_count, b_start);
 
@@ -103,7 +99,7 @@ int main (int argc, char *argv[]) {
 
         hsize_t meta_dim[2] = {BufferUtils::FILE_MOD, 1};
         H5::DataSpace meta_space (2, meta_dim);
-        hsize_t m_count[] = {STREAM_BLOCK_SIZE, 1};
+        hsize_t m_count[] = {BufferUtils::STREAM_BLOCK_SIZE, 1};
         hsize_t m_start[] = {0, 0, 0};
         meta_space.selectHyperslab(H5S_SELECT_SET, m_count, m_start);
 
@@ -127,9 +123,9 @@ int main (int argc, char *argv[]) {
         for (
                 size_t start_pulse=0;
                 start_pulse<BufferUtils::FILE_MOD;
-                start_pulse+STREAM_BLOCK_SIZE) {
+                start_pulse+BufferUtils::STREAM_BLOCK_SIZE) {
 
-                for (size_t i_frame=0; i_frame < STREAM_BLOCK_SIZE; i_frame++) {
+                for (size_t i_frame=0; i_frame < BufferUtils::STREAM_BLOCK_SIZE; i_frame++) {
                     ModuleFrame module_frame = {
                             metadata_buffer->pulse_id[i_frame],
                             metadata_buffer->frame_index[i_frame],
@@ -150,11 +146,11 @@ int main (int argc, char *argv[]) {
                 }
 
                 // Load next
-                if (start_pulse + STREAM_BLOCK_SIZE < BufferUtils::FILE_MOD) {
+                if (start_pulse + BufferUtils::STREAM_BLOCK_SIZE < BufferUtils::FILE_MOD) {
 
                     hsize_t file_dim[3] = {BufferUtils::FILE_MOD, 512, 1024};
                     H5::DataSpace file_space (3, file_dim);
-                    hsize_t b_count[] = {STREAM_BLOCK_SIZE, 512, 1024};
+                    hsize_t b_count[] = {BufferUtils::STREAM_BLOCK_SIZE, 512, 1024};
                     hsize_t b_start[] = {start_pulse, 0, 0};
                     file_space.selectHyperslab(H5S_SELECT_SET, b_count, b_start);
 
@@ -164,7 +160,7 @@ int main (int argc, char *argv[]) {
 
                     hsize_t meta_dim[2] = {BufferUtils::FILE_MOD, 1};
                     H5::DataSpace meta_space (2, meta_dim);
-                    hsize_t m_count[] = {STREAM_BLOCK_SIZE, 1};
+                    hsize_t m_count[] = {BufferUtils::STREAM_BLOCK_SIZE, 1};
                     hsize_t m_start[] = {start_pulse, 0, 0};
                     meta_space.selectHyperslab(H5S_SELECT_SET, m_count, m_start);
 
