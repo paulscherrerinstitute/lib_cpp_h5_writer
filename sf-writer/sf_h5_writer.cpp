@@ -127,13 +127,15 @@ int main (int argc, char *argv[])
         }
 
         if (i_write==100) {
-            cout << "assembly_ms " << total_ms / 100;
-            cout << "max_ms " << max_ms << endl;
+            cout << "avg_ms " << total_ms / 100;
+            cout << " max_ms " << max_ms << endl;
             i_write = 0;
             total_ms = 0;
             max_ms = 0;
         }
         start_time = chrono::steady_clock::now();
+
+        modules_ready = all_modules_ready;
     }
 
     return 0;
