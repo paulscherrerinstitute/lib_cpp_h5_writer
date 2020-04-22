@@ -129,7 +129,8 @@ int main (int argc, char *argv[]) {
 
             if ((i_frame>0) && (i_frame % 100 == 0)) {
                 // Waiting to send more.
-                zmq_recv(more_socket, nullptr, 0, 0);
+                uint64_t test = 0;
+                zmq_recv(more_socket, &test, sizeof(test), 0);
             }
         }
     }

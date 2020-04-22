@@ -6,6 +6,7 @@
 #include <RingBuffer.hpp>
 #include <BufferUtils.hpp>
 #include <jungfrau.hpp>
+#include <unordered_map>
 
 using namespace std;
 
@@ -58,7 +59,7 @@ int main (int argc, char *argv[])
     auto metadata_buffer = make_unique<ModuleFrame>();
 
     auto image_buffer = make_unique<uint16_t[]>(512 * 1024);
-    auto received_counter = unordered_map<uint64_t, int>();
+    unordered_map<uint64_t, int> received_counter;
 
     while (true) {
         auto n_bytes_metadata = zmq_recv(
@@ -97,7 +98,9 @@ int main (int argc, char *argv[])
         cout << "n frames in progress " << n_in_progress_frames << endl;
 
         if (n_in_progress_frames == 0) {
-            zmq_send(more_socket, nullptr, 0, 0);
+            uint64_t test = 0;
+            zmq_send(more_socket, &test, sizeof(test), 0);
+            cout << "SENT!!!" << endl;
         }
     }
 
