@@ -71,6 +71,10 @@ int main (int argc, char *argv[])
                     sizeof(ModuleFrame),
                     0);
 
+            if (n_bytes_metadata != sizeof(ModuleFrame)) {
+                throw runtime_error("Unexpected number of bytes in metadata.");
+            }
+
             if (i == 0) {
                 pulse_id = metadata_buffer->pulse_id;
             }
@@ -78,10 +82,6 @@ int main (int argc, char *argv[])
             if (pulse_id != metadata_buffer->pulse_id) {
                 cout << "Module " << i << " pulse " << metadata_buffer->pulse_id;
                 cout << " instead of " << pulse_id << endl;
-            }
-
-            if (n_bytes_metadata != sizeof(ModuleFrame)) {
-                throw runtime_error("Unexpected number of bytes in metadata.");
             }
 
             auto n_bytes_image = zmq_recv(
