@@ -12,7 +12,7 @@ using namespace std;
 
 int main (int argc, char *argv[]) {
 
-    if (argc != 5) {
+    if (argc != 6) {
         cout << endl;
         cout << "Usage: sf_replay [device]";
         cout << " [channel_name] [module_id] [start_pulse_id] [stop_pulse_id]";
