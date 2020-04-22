@@ -113,7 +113,7 @@ int main (int argc, char *argv[]) {
                 BufferUtils::FILE_MOD * 512 * 1024 * 2,
                 0);
 
-        this_thread::sleep_for(chrono::milliseconds(5));
+        this_thread::sleep_for(chrono::milliseconds(1000));
     }
 
     zmq_close(socket);

@@ -30,7 +30,7 @@ int main (int argc, char *argv[])
     size_t n_modules = 32;
 
     auto ctx = zmq_ctx_new();
-    zmq_ctx_set (ctx, ZMQ_IO_THREADS, 4);
+    zmq_ctx_set (ctx, ZMQ_IO_THREADS, 16);
 
     auto socket = zmq_socket(ctx, ZMQ_PULL);
 
