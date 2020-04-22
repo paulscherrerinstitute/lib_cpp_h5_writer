@@ -44,7 +44,7 @@ int main (int argc, char *argv[])
 
     for (size_t i=0; i<n_modules; i++) {
         sockets[i] = zmq_socket(ctx, ZMQ_PULL);
-        int rcvhwm = 10;
+        int rcvhwm = 100;
         if (zmq_setsockopt(sockets[i], ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
             throw runtime_error(strerror (errno));
         }
@@ -67,6 +67,7 @@ int main (int argc, char *argv[])
     auto image_buffer = make_unique<uint16_t[]>(32*512*1024);
 
     int i_write = 0;
+    size_t total_ms = 0;
 
     while (true) {
         uint64_t pulse_id = 0;
@@ -106,15 +107,21 @@ int main (int argc, char *argv[])
             }
         }
 
-        writer.write_data("image", i_write, (char*) (image_buffer.get()),
-                {32*512, 1024}, 32*512*1024*2, "uint16", "little");
+//        writer.write_data("image", i_write, (char*) (image_buffer.get()),
+//                {32*512, 1024}, 32*512*1024*2, "uint16", "little");
         i_write++;
 
         auto end_time = chrono::steady_clock::now();
 
-        cout << pulse_id << " took ";
-        cout << chrono::duration_cast<chrono::milliseconds>(end_time-start_time).count();
-        cout << " ms" << endl;
+        // TODO: Some poor statistics.
+
+        auto ms_duration = chrono::duration_cast<chrono::milliseconds>(end_time-start_time).count();
+        total_ms += ms_duration;
+
+        if (i_write==100) {
+            cout << "assembly_ms " << total_ms / 100 << endl;
+            i_write = 0;
+        }
     }
 
     writer.close_file();
