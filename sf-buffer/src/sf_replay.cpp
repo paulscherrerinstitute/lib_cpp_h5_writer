@@ -124,10 +124,7 @@ int main (int argc, char *argv[]) {
                      512 * 1024 * 2,
                      0);
 
-            if ((i_frame > 0) && (i_frame%100 == 0)) {
-                // Wait for the sync message.
-                zmq_recv(meta_socket, nullptr, 0, 0);
-            }
+            zmq_recv(meta_socket, nullptr, 0, 0);
         }
     }
 
