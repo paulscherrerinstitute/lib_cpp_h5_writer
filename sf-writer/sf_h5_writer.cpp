@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <thread>
 #include <sstream>
+#include <chrono>
 
 using namespace std;
 
@@ -64,6 +65,8 @@ int main (int argc, char *argv[])
     while (true) {
         uint64_t pulse_id = 0;
 
+        auto start_time = chrono::steady_clock::now();
+
         for (size_t i=0; i<n_modules; i++) {
             auto n_bytes_metadata = zmq_recv(
                     sockets[i],
@@ -95,8 +98,13 @@ int main (int argc, char *argv[])
                 cout << "n_bytes_image " << n_bytes_image << endl;
                 throw runtime_error("Unexpected number of bytes in image.");
             }
-
         }
+
+        auto end_time = chrono::steady_clock::now();
+
+        cout << pulse_id << " took ";
+        cout << chrono::duration_cast<chrono::milliseconds>(end_time-start_time).count();
+        cout << " ms" << endl;
     }
 
     for (size_t i=0; i<n_modules; i++) {
