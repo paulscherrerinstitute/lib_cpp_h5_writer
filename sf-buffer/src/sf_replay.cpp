@@ -57,14 +57,6 @@ int main (int argc, char *argv[]) {
         throw runtime_error(strerror (errno));
     }
 
-    auto meta_socket = zmq_socket(ctx, ZMQ_SUB);
-    if (zmq_connect(meta_socket, "ipc://metadata") != 0) {
-        throw runtime_error(strerror (errno));
-    }
-    if (zmq_setsockopt(meta_socket, ZMQ_SUBSCRIBE, "", 0) != 0) {
-        throw runtime_error(strerror (errno));
-    }
-
     for (const auto& suffix:path_suffixes) {
         metadata_buffer->start_pulse_id = suffix.start_pulse_id;
         metadata_buffer->stop_pulse_id = suffix.stop_pulse_id;
@@ -181,9 +173,6 @@ int main (int argc, char *argv[]) {
                             H5::PredType::NATIVE_UINT16,
                             H5::DataSpace::ALL, meta_space);
                 }
-
-                // Wait for sync.
-                zmq_recv(meta_socket, nullptr, 0, 0);
             }
 
         input_file.close();
