@@ -118,11 +118,6 @@ int main (int argc, char *argv[]) {
                      ZMQ_SNDMORE);
 
             zmq_send(socket,
-                     metadata_buffer.get(),
-                     sizeof(FileBufferMetadata),
-                     ZMQ_SNDMORE);
-
-            zmq_send(socket,
                      (char*) (image_buffer.get() + (i_frame * 512 * 1024)),
                      512 * 1024 * 2,
                      0);
