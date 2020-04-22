@@ -12,24 +12,6 @@
 #include <chrono>
 #include "date.h"
 
-#pragma pack(push)
-#pragma pack(1)
-struct FileBufferMetadata {
-    // Needed by RingBuffer
-    const uint64_t frame_bytes_size = 2*512*1024*50;
-    uint64_t buffer_slot_index;
-
-    uint64_t start_pulse_id;
-    uint64_t stop_pulse_id;
-    uint16_t module_id;
-
-    uint64_t pulse_id[50];
-    uint64_t frame_index[50];
-    uint32_t daq_rec[50];
-    uint16_t n_received_packets[50];
-};
-#pragma pack(pop)
-
 struct FrameMetadata
 {
     // Ring buffer needed data.
