@@ -105,6 +105,8 @@ int main (int argc, char *argv[]) {
 
         input_file.close();
 
+        size_t send_counter = 0;
+
         for (size_t i_frame=0; i_frame<BufferUtils::FILE_MOD; i_frame++) {
             ModuleFrame module_frame = {
                     metadata_buffer->pulse_id[i_frame],
@@ -124,9 +126,12 @@ int main (int argc, char *argv[]) {
                      512 * 1024 * 2,
                      0);
 
-            if ((i_frame > 0) && (i_frame%50 == 0)) {
+            send_counter++;
+
+            if (send_counter == 50) {
                 // Wait for the sync message.
                 zmq_recv(meta_socket, nullptr, 0, 0);
+                send_counter = 0;
             }
         }
     }
