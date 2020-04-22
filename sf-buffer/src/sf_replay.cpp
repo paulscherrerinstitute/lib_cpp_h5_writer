@@ -55,7 +55,7 @@ int main (int argc, char *argv[]) {
 
     int status = 0;
 
-    int sndhwm = 1;
+    int sndhwm = 1000;
     status += zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm));
     int linger_ms = 0;
     status += zmq_setsockopt(socket, ZMQ_LINGER, &linger_ms, sizeof(linger_ms));

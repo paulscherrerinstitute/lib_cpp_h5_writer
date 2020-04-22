@@ -40,7 +40,7 @@ int main (int argc, char *argv[])
         throw runtime_error(strerror (errno));
     }
 
-    int rcvhwm = 1;
+    int rcvhwm = 10000;
     int status = zmq_setsockopt(socket, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm));
     if (status != 0) {
         throw runtime_error(strerror (errno));
