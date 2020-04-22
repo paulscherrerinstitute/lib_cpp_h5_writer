@@ -53,7 +53,12 @@ int main (int argc, char *argv[]) {
     if (zmq_setsockopt(socket, ZMQ_LINGER, &linger_ms, sizeof(linger_ms))) {
         throw runtime_error(strerror (errno));
     }
-    if (zmq_connect(socket, "ipc://writer") != 0) {
+
+    stringstream ipc_addr;
+    ipc_addr << "ipc://sf-replay-" << (int)module_id;
+    auto ipc = ipc_addr.str();
+
+    if (zmq_connect(socket, ipc.c_str()) != 0) {
         throw runtime_error(strerror (errno));
     }
 
