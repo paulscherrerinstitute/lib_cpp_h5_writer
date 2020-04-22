@@ -38,13 +38,13 @@ int main (int argc, char *argv[])
     void* sockets[n_modules];
 
     for (size_t i=0; i<n_modules; i++) {
-        auto socket = zmq_socket(ctx, ZMQ_PULL);
+        sockets[i] = zmq_socket(ctx, ZMQ_PULL);
         int rcvhwm = 10;
-        if (zmq_setsockopt(socket, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
+        if (zmq_setsockopt(sockets[i], ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
             throw runtime_error(strerror (errno));
         }
         int linger = 0;
-        if (zmq_setsockopt(socket, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
+        if (zmq_setsockopt(sockets[i], ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
             throw runtime_error(strerror (errno));
         }
 
@@ -52,7 +52,7 @@ int main (int argc, char *argv[])
         ipc_addr << "ipc://sf-replay-" << i;
         auto ipc = ipc_addr.str();
 
-        if (zmq_bind(socket, ipc.c_str()) != 0) {
+        if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
             throw runtime_error(strerror (errno));
         }
     }
@@ -72,7 +72,8 @@ int main (int argc, char *argv[])
                     0);
 
             if (n_bytes_metadata != sizeof(ModuleFrame)) {
-                throw runtime_error("Unexpected number of bytes in metadata.");
+                throw runtime_error(strerror (errno));
+
             }
 
             if (i == 0) {
