@@ -47,9 +47,14 @@ int main (int argc, char *argv[]) {
 
     auto ctx = zmq_ctx_new();
     auto socket = zmq_socket(ctx, ZMQ_PUSH);
+    auto more_socket = zmq_socket(ctx, ZMQ_SUB);
 
     //TODO: Use ipc?
     if (zmq_connect(socket, "tcp://localhost:50000") != 0) {
+        throw runtime_error(strerror (errno));
+    }
+
+    if (zmq_connect(more_socket, "tcp://localhost:50001") != 0) {
         throw runtime_error(strerror (errno));
     }
 
@@ -121,6 +126,11 @@ int main (int argc, char *argv[]) {
                      (char*) (image_buffer.get() + (i_frame * 512 * 1024)),
                      512 * 1024 * 2,
                      0);
+
+            if ((i_frame>0) && (i_frame % 100 == 0)) {
+                // Waiting to send more.
+                zmq_recv(more_socket, nullptr, 0, 0);
+            }
         }
     }
 

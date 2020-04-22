@@ -34,9 +34,14 @@ int main (int argc, char *argv[])
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, 16);
 
     auto socket = zmq_socket(ctx, ZMQ_PULL);
+    auto more_socket = zmq_socket(ctx, ZMQ_PUB);
 
     //TODO: Use ipc?
     if (zmq_bind(socket, "tcp://127.0.0.1:50000") != 0) {
+        throw runtime_error(strerror (errno));
+    }
+
+    if (zmq_bind(more_socket, "tcp://127.0.0.1:50001") != 0) {
         throw runtime_error(strerror (errno));
     }
 
@@ -53,6 +58,7 @@ int main (int argc, char *argv[])
     auto metadata_buffer = make_unique<ModuleFrame>();
 
     auto image_buffer = make_unique<uint16_t[]>(512 * 1024);
+    auto received_counter = unordered_map<uint64_t, int>();
 
     while (true) {
         auto n_bytes_metadata = zmq_recv(
@@ -76,9 +82,23 @@ int main (int argc, char *argv[])
             throw runtime_error("Unexpected number of bytes in image.");
         }
 
-        cout << "Received " << metadata_buffer->pulse_id;
-        cout << " from " << metadata_buffer->module_id;
-        cout << endl;
+        if (received_counter.find(metadata_buffer->pulse_id) ==
+                received_counter.end()) {
+            received_counter.insert({metadata_buffer->pulse_id, 31});
+        } else {
+            received_counter[metadata_buffer->pulse_id]--;
+
+            if (received_counter[metadata_buffer->pulse_id] == 0) {
+                received_counter.erase(metadata_buffer->pulse_id);
+            }
+        }
+
+        size_t n_in_progress_frames = received_counter.size();
+        cout << "n frames in progress " << n_in_progress_frames << endl;
+
+        if (n_in_progress_frames == 0) {
+            zmq_send(more_socket, nullptr, 0, 0);
+        }
     }
 
     zmq_close(socket);
