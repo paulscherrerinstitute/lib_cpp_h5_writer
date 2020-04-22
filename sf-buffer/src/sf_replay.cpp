@@ -184,8 +184,6 @@ int main (int argc, char *argv[]) {
 
                 // Wait for sync.
                 zmq_recv(meta_socket, nullptr, 0, 0);
-
-
             }
 
         input_file.close();

@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
     auto image_buffer = make_unique<uint16_t[]>(512 * 1024);
     unordered_map<uint64_t, int> received_counter;
 
-    size_t n_frames_left = 32*50;
+    size_t n_frames_left = 32*BufferUtils::STREAM_BLOCK_SIZE;
 
     while (true) {
         auto n_bytes_metadata = zmq_recv(
@@ -99,11 +99,13 @@ int main (int argc, char *argv[])
         }
 
         if (n_frames_left == 0) {
+            cout << "Batch finished." << endl;
             for(auto& data:received_counter) {
                 cout << data.first << ": " << data.second << endl;
             }
-//            zmq_send(meta_socket, "", strlen(""), 0);
-            n_frames_left = 32*50;
+
+            zmq_send(meta_socket, "", strlen(""), 0);
+            n_frames_left = 32*BufferUtils::STREAM_BLOCK_SIZE;
         }
     }
 
