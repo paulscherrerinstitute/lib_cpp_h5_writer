@@ -112,7 +112,7 @@ int main (int argc, char *argv[])
 
     while (true) {
 
-        if (modules_ready != 0) {
+        if (modules_ready > 0) {
             continue;
         }
 
@@ -133,7 +133,7 @@ int main (int argc, char *argv[])
             total_ms = 0;
             max_ms = 0;
         }
-        auto start_time = chrono::steady_clock::now();
+        start_time = chrono::steady_clock::now();
     }
 
     return 0;
