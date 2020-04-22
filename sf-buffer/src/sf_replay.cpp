@@ -72,7 +72,7 @@ int main (int argc, char *argv[]) {
     }
 
     //TODO: Use ipc?
-    if (zmq_connect(socket, "ipc://writer_metad") != 0) {
+    if (zmq_connect(socket, "ipc://writer_meta") != 0) {
         throw runtime_error(strerror (errno));
     }
 
