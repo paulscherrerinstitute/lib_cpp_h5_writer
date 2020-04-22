@@ -51,7 +51,7 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, 16);
 
-    vector<thread> threads;
+    vector<thread> threads(n_modules);
 
     auto read_thread = [&](int module_id) {
         auto socket = zmq_socket(ctx, ZMQ_PULL);
