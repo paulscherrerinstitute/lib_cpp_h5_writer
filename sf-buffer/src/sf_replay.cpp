@@ -70,7 +70,7 @@ int main (int argc, char *argv[]) {
 
 
     auto meta_socket = zmq_socket(ctx, ZMQ_SUB);
-    if (zmq_connect(socket, "ipc://metadata") != 0) {
+    if (zmq_connect(meta_socket, "ipc://metadata") != 0) {
         throw runtime_error(strerror (errno));
     }
     if (zmq_setsockopt(meta_socket, ZMQ_SUBSCRIBE, "", 0) != 0) {
