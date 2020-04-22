@@ -10,7 +10,7 @@ using namespace std;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 5) {
+    if (argc != 4) {
         cout << endl;
         cout << "Usage: sf_h5_writer ";
         cout << " [output_file] [start_pulse_id] [stop_pulse_id]";
