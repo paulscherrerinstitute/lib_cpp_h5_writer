@@ -27,6 +27,8 @@ namespace core_buffer {
 
     // Size of sf_buffer RB in elements.
     const size_t BUFFER_RB_SIZE = 1000;
+
+    const int WRITER_ZMQ_IO_THREADS = 16;
 }
 
 #endif //BUFFERCONFIG_HPP
