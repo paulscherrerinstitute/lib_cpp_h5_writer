@@ -1,6 +1,8 @@
 #include "FastH5Writer.hpp"
 #include "gtest/gtest.h"
 
+using namespace core_buffer;
+
 TEST(FastH5Writer, basic_interaction)
 {
     auto root_folder = ".";
@@ -16,7 +18,7 @@ TEST(FastH5Writer, basic_interaction)
     metadata.n_recv_packets = 128;
 
     FastH5Writer writer(
-            BufferUtils::FILE_MOD, 512, 1024, device_name, root_folder);
+            core_buffer::FILE_MOD, 512, 1024, device_name, root_folder);
 
     writer.add_scalar_metadata<uint64_t>("pulse_id");
     writer.add_scalar_metadata<uint64_t>("frame_id");
@@ -99,7 +101,7 @@ TEST(FastH5Writer, SWMR)
     }
 
     FastH5Writer writer(
-            BufferUtils::FILE_MOD, 512, 1024, device_name, root_folder);
+            FILE_MOD, MODULE_Y_SIZE, MODULE_X_SIZE, device_name, root_folder);
     writer.add_scalar_metadata<uint64_t>("pulse_id");
     writer.set_pulse_id(0);
 
