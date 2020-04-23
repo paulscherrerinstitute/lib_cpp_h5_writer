@@ -4,9 +4,8 @@
 #include <UdpRecvModule.hpp>
 #include <FastH5Writer.hpp>
 
-#include "config.hpp"
+#include "buffer_config.hpp"
 #include "jungfrau.hpp"
-#include "BufferUtils.hpp"
 
 
 using namespace std;
@@ -29,7 +28,7 @@ int main (int argc, char *argv[]) {
     int udp_port = atoi(argv[2]);
     string root_folder = string(argv[3]);
 
-    RingBuffer<UdpFrameMetadata> ring_buffer(config::ring_buffer_n_slots);
+    RingBuffer<UdpFrameMetadata> ring_buffer(core_buffer::BUFFER_RB_SIZE);
 
     UdpRecvModule udp_module(ring_buffer);
     udp_module.start_recv(udp_port, JUNGFRAU_DATA_BYTES_PER_FRAME);
@@ -40,7 +39,7 @@ int main (int argc, char *argv[]) {
     uint64_t last_pulse_id = 0;
 
     FastH5Writer writer(
-            BufferUtils::FILE_MOD, 512, 1024, device_name, root_folder);
+            core_buffer::FILE_MOD, 512, 1024, device_name, root_folder);
 
     writer.add_scalar_metadata<uint64_t>("pulse_id");
     writer.add_scalar_metadata<uint64_t>("frame_id");
