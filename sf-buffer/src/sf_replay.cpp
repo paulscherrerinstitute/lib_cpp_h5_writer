@@ -146,9 +146,9 @@ int main (int argc, char *argv[]) {
                 };
 
                 if (module_frame.pulse_id != current_pulse_id) {
-//                    cout << "Unexpected pulse_id for module " << module_id;
-//                    cout << " Got " << module_frame.pulse_id;
-//                    cout << " expected " << current_pulse_id;
+                    cout << "Unexpected pulse_id for module " << module_id;
+                    cout << " Got " << module_frame.pulse_id;
+                    cout << " expected " << current_pulse_id;
                 }
 
                 zmq_send(socket,
