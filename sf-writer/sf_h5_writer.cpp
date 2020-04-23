@@ -131,7 +131,7 @@ int main (int argc, char *argv[])
 
     size_t n_modules = 32;
 
-    RingBuffer<DetectorFrame> ring_buffer(5);
+    RingBuffer<DetectorFrame> ring_buffer(10);
     ring_buffer.initialize(MODULE_N_BYTES*n_modules);
 
     string ipc_prefix = "ipc://sf-replay-";
