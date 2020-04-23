@@ -142,7 +142,10 @@ int main (int argc, char *argv[]) {
     auto path_suffixes =
             BufferUtils::get_path_suffixes(start_pulse_id, stop_pulse_id);
 
-    size_t current_pulse_id = start_pulse_id;
+    uint64_t base_pulse_id = start_pulse_id / core_buffer::FILE_MOD;
+    base_pulse_id *= core_buffer::FILE_MOD;
+
+    size_t current_pulse_id = base_pulse_id;
     string filename_base = device + "/" + channel_name + "/";
 
     for (const auto& suffix:path_suffixes) {
