@@ -107,6 +107,7 @@ int main (int argc, char *argv[]) {
         cout << " start_pulse_id " << start_pulse_id;
         cout << " stop_pulse_id " << stop_pulse_id;
         cout << " ipc_address " << ipc_address;
+        cout << endl;
     #endif
 
     auto ctx = zmq_ctx_new();
@@ -131,10 +132,21 @@ int main (int argc, char *argv[]) {
             BufferUtils::get_path_suffixes(start_pulse_id, stop_pulse_id);
 
     size_t current_pulse_id = start_pulse_id;
+    string filename_base = device + "/" + channel_name + "/";
 
     for (const auto& suffix:path_suffixes) {
 
-        string filename = device + "/" + channel_name + "/" + suffix.path;
+        string filename = filename_base + suffix.path;
+
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            using namespace chrono;
+
+            cout << "[" << system_clock::now() << "]";
+            cout << "[sf_replay::receive]";
+
+            cout << " Reading from filename " << filename << endl;
+        #endif
 
         for (size_t file_index_offset=0;
                 file_index_offset < FILE_MOD;
