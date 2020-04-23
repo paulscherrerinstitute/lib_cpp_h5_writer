@@ -17,10 +17,10 @@ using namespace core_buffer;
 void receive_replay(
         const string ipc_prefix,
         const size_t n_modules,
-        RingBuffer<DetectorFrame>& ring_buffer)
+        RingBuffer<DetectorFrame>& ring_buffer,
+        void* ctx)
 {
-    auto ctx = zmq_ctx_new();
-    zmq_ctx_set (ctx, ZMQ_IO_THREADS, WRITER_ZMQ_IO_THREADS);
+
 
     void* sockets[n_modules];
     for (size_t i=0; i<n_modules; i++) {
@@ -35,7 +35,7 @@ void receive_replay(
         }
 
         stringstream ipc_addr;
-        ipc_addr << "ipc://sf-replay-" << i;
+        ipc_addr << ipc_prefix << i;
         auto ipc = ipc_addr.str();
 
         if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
@@ -118,14 +118,17 @@ int main (int argc, char *argv[])
 
     RingBuffer<DetectorFrame> ring_buffer(5);
 
-    string ipc_prefix = "ipc://sf-replay-";
     size_t n_modules = 32;
+    string ipc_prefix = "ipc://sf-replay-";
+    auto ctx = zmq_ctx_new();
+    zmq_ctx_set (ctx, ZMQ_IO_THREADS, WRITER_ZMQ_IO_THREADS);
 
     thread replay_receive_thread(
             receive_replay,
             ipc_prefix,
             n_modules,
-            ref(ring_buffer));
+            ref(ring_buffer),
+            ctx);
 
     H5Writer writer(output_file);
     writer.create_file();
