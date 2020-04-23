@@ -4,26 +4,34 @@
 #include "jungfrau.hpp"
 #include "BufferUtils.hpp"
 #include "zmq.h"
+#include "buffer_config.hpp"
 
 using namespace std;
-using namespace BufferUtils;
+using namespace core_buffer;
+
+struct FileBufferMetadata {
+    uint64_t pulse_id[REPLAY_BLOCK_SIZE];
+    uint64_t frame_index[REPLAY_BLOCK_SIZE];
+    uint32_t daq_rec[REPLAY_BLOCK_SIZE];
+    uint16_t n_received_packets[REPLAY_BLOCK_SIZE];
+};
 
 void load_data_from_file (
-        BufferUtils::FileBufferMetadata* metadata_buffer,
+        FileBufferMetadata* metadata_buffer,
         char* image_buffer,
         const string &filename,
         const size_t start_index)
 {
 
-    hsize_t image_dim[3] = {BufferUtils::FILE_MOD, 512, 1024};
+    hsize_t image_dim[3] = {FILE_MOD, 512, 1024};
     H5::DataSpace image_space (3, image_dim);
-    hsize_t i_count[] = {STREAM_BLOCK_SIZE, 512, 1024};
+    hsize_t i_count[] = {REPLAY_BLOCK_SIZE, 512, 1024};
     hsize_t i_start[] = {start_index, 0, 0};
     image_space.selectHyperslab(H5S_SELECT_SET, i_count, i_start);
 
-    hsize_t metadata_dim[2] = {BufferUtils::FILE_MOD, 1};
+    hsize_t metadata_dim[2] = {FILE_MOD, 1};
     H5::DataSpace metadata_space (2, metadata_dim);
-    hsize_t m_count[] = {STREAM_BLOCK_SIZE, 1};
+    hsize_t m_count[] = {REPLAY_BLOCK_SIZE, 1};
     hsize_t m_start[] = {start_index, 0};
     metadata_space.selectHyperslab(H5S_SELECT_SET, m_count, m_start);
 
@@ -82,17 +90,10 @@ int main (int argc, char *argv[]) {
     uint64_t start_pulse_id = (uint64_t) atoll(argv[4]);
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[5]);
 
-    auto metadata_buffer = make_unique<FileBufferMetadata>();
-    metadata_buffer->module_id = module_id;
-
-    auto image_buffer = make_unique<uint16_t[]>(STREAM_BLOCK_SIZE * 512 * 1024);
-
-    auto path_suffixes = get_path_suffixes(start_pulse_id, stop_pulse_id);
 
     auto ctx = zmq_ctx_new();
-
     auto socket = zmq_socket(ctx, ZMQ_PUSH);
-    int sndhwm = STREAM_BLOCK_SIZE;
+    int sndhwm = REPLAY_BLOCK_SIZE;
     if (zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
         throw runtime_error(strerror (errno));
     };
@@ -100,18 +101,21 @@ int main (int argc, char *argv[]) {
     if (zmq_setsockopt(socket, ZMQ_LINGER, &linger_ms, sizeof(linger_ms))) {
         throw runtime_error(strerror (errno));
     }
-
     stringstream ipc_addr;
     ipc_addr << "ipc://sf-replay-" << (int)module_id;
     auto ipc = ipc_addr.str();
-
     if (zmq_connect(socket, ipc.c_str()) != 0) {
         throw runtime_error(strerror (errno));
     }
 
+    auto metadata_buffer = make_unique<FileBufferMetadata>();
+    auto image_buffer = make_unique<uint16_t[]>(
+            REPLAY_BLOCK_SIZE * MODULE_N_PIXELS);
+
+    auto path_suffixes =
+            BufferUtils::get_path_suffixes(start_pulse_id, stop_pulse_id);
+
     for (const auto& suffix:path_suffixes) {
-        metadata_buffer->start_pulse_id = suffix.start_pulse_id;
-        metadata_buffer->stop_pulse_id = suffix.stop_pulse_id;
 
         string filename =
                 device + "/" +
@@ -120,8 +124,8 @@ int main (int argc, char *argv[]) {
 
         for (
                 size_t i_batch=0;
-                i_batch<FILE_MOD;
-                i_batch+STREAM_BLOCK_SIZE)
+                i_batch < FILE_MOD;
+                i_batch + REPLAY_BLOCK_SIZE)
         {
             load_data_from_file(
                     metadata_buffer.get(),
@@ -144,9 +148,10 @@ int main (int argc, char *argv[]) {
                          sizeof(ModuleFrame),
                          ZMQ_SNDMORE);
 
+                auto buff_offset = i_frame * MODULE_N_PIXELS;
                 zmq_send(socket,
-                         (char*) (image_buffer.get() + (i_frame * 512 * 1024)),
-                         512 * 1024 * 2,
+                         (char*)(image_buffer.get() + buff_offset),
+                         MODULE_N_BYTES,
                          0);
             }
         }
