@@ -180,10 +180,10 @@ int main (int argc, char *argv[])
 
         cout << "Received pulse_id " << metadata->pulse_id << endl;
 
-//        if (metadata->pulse_id != current_pulse_id) {
-//            cout << "ERROR expecting " << current_pulse_id;
-//            cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
-//        }
+        if (metadata->pulse_id != current_pulse_id) {
+            cout << "ERROR expecting " << current_pulse_id;
+            cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
+        }
 
         // TODO: Write to H5
 
