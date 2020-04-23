@@ -5,6 +5,10 @@
 #include <string>
 
 namespace core_buffer {
+
+    const size_t MODULE_X_SIZE = 1024;
+    const size_t MODULE_Y_SIZE = 512;
+
     // How many frames we store in each file.
     // Must be power of 10 and <= than FOLDER_MOD
     const size_t FILE_MOD = 1000;
