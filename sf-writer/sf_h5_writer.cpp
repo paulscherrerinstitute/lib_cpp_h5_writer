@@ -185,7 +185,14 @@ int main (int argc, char *argv[])
             cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
         }
 
-        // TODO: Write to H5
+        writer.write_data(
+                "image",
+                current_pulse_id-start_pulse_id,
+                data,
+                {n_modules*512, 1024},
+                n_modules*MODULE_N_BYTES,
+                "uint16",
+                "little");
 
         ring_buffer.release(metadata->buffer_slot_index);
 
