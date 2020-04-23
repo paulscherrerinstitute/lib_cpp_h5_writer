@@ -102,6 +102,7 @@ void receive_replay(
         using namespace chrono;
 
         cout << "[" << system_clock::now() << "]";
+        cout << "[sf_h5_writer::receive_replay]";
         cout << " Stopped because of exception: " << endl;
         cout << e.what() << endl;
 
@@ -128,9 +129,11 @@ int main (int argc, char *argv[])
     uint64_t start_pulse_id = (uint64_t) atoll(argv[2]);
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[3]);
 
-    RingBuffer<DetectorFrame> ring_buffer(5);
-
     size_t n_modules = 32;
+
+    RingBuffer<DetectorFrame> ring_buffer(5);
+    ring_buffer.initialize(MODULE_N_BYTES*n_modules);
+
     string ipc_prefix = "ipc://sf-replay-";
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, WRITER_ZMQ_IO_THREADS);
