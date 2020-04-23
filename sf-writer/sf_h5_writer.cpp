@@ -183,14 +183,15 @@ int main (int argc, char *argv[])
             cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
         }
 
-        writer.write_data(
-                "image",
-                current_pulse_id-start_pulse_id,
-                data,
-                {n_modules*MODULE_Y_SIZE, MODULE_X_SIZE},
-                n_modules*MODULE_N_BYTES,
-                "uint16",
-                "little");
+        this_thread::sleep_for(chrono::milliseconds(8));
+//        writer.write_data(
+//                "image",
+//                current_pulse_id-start_pulse_id,
+//                data,
+//                {n_modules*MODULE_Y_SIZE, MODULE_X_SIZE},
+//                n_modules*MODULE_N_BYTES,
+//                "uint16",
+//                "little");
 
         ring_buffer.release(metadata->buffer_slot_index);
 
