@@ -9,6 +9,7 @@
 
 
 using namespace std;
+using namespace core_buffer;
 
 
 int main (int argc, char *argv[]) {
@@ -28,7 +29,7 @@ int main (int argc, char *argv[]) {
     int udp_port = atoi(argv[2]);
     string root_folder = string(argv[3]);
 
-    RingBuffer<UdpFrameMetadata> ring_buffer(core_buffer::BUFFER_RB_SIZE);
+    RingBuffer<UdpFrameMetadata> ring_buffer(BUFFER_RB_SIZE);
 
     UdpRecvModule udp_module(ring_buffer);
     udp_module.start_recv(udp_port, JUNGFRAU_DATA_BYTES_PER_FRAME);
@@ -39,7 +40,8 @@ int main (int argc, char *argv[]) {
     uint64_t last_pulse_id = 0;
 
     FastH5Writer writer(
-            core_buffer::FILE_MOD, 512, 1024, device_name, root_folder);
+            core_buffer::FILE_MOD, MODULE_Y_SIZE, MODULE_X_SIZE,
+            device_name, root_folder);
 
     writer.add_scalar_metadata<uint64_t>("pulse_id");
     writer.add_scalar_metadata<uint64_t>("frame_id");
@@ -58,6 +60,8 @@ int main (int argc, char *argv[]) {
         writer.set_pulse_id(pulse_id);
 
         writer.write_data(data.second);
+
+        // TODO: Combine all this into 1 struct.
 
         writer.write_scalar_metadata<uint64_t>(
                 "pulse_id", &(data.first->pulse_id));
