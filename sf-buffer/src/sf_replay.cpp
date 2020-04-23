@@ -90,7 +90,6 @@ int main (int argc, char *argv[]) {
     uint64_t start_pulse_id = (uint64_t) atoll(argv[4]);
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[5]);
 
-
     auto ctx = zmq_ctx_new();
     auto socket = zmq_socket(ctx, ZMQ_PUSH);
 
@@ -115,6 +114,8 @@ int main (int argc, char *argv[]) {
 
     auto path_suffixes =
             BufferUtils::get_path_suffixes(start_pulse_id, stop_pulse_id);
+
+    size_t current_pulse_id = start_pulse_id;
 
     for (const auto& suffix:path_suffixes) {
 
@@ -144,6 +145,12 @@ int main (int argc, char *argv[]) {
                         module_id
                 };
 
+                if (module_frame.pulse_id != current_pulse_id) {
+                    cout << "Unexpected pulse_id for module " << module_id;
+                    cout << " Got " << module_frame.pulse_id;
+                    cout << " expected " << current_pulse_id;
+                }
+
                 zmq_send(socket,
                          &module_frame,
                          sizeof(ModuleFrame),
@@ -154,6 +161,8 @@ int main (int argc, char *argv[]) {
                          (char*)(image_buffer.get() + buff_offset),
                          MODULE_N_BYTES,
                          0);
+
+                current_pulse_id++;
             }
         }
     }
