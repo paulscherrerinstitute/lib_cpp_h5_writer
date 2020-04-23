@@ -40,6 +40,18 @@ struct UdpFrameMetadata
     uint16_t n_recv_packets;
 };
 
+struct DetectorFrame
+{
+    // Ring buffer needed data.
+    size_t buffer_slot_index;
+    const size_t frame_bytes_size = 2*32*512*1024;
+
+    uint64_t pulse_id;
+    uint64_t frame_index;
+    uint32_t daq_rec;
+    uint16_t n_received_packets;
+};
+
 template <class T>
 class RingBuffer
 {
