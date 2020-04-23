@@ -23,7 +23,7 @@ namespace core_buffer {
     const std::string FILE_EXTENSION = ".h5";
 
     // How many frames do we read at once during replay.
-    const size_t REPLAY_BLOCK_SIZE = 100;
+    const size_t REPLAY_BLOCK_SIZE = 200;
 
     // Size of sf_buffer RB in elements.
     const size_t BUFFER_RB_SIZE = 1000;
