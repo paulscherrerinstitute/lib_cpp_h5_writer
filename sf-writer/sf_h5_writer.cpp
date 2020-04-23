@@ -175,6 +175,8 @@ int main (int argc, char *argv[])
     size_t total_ms = 0;
     size_t max_ms = 0;
 
+    char* buffer = new char[n_modules*MODULE_Y_SIZE*MODULE_X_SIZE*2];
+
     for (
             size_t current_pulse_id=start_pulse_id;
             current_pulse_id <= stop_pulse_id;
@@ -221,7 +223,7 @@ int main (int argc, char *argv[])
         disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
 
         current_image_dataset_.write(
-                data,
+                buffer,
                 H5::PredType::NATIVE_UINT16,
                 buffer_space,
                 disk_space);
