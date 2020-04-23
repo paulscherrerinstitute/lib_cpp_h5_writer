@@ -20,81 +20,93 @@ void receive_replay(
         RingBuffer<DetectorFrame>& ring_buffer,
         void* ctx)
 {
+    try {
 
+        void *sockets[n_modules];
+        for (size_t i = 0; i < n_modules; i++) {
+            sockets[i] = zmq_socket(ctx, ZMQ_PULL);
+            int rcvhwm = REPLAY_BLOCK_SIZE;
+            if (zmq_setsockopt(sockets[i], ZMQ_RCVHWM, &rcvhwm,
+                               sizeof(rcvhwm)) != 0) {
+                throw runtime_error(strerror(errno));
+            }
+            int linger = 0;
+            if (zmq_setsockopt(sockets[i], ZMQ_LINGER, &linger,
+                               sizeof(linger)) != 0) {
+                throw runtime_error(strerror(errno));
+            }
 
-    void* sockets[n_modules];
-    for (size_t i=0; i<n_modules; i++) {
-        sockets[i] = zmq_socket(ctx, ZMQ_PULL);
-        int rcvhwm = REPLAY_BLOCK_SIZE;
-        if (zmq_setsockopt(sockets[i], ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
-            throw runtime_error(strerror (errno));
+            stringstream ipc_addr;
+            ipc_addr << ipc_prefix << i;
+            auto ipc = ipc_addr.str();
+
+            if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
+                throw runtime_error(strerror(errno));
+            }
         }
-        int linger = 0;
-        if (zmq_setsockopt(sockets[i], ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
-            throw runtime_error(strerror (errno));
+
+        auto metadata_buffer = make_unique<ModuleFrame>();
+        char *image_buffer = nullptr;
+
+        while (true) {
+            auto rb_metadata = make_shared<DetectorFrame>();
+            image_buffer = ring_buffer.reserve(rb_metadata);
+
+            for (size_t i = 0; i < n_modules; i++) {
+                auto n_bytes_metadata = zmq_recv(
+                        sockets[i],
+                        metadata_buffer.get(),
+                        sizeof(ModuleFrame),
+                        0);
+
+                if (n_bytes_metadata != sizeof(ModuleFrame)) {
+                    // TODO: Make nicer expcetion.
+                    throw runtime_error(strerror(errno));
+                }
+
+                // Initialize buffers in first iteration for each pulse_id.
+                if (i == 0) {
+                    rb_metadata->pulse_id = metadata_buffer->pulse_id;
+                    rb_metadata->frame_index = metadata_buffer->frame_index;
+                    rb_metadata->daq_rec = metadata_buffer->daq_rec;
+                    rb_metadata->n_received_packets =
+                            metadata_buffer->n_received_packets;
+                }
+
+                if (rb_metadata->pulse_id != metadata_buffer->pulse_id) {
+                    throw runtime_error("Unexpected pulse_id received.");
+                }
+
+                auto n_bytes_image = zmq_recv(
+                        sockets[i],
+                        (image_buffer + (MODULE_N_PIXELS * i)),
+                        MODULE_N_BYTES,
+                        0);
+
+                if (n_bytes_image != MODULE_N_BYTES) {
+                    // TODO: Make nicer expcetion.
+                    throw runtime_error("Unexpected number of bytes in image.");
+                }
+            }
+
+            ring_buffer.commit(rb_metadata);
         }
 
-        stringstream ipc_addr;
-        ipc_addr << ipc_prefix << i;
-        auto ipc = ipc_addr.str();
-
-        if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
-            throw runtime_error(strerror (errno));
+        for (size_t i = 0; i < n_modules; i++) {
+            zmq_close(sockets[i]);
         }
+
+        zmq_ctx_destroy(ctx);
+    } catch (const std::exception& e) {
+        using namespace date;
+        using namespace chrono;
+
+        cout << "[" << system_clock::now() << "]";
+        cout << " Stopped because of exception: " << endl;
+        cout << e.what() << endl;
+
+        throw;
     }
-
-    auto metadata_buffer = make_unique<ModuleFrame>();
-    char* image_buffer = nullptr;
-
-    while (true) {
-        auto rb_metadata = make_shared<DetectorFrame>();
-        image_buffer = ring_buffer.reserve(rb_metadata);
-
-        for (size_t i=0; i<n_modules; i++) {
-            auto n_bytes_metadata = zmq_recv(
-                    sockets[i],
-                    metadata_buffer.get(),
-                    sizeof(ModuleFrame),
-                    0);
-
-            if (n_bytes_metadata != sizeof(ModuleFrame)) {
-                // TODO: Make nicer expcetion.
-                throw runtime_error(strerror (errno));
-            }
-
-            // Initialize buffers in first iteration for each pulse_id.
-            if (i == 0) {
-                rb_metadata->pulse_id = metadata_buffer->pulse_id;
-                rb_metadata->frame_index = metadata_buffer->frame_index;
-                rb_metadata->daq_rec = metadata_buffer->daq_rec;
-                rb_metadata->n_received_packets =
-                        metadata_buffer->n_received_packets;
-            }
-
-            if (rb_metadata->pulse_id != metadata_buffer->pulse_id) {
-                throw runtime_error("Unexpected pulse_id received.");
-            }
-
-            auto n_bytes_image = zmq_recv(
-                    sockets[i],
-                    (image_buffer + (MODULE_N_PIXELS*i)),
-                    MODULE_N_BYTES,
-                    0);
-
-            if (n_bytes_image != MODULE_N_BYTES) {
-                // TODO: Make nicer expcetion.
-                throw runtime_error("Unexpected number of bytes in image.");
-            }
-        }
-
-        ring_buffer.commit(rb_metadata);
-    }
-
-    for (size_t i=0; i<n_modules; i++) {
-        zmq_close(sockets[i]);
-    }
-
-    zmq_ctx_destroy(ctx);
 }
 
 int main (int argc, char *argv[])
