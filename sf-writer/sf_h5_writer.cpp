@@ -160,16 +160,19 @@ int main (int argc, char *argv[])
     {
         auto start_time = chrono::steady_clock::now();
 
-        auto received_data = ring_buffer.read();
+        pair<shared_ptr<DetectorFrame>, char *> received_data;
 
-        // .first is nullptr if ringbuffer is empty.
-        if(received_data.first == nullptr) {
-            this_thread::sleep_for(chrono::milliseconds(
-                    config::ring_buffer_read_retry_interval));
+        while (true)
+        {
+            received_data = ring_buffer.read();
 
-            // TODO: Very ugly hack. Make it nicer.
-            current_pulse_id--;
-            continue;
+            // .first is nullptr if ringbuffer is empty.
+            if(received_data.first == nullptr) {
+                this_thread::sleep_for(chrono::milliseconds(
+                        config::ring_buffer_read_retry_interval));
+                continue;
+            }
+            break;
         }
 
         auto metadata = received_data.first;
@@ -178,7 +181,8 @@ int main (int argc, char *argv[])
         cout << "Received pulse_id " << metadata->pulse_id << endl;
 
         if (metadata->pulse_id != current_pulse_id) {
-            cout << "ERROR expecting " << current_pulse_id << endl;
+            cout << "ERROR expecting " << current_pulse_id;
+            cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
         }
 
         // TODO: Write to H5
