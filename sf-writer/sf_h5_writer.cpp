@@ -183,6 +183,8 @@ int main (int argc, char *argv[])
 
         // TODO: Write to H5
 
+        ring_buffer.release(metadata->buffer_slot_index);
+
         i_write++;
 
         auto end_time = chrono::steady_clock::now();
