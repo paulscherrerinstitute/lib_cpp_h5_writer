@@ -178,8 +178,6 @@ int main (int argc, char *argv[])
         auto metadata = received_data.first;
         auto data = received_data.second;
 
-        cout << "Received pulse_id " << metadata->pulse_id << endl;
-
         if (metadata->pulse_id != current_pulse_id) {
             cout << "ERROR expecting " << current_pulse_id;
             cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
