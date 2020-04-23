@@ -8,6 +8,8 @@ namespace core_buffer {
 
     const size_t MODULE_X_SIZE = 1024;
     const size_t MODULE_Y_SIZE = 512;
+    const size_t MODULE_N_PIXELS = MODULE_X_SIZE * MODULE_Y_SIZE;
+    const size_t MODULE_N_BYTES = MODULE_N_PIXELS * 2;
 
     // How many frames we store in each file.
     // Must be power of 10 and <= than FOLDER_MOD
