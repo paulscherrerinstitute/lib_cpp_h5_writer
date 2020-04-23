@@ -1,18 +1,16 @@
 #include <iostream>
 #include <stdexcept>
-#include "config.hpp"
+#include "buffer_config.hpp"
 #include "zmq.h"
 #include <string>
 #include <RingBuffer.hpp>
-#include <BufferUtils.hpp>
 #include <jungfrau.hpp>
-#include <unordered_map>
 #include <thread>
-#include <sstream>
 #include <chrono>
 #include <H5Writer.hpp>
 
 using namespace std;
+using namespace core_buffer;
 
 int main (int argc, char *argv[])
 {
@@ -33,18 +31,18 @@ int main (int argc, char *argv[])
     uint64_t start_pulse_id = (uint64_t) atoll(argv[2]);
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[3]);
 
+    size_t n_modules = 32;
+
     H5Writer writer(output_file);
     writer.create_file();
 
     auto ctx = zmq_ctx_new();
-    zmq_ctx_set (ctx, ZMQ_IO_THREADS, 16);
+    zmq_ctx_set (ctx, ZMQ_IO_THREADS, WRITER_ZMQ_IO_THREADS);
 
-    size_t n_modules = 32;
     void* sockets[n_modules];
-
     for (size_t i=0; i<n_modules; i++) {
         sockets[i] = zmq_socket(ctx, ZMQ_PULL);
-        int rcvhwm = 100;
+        int rcvhwm = REPLAY_BLOCK_SIZE;
         if (zmq_setsockopt(sockets[i], ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
             throw runtime_error(strerror (errno));
         }
@@ -62,9 +60,8 @@ int main (int argc, char *argv[])
         }
     }
 
-
     auto metadata_buffer = make_unique<ModuleFrame>();
-    auto image_buffer = make_unique<uint16_t[]>(32*512*1024);
+    auto image_buffer = make_unique<uint16_t[]>(n_modules * MODULE_N_PIXELS);
 
     int i_write = 0;
     size_t total_ms = 0;
