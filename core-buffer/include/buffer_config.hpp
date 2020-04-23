@@ -18,6 +18,9 @@ namespace core_buffer {
 
     // How many frames do we read at once during replay.
     const size_t REPLAY_BLOCK_SIZE = 100;
+
+    // Size of sf_buffer RB in elements.
+    const size_t BUFFER_RB_SIZE = 1000;
 }
 
 #endif //BUFFERCONFIG_HPP
