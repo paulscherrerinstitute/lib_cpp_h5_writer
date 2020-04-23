@@ -145,8 +145,30 @@ int main (int argc, char *argv[])
             ref(ring_buffer),
             ctx);
 
-    H5Writer writer(output_file);
-    writer.create_file();
+    auto n_pulses = stop_pulse_id-start_pulse_id;
+
+    auto current_output_file_ = H5::H5File(output_file,
+                                      H5F_ACC_TRUNC | H5F_ACC_SWMR_WRITE);
+
+    hsize_t dataset_dimension[3] =
+            {n_pulses, n_modules*MODULE_Y_SIZE, MODULE_X_SIZE};
+    hsize_t max_dataset_dimension[3] =
+            {n_pulses, n_modules*MODULE_Y_SIZE, MODULE_X_SIZE};
+    H5::DataSpace dataspace(
+            3, dataset_dimension, max_dataset_dimension);
+
+    hsize_t dataset_chunking[3] =
+            {1, n_modules*MODULE_Y_SIZE, MODULE_X_SIZE};
+    H5::DSetCreatPropList dataset_properties;
+    dataset_properties.setChunk(3, dataset_chunking);
+
+    current_output_file_.createDataSet(
+            "image",
+            H5::PredType::NATIVE_UINT16,
+            dataspace,
+            dataset_properties);
+
+    auto current_image_dataset_ = current_output_file_.openDataSet("image");
 
     // TODO: Remove stats trash.
     int i_write = 0;
@@ -187,14 +209,22 @@ int main (int argc, char *argv[])
 
         std::vector<size_t> data_shape = {n_modules*512, 1024};
 
-        writer.write_data(
-                "image",
-                current_pulse_id-start_pulse_id,
+        hsize_t buff_dim[2] = {MODULE_Y_SIZE, MODULE_X_SIZE};
+        H5::DataSpace buffer_space (2, buff_dim);
+
+        hsize_t disk_dim[3] =
+                {n_pulses, n_modules*MODULE_Y_SIZE, MODULE_X_SIZE};
+        H5::DataSpace disk_space(3, disk_dim);
+
+        hsize_t count[] = {1, n_modules*MODULE_Y_SIZE, MODULE_X_SIZE};
+        hsize_t start[] = {current_pulse_id-start_pulse_id, 0, 0};
+        disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
+
+        current_image_dataset_.write(
                 data,
-                data_shape,
-                n_modules*MODULE_N_BYTES,
-                "uint16",
-                "little");
+                H5::PredType::NATIVE_UINT16,
+                buffer_space,
+                disk_space);
 
         ring_buffer.release(metadata->buffer_slot_index);
 
@@ -220,7 +250,7 @@ int main (int argc, char *argv[])
 
     }
 
-    writer.close_file();
+    current_output_file_.close();
 
     return 0;
 }
