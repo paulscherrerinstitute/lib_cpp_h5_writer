@@ -93,8 +93,8 @@ int main (int argc, char *argv[]) {
 
     auto ctx = zmq_ctx_new();
     auto socket = zmq_socket(ctx, ZMQ_PUSH);
-    // The +1 is important so we pre-load the next chunk.
-    int sndhwm = REPLAY_BLOCK_SIZE + 1;
+
+    int sndhwm = REPLAY_BLOCK_SIZE;
     if (zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
         throw runtime_error(strerror (errno));
     };
