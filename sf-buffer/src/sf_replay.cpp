@@ -134,7 +134,7 @@ int main (int argc, char *argv[]) {
                     filename,
                     i_batch);
 
-            for (size_t i_frame=0; i_frame < FILE_MOD; i_frame++) {
+            for (size_t i_frame=0; i_frame < REPLAY_BLOCK_SIZE; i_frame++) {
 
                 ModuleFrame module_frame = {
                         metadata_buffer->pulse_id[i_frame],
