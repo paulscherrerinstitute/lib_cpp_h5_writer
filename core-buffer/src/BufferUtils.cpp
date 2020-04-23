@@ -1,39 +1,34 @@
 #include "BufferUtils.hpp"
 #include <sstream>
 #include <fstream>
+#include <config.hpp>
 
 using namespace std;
-
-// Must be power of 10 and <= than FOLDER_MOD
-const size_t BufferUtils::FILE_MOD = 1000;
-// Must be power of 10 and >= than FILE_MOD.
-const size_t BufferUtils::FOLDER_MOD = 100000;
-const std::string BufferUtils::FILE_EXTENSION = ".h5";
 
 string BufferUtils::get_filename(
         std::string root_folder,
         std::string device_name,
         uint64_t pulse_id)
 {
-    uint64_t folder_base = pulse_id / FOLDER_MOD;
-    folder_base *= FOLDER_MOD;
+    uint64_t folder_base = pulse_id / core_buffer::FOLDER_MOD;
+    folder_base *= core_buffer::FOLDER_MOD;
 
-    uint64_t file_base = pulse_id / FILE_MOD;
-    file_base *= FILE_MOD;
+    uint64_t file_base = pulse_id / core_buffer::FILE_MOD;
+    file_base *= core_buffer::FILE_MOD;
 
     stringstream folder;
     folder << root_folder << "/";
     folder << device_name << "/";
     folder << folder_base << "/";
-    folder << file_base << FILE_EXTENSION;
+    folder << file_base << core_buffer::FILE_EXTENSION;
 
     return folder.str();
 }
 
 size_t BufferUtils::get_file_frame_index(uint64_t pulse_id)
 {
-    uint64_t file_base = pulse_id / FILE_MOD;
-    file_base *= FILE_MOD;
+    uint64_t file_base = pulse_id / core_buffer::FILE_MOD;
+    file_base *= core_buffer::FILE_MOD;
 
     return pulse_id - file_base;
 }
@@ -71,27 +66,27 @@ vector<BufferUtils::path_sufix> BufferUtils::get_path_suffixes (
 {
     vector<BufferUtils::path_sufix> result;
 
-    uint64_t start_file_base = start_pulse_id / FILE_MOD;
-    start_file_base *= FILE_MOD;
+    uint64_t start_file_base = start_pulse_id / core_buffer::FILE_MOD;
+    start_file_base *= core_buffer::FILE_MOD;
 
     for (
             uint64_t first_pulse_id=start_file_base;
             first_pulse_id <= stop_pulse_id;
-            first_pulse_id += FILE_MOD) {
+            first_pulse_id += core_buffer::FILE_MOD) {
 
-        uint64_t folder_base = first_pulse_id / FOLDER_MOD;
-        folder_base *= FOLDER_MOD;
+        uint64_t folder_base = first_pulse_id / core_buffer::FOLDER_MOD;
+        folder_base *= core_buffer::FOLDER_MOD;
 
-        uint64_t file_base = first_pulse_id / FILE_MOD;
-        file_base *= FILE_MOD;
+        uint64_t file_base = first_pulse_id / core_buffer::FILE_MOD;
+        file_base *= core_buffer::FILE_MOD;
 
         stringstream folder;
         folder << folder_base << "/";
-        folder << file_base << FILE_EXTENSION;
+        folder << file_base << core_buffer::FILE_EXTENSION;
 
         result.emplace_back<BufferUtils::path_sufix>(
                 {first_pulse_id,
-                 first_pulse_id+FILE_MOD-1,
+                 first_pulse_id+core_buffer::FILE_MOD-1,
                  folder.str()});
     }
 
