@@ -209,7 +209,7 @@ int main (int argc, char *argv[])
 
         std::vector<size_t> data_shape = {n_modules*512, 1024};
 
-        hsize_t buff_dim[2] = {MODULE_Y_SIZE, MODULE_X_SIZE};
+        hsize_t buff_dim[2] = {n_modules*MODULE_Y_SIZE, MODULE_X_SIZE};
         H5::DataSpace buffer_space (2, buff_dim);
 
         hsize_t disk_dim[3] =
