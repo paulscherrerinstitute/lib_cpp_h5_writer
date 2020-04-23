@@ -178,18 +178,20 @@ int main (int argc, char *argv[])
         auto metadata = received_data.first;
         auto data = received_data.second;
 
-        cout << "Received pulse_id " << metadata->pulse_id << endl;
+//        cout << "Received pulse_id " << metadata->pulse_id << endl;
+//
+//        if (metadata->pulse_id != current_pulse_id) {
+//            cout << "ERROR expecting " << current_pulse_id;
+//            cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
+//        }
 
-        if (metadata->pulse_id != current_pulse_id) {
-            cout << "ERROR expecting " << current_pulse_id;
-            cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
-        }
+        std::vector<size_t> data_shape = {n_modules*512, 1024};
 
         writer.write_data(
                 "image",
                 current_pulse_id-start_pulse_id,
                 data,
-                {n_modules*512, 1024},
+                data_shape,
                 n_modules*MODULE_N_BYTES,
                 "uint16",
                 "little");
