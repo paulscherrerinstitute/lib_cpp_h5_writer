@@ -50,7 +50,7 @@ TEST(BufferUtils, get_file_frame_index)
 
 TEST(BufferUtils, get_path_suffixes)
 {
-    auto suffixes = BufferUtils::get_path_suffixes(15100, 17500);
+    auto suffixes = BufferUtils::get_path_suffixes(15100, 18000);
     ASSERT_EQ(suffixes[0].start_pulse_id, 15000);
     ASSERT_EQ(suffixes[0].stop_pulse_id, 15999);
     ASSERT_EQ(suffixes[0].path, "0/15000.h5");
@@ -62,4 +62,8 @@ TEST(BufferUtils, get_path_suffixes)
     ASSERT_EQ(suffixes[2].start_pulse_id, 17000);
     ASSERT_EQ(suffixes[2].stop_pulse_id, 17999);
     ASSERT_EQ(suffixes[2].path, "0/17000.h5");
+
+    ASSERT_EQ(suffixes[3].start_pulse_id, 18000);
+    ASSERT_EQ(suffixes[3].stop_pulse_id, 18999);
+    ASSERT_EQ(suffixes[3].path, "0/18000.h5");
 }
