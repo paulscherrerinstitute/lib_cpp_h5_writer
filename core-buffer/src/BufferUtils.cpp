@@ -1,7 +1,7 @@
 #include "BufferUtils.hpp"
 #include <sstream>
 #include <fstream>
-#include <config.hpp>
+#include <buffer_config.hpp>
 
 using namespace std;
 
