@@ -69,25 +69,14 @@ vector<BufferUtils::path_sufix> BufferUtils::get_path_suffixes (
     uint64_t start_file_base = start_pulse_id / core_buffer::FILE_MOD;
     start_file_base *= core_buffer::FILE_MOD;
 
-    for (
-            uint64_t first_pulse_id=start_file_base;
+    for (uint64_t first_pulse_id=start_file_base;
             first_pulse_id <= stop_pulse_id;
             first_pulse_id += core_buffer::FILE_MOD) {
 
-        uint64_t folder_base = first_pulse_id / core_buffer::FOLDER_MOD;
-        folder_base *= core_buffer::FOLDER_MOD;
-
-        uint64_t file_base = first_pulse_id / core_buffer::FILE_MOD;
-        file_base *= core_buffer::FILE_MOD;
-
-        stringstream folder;
-        folder << folder_base << "/";
-        folder << file_base << core_buffer::FILE_EXTENSION;
-
         result.emplace_back<BufferUtils::path_sufix>(
                 {first_pulse_id,
-                 first_pulse_id+core_buffer::FILE_MOD-1,
-                 folder.str()});
+                 first_pulse_id + core_buffer::FILE_MOD - 1,
+                 get_filename("", "", first_pulse_id)});
     }
 
     return result;
