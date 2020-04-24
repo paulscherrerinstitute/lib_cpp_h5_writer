@@ -108,7 +108,7 @@ void sf_replay (
             using namespace chrono;
 
             cout << "[" << system_clock::now() << "]";
-            cout << "[sf_replay::receive]";
+            cout << "[sf_replay::sf_replay]";
 
             cout << " Reading from filename " << filename << endl;
         #endif
@@ -170,6 +170,16 @@ void sf_replay (
                          (char*)(image_buffer.get() + buff_offset),
                          MODULE_N_BYTES,
                          0);
+
+                #ifdef DEBUG_OUTPUT
+                    using namespace date;
+                    using namespace chrono;
+
+                    cout << "[" << system_clock::now() << "]";
+                    cout << "[sf_replay::sf_replay]";
+                    cout << " Sent pulse_id ";
+                    cout << current_pulse_id << endl;
+                #endif
 
                 current_pulse_id++;
             }
