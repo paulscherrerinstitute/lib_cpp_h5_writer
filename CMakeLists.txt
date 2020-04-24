@@ -30,7 +30,4 @@ add_subdirectory(
 
 add_subdirectory("core-buffer")
 add_subdirectory("core-writer")
-#add_subdirectory("csaxs")
-add_subdirectory("sf-writer")
 add_subdirectory("sf-buffer")
-#add_subdirectory("swmr-writer")
