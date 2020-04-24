@@ -38,7 +38,7 @@ void receive_replay(
 
             stringstream ipc_addr;
             ipc_addr << ipc_prefix << i;
-            auto ipc = ipc_addr.str();
+            const auto ipc = ipc_addr.str();
 
             if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
                 throw runtime_error(strerror(errno));
@@ -153,26 +153,17 @@ int main (int argc, char *argv[])
     size_t total_ms = 0;
     size_t max_ms = 0;
 
-    for (
-            size_t current_pulse_id=start_pulse_id;
-            current_pulse_id <= stop_pulse_id;
-            current_pulse_id++)
-    {
-        auto start_time = chrono::steady_clock::now();
+    auto start_time = chrono::steady_clock::now();
 
-        pair<shared_ptr<DetectorFrame>, char *> received_data;
+    auto current_pulse_id = start_pulse_id;
+    while (current_pulse_id <= stop_pulse_id) {
 
-        while (true)
-        {
-            received_data = ring_buffer.read();
+        auto received_data = ring_buffer.read();
 
-            // .first is nullptr if ringbuffer is empty.
-            if(received_data.first == nullptr) {
-                this_thread::sleep_for(chrono::milliseconds(
-                        config::ring_buffer_read_retry_interval));
-                continue;
-            }
-            break;
+        if(received_data.first == nullptr) {
+            this_thread::sleep_for(chrono::milliseconds(
+                    config::ring_buffer_read_retry_interval));
+            continue;
         }
 
         auto metadata = received_data.first;
@@ -195,6 +186,7 @@ int main (int argc, char *argv[])
 
         writer.write(metadata, data);
         ring_buffer.release(metadata->buffer_slot_index);
+        current_pulse_id++;
 
         i_write++;
 
@@ -216,6 +208,7 @@ int main (int argc, char *argv[])
             max_ms = 0;
         }
 
+        start_time = chrono::steady_clock::now();
     }
 
     writer.close_file();
