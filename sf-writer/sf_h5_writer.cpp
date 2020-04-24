@@ -7,7 +7,7 @@
 #include <jungfrau.hpp>
 #include <thread>
 #include <chrono>
-#include <H5Writer.hpp>
+#include "SFWriter.hpp"
 #include <config.hpp>
 
 using namespace std;
@@ -145,8 +145,8 @@ int main (int argc, char *argv[])
             ref(ring_buffer),
             ctx);
 
-    H5Writer writer(output_file);
-    writer.create_file();
+    size_t n_frames = stop_pulse_id - start_pulse_id;
+    SFWriter writer(output_file, n_frames, n_modules);
 
     // TODO: Remove stats trash.
     int i_write = 0;
@@ -183,15 +183,7 @@ int main (int argc, char *argv[])
             cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
         }
 
-        this_thread::sleep_for(chrono::milliseconds(8));
-//        writer.write_data(
-//                "image",
-//                current_pulse_id-start_pulse_id,
-//                data,
-//                {n_modules*MODULE_Y_SIZE, MODULE_X_SIZE},
-//                n_modules*MODULE_N_BYTES,
-//                "uint16",
-//                "little");
+        writer.write(data, metadata);
 
         ring_buffer.release(metadata->buffer_slot_index);
 
