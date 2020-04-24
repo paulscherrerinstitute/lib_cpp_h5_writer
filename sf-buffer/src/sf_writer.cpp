@@ -114,7 +114,7 @@ int main (int argc, char *argv[])
 {
     if (argc != 4) {
         cout << endl;
-        cout << "Usage: sf_h5_writer ";
+        cout << "Usage: sf_writer ";
         cout << " [output_file] [start_pulse_id] [stop_pulse_id]";
         cout << endl;
         cout << "\toutput_file: Complete path to the output file." << endl;

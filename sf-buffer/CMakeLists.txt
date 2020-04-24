@@ -56,5 +56,19 @@ target_link_libraries(sf-replay
         boost_system
         pthread)
 
+add_executable(sf-writer src/sf_replay.cpp)
+set_target_properties(sf-writer PROPERTIES OUTPUT_NAME sf_writer)
+
+target_link_libraries(sf-writer
+        core-buffer
+        core-writer
+        external
+        zmq
+        hdf5
+        hdf5_hl
+        hdf5_cpp
+        boost_system
+        pthread)
+
 enable_testing()
 add_subdirectory(test/)
