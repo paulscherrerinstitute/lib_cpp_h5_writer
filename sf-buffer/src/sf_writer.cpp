@@ -36,11 +36,11 @@ void receive_replay(
                 throw runtime_error(strerror(errno));
             }
 
-            stringstream ipc_addr;
-            ipc_addr << ipc_prefix << i;
-            auto ipc = ipc_addr.str();
+            stringstream ipc_stream;
+            ipc_stream << "ipc://sf-replay-" << n_modules;
+            const auto ipc_address = ipc_stream.str();
 
-            if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
+            if (zmq_bind(sockets[i], ipc_address.c_str()) != 0) {
                 throw runtime_error(strerror(errno));
             }
         }
