@@ -7,7 +7,7 @@
 #include <jungfrau.hpp>
 #include <thread>
 #include <chrono>
-#include <H5Writer.hpp>
+#include "SFWriter.hpp"
 #include <config.hpp>
 
 using namespace std;
@@ -114,7 +114,7 @@ int main (int argc, char *argv[])
 {
     if (argc != 4) {
         cout << endl;
-        cout << "Usage: sf_h5_writer ";
+        cout << "Usage: sf_writer ";
         cout << " [output_file] [start_pulse_id] [stop_pulse_id]";
         cout << endl;
         cout << "\toutput_file: Complete path to the output file." << endl;
@@ -145,8 +145,8 @@ int main (int argc, char *argv[])
             ref(ring_buffer),
             ctx);
 
-    H5Writer writer(output_file);
-    writer.create_file();
+    size_t n_frames = stop_pulse_id - start_pulse_id;
+    SFWriter writer(output_file, n_frames, n_modules);
 
     // TODO: Remove stats trash.
     int i_write = 0;
@@ -179,20 +179,21 @@ int main (int argc, char *argv[])
         auto data = received_data.second;
 
         if (metadata->pulse_id != current_pulse_id) {
-            cout << "ERROR expecting " << current_pulse_id;
-            cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
+            stringstream err_msg;
+
+            using namespace date;
+            using namespace chrono;
+            err_msg << "[" << system_clock::now() << "]";
+            err_msg << "[sf_writer::main]";
+            err_msg << " Read unexpected pulse_id. ";
+            err_msg << " Expected " << current_pulse_id;
+            err_msg << " received " << metadata->pulse_id;
+            err_msg << endl;
+
+            throw runtime_error(err_msg.str());
         }
 
-        this_thread::sleep_for(chrono::milliseconds(8));
-//        writer.write_data(
-//                "image",
-//                current_pulse_id-start_pulse_id,
-//                data,
-//                {n_modules*MODULE_Y_SIZE, MODULE_X_SIZE},
-//                n_modules*MODULE_N_BYTES,
-//                "uint16",
-//                "little");
-
+        writer.write(metadata, data);
         ring_buffer.release(metadata->buffer_slot_index);
 
         i_write++;
