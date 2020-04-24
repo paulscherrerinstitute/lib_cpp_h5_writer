@@ -56,7 +56,7 @@ target_link_libraries(sf-replay
         boost_system
         pthread)
 
-add_executable(sf-writer src/sf_replay.cpp)
+add_executable(sf-writer src/sf_writer.cpp)
 set_target_properties(sf-writer PROPERTIES OUTPUT_NAME sf_writer)
 
 target_link_libraries(sf-writer
