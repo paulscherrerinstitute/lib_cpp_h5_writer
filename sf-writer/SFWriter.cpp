@@ -7,12 +7,15 @@ using namespace core_buffer;
 SFWriter::SFWriter(
         const string& output_file,
         const size_t n_frames,
-        const size_t n_modules)
+        const size_t n_modules) :
+        n_frames_(n_frames),
+        n_modules_(n_modules),
+        current_write_index_(0)
 {
     file_ = H5::H5File(output_file, H5F_ACC_TRUNC);
 
     hsize_t image_dataset_dims[3] =
-            {n_frames, n_modules * MODULE_Y_SIZE, MODULE_X_SIZE};
+            {n_frames_, n_modules * MODULE_Y_SIZE, MODULE_X_SIZE};
 
     H5::DataSpace image_dataspace(3, image_dataset_dims);
 
@@ -27,7 +30,7 @@ SFWriter::SFWriter(
             image_dataspace,
             image_dataset_properties);
 
-    hsize_t metadata_dataset_dims[2] = {n_frames, 1};
+    hsize_t metadata_dataset_dims[2] = {n_frames_, 1};
     H5::DataSpace metadata_dataspace(2, metadata_dataset_dims);
 
     pulse_id_dataset_ = file_.createDataSet(
@@ -67,5 +70,23 @@ void SFWriter::close_file()
     file_.close();
 }
 
-//void write(char* data, std::shared_ptr<DetectorFrame> metadata);
-//void close_file();
+void SFWriter::write(char* data, std::shared_ptr<DetectorFrame> metadata) {
+    auto pulse_id = metadata->pulse_id;
+    auto frame_index = metadata->frame_index;
+    auto daq_rec = metadata->daq_rec;
+    auto n_received_packets = metadata->n_received_packets;
+
+    hsize_t buff_dim[2] = {n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
+    H5::DataSpace buffer_space (2, buff_dim);
+
+    hsize_t disk_dim[3] = {n_frames_, n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
+    H5::DataSpace disk_space(3, disk_dim);
+
+    hsize_t count[] = {1, n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
+    hsize_t start[] = {current_write_index_, 0, 0};
+    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
+
+    image_dataset_.write(data, H5::PredType::NATIVE_UINT16,
+            buffer_space,
+            disk_space);
+}
