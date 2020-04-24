@@ -7,7 +7,7 @@
 #include <jungfrau.hpp>
 #include <thread>
 #include <chrono>
-#include "SFWriter.hpp"
+#include <H5Writer.hpp>
 #include <config.hpp>
 
 using namespace std;
@@ -36,11 +36,11 @@ void receive_replay(
                 throw runtime_error(strerror(errno));
             }
 
-            stringstream ipc_stream;
-            ipc_stream << "ipc://sf-replay-" << (int)n_modules;
-            const auto ipc_address = ipc_stream.str();
+            stringstream ipc_addr;
+            ipc_addr << ipc_prefix << i;
+            auto ipc = ipc_addr.str();
 
-            if (zmq_bind(sockets[i], ipc_address.c_str()) != 0) {
+            if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
                 throw runtime_error(strerror(errno));
             }
         }
@@ -114,7 +114,7 @@ int main (int argc, char *argv[])
 {
     if (argc != 4) {
         cout << endl;
-        cout << "Usage: sf_writer ";
+        cout << "Usage: sf_h5_writer ";
         cout << " [output_file] [start_pulse_id] [stop_pulse_id]";
         cout << endl;
         cout << "\toutput_file: Complete path to the output file." << endl;
@@ -145,50 +145,55 @@ int main (int argc, char *argv[])
             ref(ring_buffer),
             ctx);
 
-    size_t n_frames = stop_pulse_id - start_pulse_id;
-    SFWriter writer(output_file, n_frames, n_modules);
+    H5Writer writer(output_file);
+    writer.create_file();
 
     // TODO: Remove stats trash.
     int i_write = 0;
     size_t total_ms = 0;
     size_t max_ms = 0;
 
+    for (
+            size_t current_pulse_id=start_pulse_id;
+            current_pulse_id <= stop_pulse_id;
+            current_pulse_id++)
+    {
+        auto start_time = chrono::steady_clock::now();
 
+        pair<shared_ptr<DetectorFrame>, char *> received_data;
 
-    auto start_time = chrono::steady_clock::now();
+        while (true)
+        {
+            received_data = ring_buffer.read();
 
-    auto current_pulse_id = start_pulse_id;
-    while (current_pulse_id <= stop_pulse_id) {
-
-        auto received_data = ring_buffer.read();
-
-        if(received_data.first == nullptr) {
-            this_thread::sleep_for(chrono::milliseconds(
-                    config::ring_buffer_read_retry_interval));
-            continue;
+            // .first is nullptr if ringbuffer is empty.
+            if(received_data.first == nullptr) {
+                this_thread::sleep_for(chrono::milliseconds(
+                        config::ring_buffer_read_retry_interval));
+                continue;
+            }
+            break;
         }
 
         auto metadata = received_data.first;
         auto data = received_data.second;
 
         if (metadata->pulse_id != current_pulse_id) {
-            stringstream err_msg;
-
-            using namespace date;
-            using namespace chrono;
-            err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[sf_writer::main]";
-            err_msg << " Read unexpected pulse_id. ";
-            err_msg << " Expected " << current_pulse_id;
-            err_msg << " received " << metadata->pulse_id;
-            err_msg << endl;
-
-            throw runtime_error(err_msg.str());
+            cout << "ERROR expecting " << current_pulse_id;
+            cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
         }
 
-        writer.write(metadata, data);
+        this_thread::sleep_for(chrono::milliseconds(8));
+//        writer.write_data(
+//                "image",
+//                current_pulse_id-start_pulse_id,
+//                data,
+//                {n_modules*MODULE_Y_SIZE, MODULE_X_SIZE},
+//                n_modules*MODULE_N_BYTES,
+//                "uint16",
+//                "little");
+
         ring_buffer.release(metadata->buffer_slot_index);
-        current_pulse_id++;
 
         i_write++;
 
@@ -210,7 +215,6 @@ int main (int argc, char *argv[])
             max_ms = 0;
         }
 
-        start_time = chrono::steady_clock::now();
     }
 
     writer.close_file();
