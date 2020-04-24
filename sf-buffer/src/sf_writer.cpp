@@ -179,8 +179,18 @@ int main (int argc, char *argv[])
         auto data = received_data.second;
 
         if (metadata->pulse_id != current_pulse_id) {
-            cout << "ERROR expecting " << current_pulse_id;
-            cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
+            stringstream err_msg;
+
+            using namespace date;
+            using namespace chrono;
+            err_msg << "[" << system_clock::now() << "]";
+            err_msg << "[sf_writer::main]";
+            err_msg << " Read unexpected pulse_id. ";
+            err_msg << " Expected " << current_pulse_id;
+            err_msg << " received " << metadata->pulse_id;
+            err_msg << endl;
+
+            throw runtime_error(err_msg.str());
         }
 
         writer.write(metadata, data);
