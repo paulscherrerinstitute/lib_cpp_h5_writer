@@ -99,9 +99,9 @@ void sf_replay (
     size_t current_pulse_id = base_pulse_id;
     string filename_base = device + "/" + channel_name + "/";
 
-    for (const auto& suffix:path_suffixes) {
+    for (const auto& filename_suffix:path_suffixes) {
 
-        string filename = filename_base + suffix.path;
+        string filename = filename_base + filename_suffix.path;
 
         #ifdef DEBUG_OUTPUT
             using namespace date;
@@ -231,7 +231,7 @@ int main (int argc, char *argv[]) {
     if (zmq_connect(socket, ipc_address.c_str()) != 0)
         throw runtime_error(strerror (errno));
 
-    process(socket, device, channel_name, module_id,
+    sf_replay(socket, device, channel_name, module_id,
             start_pulse_id, stop_pulse_id);
 
     zmq_close(socket);
