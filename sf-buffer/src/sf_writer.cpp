@@ -183,7 +183,7 @@ int main (int argc, char *argv[])
             cout << " diff " << current_pulse_id - metadata->pulse_id << endl;
         }
 
-        writer.write(data, metadata);
+        writer.write(metadata, data);
 
         ring_buffer.release(metadata->buffer_slot_index);
 
@@ -206,7 +206,6 @@ int main (int argc, char *argv[])
             total_ms = 0;
             max_ms = 0;
         }
-
     }
 
     writer.close_file();
