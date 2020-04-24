@@ -52,6 +52,11 @@ void receive_replay(
             auto rb_metadata = make_shared<DetectorFrame>();
             image_buffer = ring_buffer.reserve(rb_metadata);
 
+            if (image_buffer == nullptr){
+                this_thread::sleep_for(chrono::milliseconds(5));
+                continue;
+            }
+
             for (size_t i = 0; i < n_modules; i++) {
                 auto n_bytes_metadata = zmq_recv(
                         sockets[i],
