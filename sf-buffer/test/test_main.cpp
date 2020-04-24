@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "test_sf_replay.cpp"
 
 using namespace std;
 
