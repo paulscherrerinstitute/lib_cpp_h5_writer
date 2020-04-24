@@ -38,7 +38,7 @@ void receive_replay(
 
             stringstream ipc_stream;
             ipc_stream << "ipc://sf-replay-" << (int)n_modules;
-            const auto ipc_address = ipc_stream.str()
+            const auto ipc_address = ipc_stream.str();
 
             if (zmq_bind(sockets[i], ipc_address.c_str()) != 0) {
                 throw runtime_error(strerror(errno));
