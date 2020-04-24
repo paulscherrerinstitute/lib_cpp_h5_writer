@@ -139,6 +139,9 @@ void sf_replay (
                 }
 
                 if (current_pulse_id > stop_pulse_id) {
+                    cout << "Done. Streamed images from ";
+                    cout << start_pulse_id << " to " << stop_pulse_id;
+                    cout << endl;
                     return;
                 }
 
