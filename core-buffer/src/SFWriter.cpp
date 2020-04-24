@@ -70,7 +70,7 @@ void SFWriter::close_file()
     file_.close();
 }
 
-void SFWriter::write(char* data, std::shared_ptr<DetectorFrame> metadata) {
+void SFWriter::write(shared_ptr<DetectorFrame> metadata, char* data) {
     auto pulse_id = metadata->pulse_id;
     auto frame_index = metadata->frame_index;
     auto daq_rec = metadata->daq_rec;

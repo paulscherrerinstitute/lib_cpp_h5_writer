@@ -26,7 +26,7 @@ public:
             const size_t n_frames,
             const size_t n_modules);
     ~SFWriter();
-    void write(char* data, std::shared_ptr<DetectorFrame> metadata);
+    void write(std::shared_ptr<DetectorFrame> metadata, char* data);
     void close_file();
 };
 
