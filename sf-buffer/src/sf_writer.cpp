@@ -199,7 +199,8 @@ int main (int argc, char *argv[])
 
         // TODO: Some poor statistics.
 
-        auto ms_duration = chrono::duration_cast<chrono::milliseconds>(end_time-start_time).count();
+        auto ms_duration = chrono::duration_cast<chrono::milliseconds>(
+                end_time-start_time).count();
         total_ms += ms_duration;
         if (ms_duration > max_ms) {
             max_ms = ms_duration;

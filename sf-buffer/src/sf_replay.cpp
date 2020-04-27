@@ -117,11 +117,19 @@ void sf_replay (
              file_index_offset < FILE_MOD;
              file_index_offset += REPLAY_BLOCK_SIZE)
         {
+            auto start_time = chrono::steady_clock::now();
+
             load_data_from_file(
                     metadata_buffer.get(),
                     (char*)(image_buffer.get()),
                     filename,
                     file_index_offset);
+
+            auto end_time = chrono::steady_clock::now();
+            auto ms_duration = chrono::duration_cast<chrono::milliseconds>(
+                    end_time-start_time).count();
+
+            cout << "read_ms " << ms_duration << endl;
 
             for (size_t i_frame=0; i_frame < REPLAY_BLOCK_SIZE; i_frame++) {
 
