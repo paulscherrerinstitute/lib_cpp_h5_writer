@@ -1,6 +1,11 @@
 #include "SFWriter.hpp"
 #include "buffer_config.hpp"
 
+extern "C"
+{
+    #include "H5DOpublic.h"
+}
+
 using namespace std;
 using namespace core_buffer;
 
@@ -76,19 +81,38 @@ void SFWriter::write(shared_ptr<DetectorFrame> metadata, char* data) {
     auto daq_rec = metadata->daq_rec;
     auto n_received_packets = metadata->n_received_packets;
 
-    hsize_t buff_dim[2] = {n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
-    H5::DataSpace buffer_space (2, buff_dim);
+//    hsize_t buff_dim[2] = {n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
+//    H5::DataSpace buffer_space (2, buff_dim);
+//
+//    hsize_t disk_dim[3] = {n_frames_, n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
+//    H5::DataSpace disk_space(3, disk_dim);
+//
+//    hsize_t count[] = {1, n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
+//    hsize_t start[] = {current_write_index_, 0, 0};
+//    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
+//
+//    image_dataset_.write(data, H5::PredType::NATIVE_UINT16,
+//            buffer_space,
+//            disk_space);
 
-    hsize_t disk_dim[3] = {n_frames_, n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
-    H5::DataSpace disk_space(3, disk_dim);
+    hsize_t offset[] = {current_write_index_, 0, 0};
 
-    hsize_t count[] = {1, n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
-    hsize_t start[] = {current_write_index_, 0, 0};
-    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
+    if( H5DOwrite_chunk(
+            image_dataset_.getId(),
+            H5P_DEFAULT,
+            0,
+            offset,
+            MODULE_N_BYTES * n_modules_,
+            data))
+    {
+        stringstream error_message;
+        using namespace date;
+        error_message << "[" << std::chrono::system_clock::now() << "]";
+        error_message << "Error while writing data to file at offset ";
+        error_message << current_write_index_ << "." << endl;
 
-    image_dataset_.write(data, H5::PredType::NATIVE_UINT16,
-            buffer_space,
-            disk_space);
+        throw runtime_error(error_message.str());
+    }
 
     current_write_index_++;
 }
