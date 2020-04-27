@@ -89,4 +89,6 @@ void SFWriter::write(shared_ptr<DetectorFrame> metadata, char* data) {
     image_dataset_.write(data, H5::PredType::NATIVE_UINT16,
             buffer_space,
             disk_space);
+
+    current_write_index_++;
 }
