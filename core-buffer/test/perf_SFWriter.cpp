@@ -42,6 +42,7 @@ int main (int argc, char *argv[])
     int i_write = 0;
     size_t total_ms = 0;
     size_t max_ms = 0;
+    size_t min_ms = 10000; // 10 seconds should be a safe first value.
 
     auto start_time = chrono::steady_clock::now();
 
@@ -67,12 +68,18 @@ int main (int argc, char *argv[])
             max_ms = ms_duration;
         }
 
+        if (ms_duration < min_ms) {
+            min_ms = ms_duration;
+        }
+
         if (i_write==100) {
-            cout << "assembly_ms " << total_ms / 100;
-            cout << " max_ms " << max_ms << endl;
+            cout << "min_write_ms" << min_ms << endl;
+            cout << "avg_write_ms " << total_ms / 100;
+            cout << " max_write_ms " << max_ms << endl;
             i_write = 0;
             total_ms = 0;
             max_ms = 0;
+            min_ms = 0;
         }
 
         start_time = chrono::steady_clock::now();
