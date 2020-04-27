@@ -75,7 +75,7 @@ int main (int argc, char *argv[])
 
         if (i_write==100) {
             cout << "avg_write_ms " << total_ms / 100;
-            cout << " min_write_ms" << min_ms;
+            cout << " min_write_ms " << min_ms;
             cout << " max_write_ms " << max_ms << endl;
 
             i_write = 0;

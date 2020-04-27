@@ -100,16 +100,7 @@ void SFWriter::write(shared_ptr<DetectorFrame> metadata, char* data) {
 //            buffer_space,
 //            disk_space);
 
-    if (image_buffer_count_ < WRITER_BUFFER_SIZE) {
-        char* buffer = image_buffer_.get();
 
-        memcpy(
-                (buffer + image_buffer_count_),
-                data,
-                MODULE_N_BYTES * n_modules_);
-
-        image_buffer_count_++;
-    } else {
         hsize_t offset[] = {current_write_index_, 0, 0};
 
         if( H5DOwrite_chunk(
@@ -129,7 +120,5 @@ void SFWriter::write(shared_ptr<DetectorFrame> metadata, char* data) {
             throw runtime_error(error_message.str());
         }
 
-        current_write_index_ += WRITER_BUFFER_SIZE;
-        image_buffer_count_ = 0;
-    }
+        current_write_index_ += 1;
 }
