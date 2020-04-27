@@ -29,6 +29,9 @@ namespace core_buffer {
     const size_t BUFFER_RB_SIZE = 1000;
 
     const int WRITER_ZMQ_IO_THREADS = 16;
+
+    // How many frames to buffer before flushing to file.
+    const size_t WRITER_BUFFER_SIZE = 100;
 }
 
 #endif //BUFFERCONFIG_HPP

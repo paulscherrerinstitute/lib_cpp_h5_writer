@@ -15,7 +15,8 @@ SFWriter::SFWriter(
         const size_t n_modules) :
         n_frames_(n_frames),
         n_modules_(n_modules),
-        current_write_index_(0)
+        current_write_index_(0),
+        image_buffer_count_(0)
 {
     file_ = H5::H5File(output_file, H5F_ACC_TRUNC);
 
@@ -57,6 +58,10 @@ SFWriter::SFWriter(
             "n_received_packets",
             H5::PredType::NATIVE_UINT16,
             metadata_dataspace);
+
+    image_buffer_ = make_unique<char[]>(
+            n_modules_ * MODULE_N_BYTES * WRITER_BUFFER_SIZE);
+    image_buffer_count_ = 0;
 }
 
 SFWriter::~SFWriter()
@@ -95,24 +100,36 @@ void SFWriter::write(shared_ptr<DetectorFrame> metadata, char* data) {
 //            buffer_space,
 //            disk_space);
 
-    hsize_t offset[] = {current_write_index_, 0, 0};
+    if (image_buffer_count_ < WRITER_BUFFER_SIZE) {
+        char* buffer = image_buffer_.get();
 
-    if( H5DOwrite_chunk(
-            image_dataset_.getId(),
-            H5P_DEFAULT,
-            0,
-            offset,
-            MODULE_N_BYTES * n_modules_,
-            data))
-    {
-        stringstream error_message;
-        using namespace date;
-        error_message << "[" << std::chrono::system_clock::now() << "]";
-        error_message << "Error while writing data to file at offset ";
-        error_message << current_write_index_ << "." << endl;
+        memcpy(
+                (buffer + image_buffer_count_),
+                data,
+                MODULE_N_BYTES * n_modules_);
 
-        throw runtime_error(error_message.str());
+        image_buffer_count_++;
+    } else {
+        hsize_t offset[] = {current_write_index_, 0, 0};
+
+        if( H5DOwrite_chunk(
+                image_dataset_.getId(),
+                H5P_DEFAULT,
+                0,
+                offset,
+                MODULE_N_BYTES * n_modules_ * WRITER_BUFFER_SIZE,
+                image_buffer_.get()))
+        {
+            stringstream error_message;
+            using namespace date;
+            error_message << "[" << std::chrono::system_clock::now() << "]";
+            error_message << "Error while writing data to file at offset ";
+            error_message << current_write_index_ << "." << endl;
+
+            throw runtime_error(error_message.str());
+        }
+
+        current_write_index_ += WRITER_BUFFER_SIZE;
+        image_buffer_count_ = 0;
     }
-
-    current_write_index_++;
 }
