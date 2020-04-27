@@ -64,6 +64,7 @@ int main (int argc, char *argv[])
         auto ms_duration = chrono::duration_cast<chrono::milliseconds>(
                 end_time-start_time).count();
         total_ms += ms_duration;
+
         if (ms_duration > max_ms) {
             max_ms = ms_duration;
         }
@@ -73,9 +74,10 @@ int main (int argc, char *argv[])
         }
 
         if (i_write==100) {
-            cout << "min_write_ms" << min_ms << endl;
             cout << "avg_write_ms " << total_ms / 100;
+            cout << " min_write_ms" << min_ms;
             cout << " max_write_ms " << max_ms << endl;
+
             i_write = 0;
             total_ms = 0;
             max_ms = 0;
