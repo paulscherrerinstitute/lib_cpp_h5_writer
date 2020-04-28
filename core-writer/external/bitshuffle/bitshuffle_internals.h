@@ -25,7 +25,7 @@
 //  typedef long long           int64_t;
 //#endif
 
-#include <c++/9/stdlib.h>
+#include <stdlib.h>
 #include "iochain.h"
 
 
