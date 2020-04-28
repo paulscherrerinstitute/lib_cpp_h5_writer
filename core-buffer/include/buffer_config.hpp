@@ -32,7 +32,7 @@ namespace core_buffer {
     const int WRITER_ZMQ_IO_THREADS = 4;
 
     // Size of buffer between the receiving and writing part of sf_writer
-    const int WRITER_RB_BUFFER_SLOTS = 100;
+    const int WRITER_RB_BUFFER_SLOTS = 10;
 
     // How many frames to buffer before flushing to file.
     const size_t WRITER_BUFFER_SIZE = 100;
