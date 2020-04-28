@@ -193,20 +193,17 @@ int main (int argc, char *argv[])
         }
 
         auto read_end_time = chrono::steady_clock::now();
+        auto read_ms_duration = chrono::duration_cast<chrono::milliseconds>(
+                read_end_time-start_time).count();
+        start_time = chrono::steady_clock::now();
 
         writer.write(metadata, data);
         ring_buffer.release(metadata->buffer_slot_index);
         current_pulse_id++;
 
-        stats_counter++;
-
-        auto write_end_time = chrono::steady_clock::now();
-
         // TODO: Some poor statistics.
-
-        auto read_ms_duration = chrono::duration_cast<chrono::milliseconds>(
-                read_end_time-start_time).count();
-
+        stats_counter++;
+        auto write_end_time = chrono::steady_clock::now();
         auto write_ms_duration = chrono::duration_cast<chrono::milliseconds>(
                 write_end_time-start_time).count();
 
