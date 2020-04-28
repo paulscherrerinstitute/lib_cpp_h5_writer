@@ -32,6 +32,9 @@ namespace core_buffer {
 
     // How many frames to buffer before flushing to file.
     const size_t WRITER_BUFFER_SIZE = 100;
+
+    // Number of pulses between each statistics print out.
+    const size_t STATS_MODULO = 100;
 }
 
 #endif //BUFFERCONFIG_HPP
