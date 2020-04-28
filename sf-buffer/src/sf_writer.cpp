@@ -225,8 +225,7 @@ int main (int argc, char *argv[])
         if (i_write==I_WRITE_MODULO) {
             cout << "read_ms " << read_total_ms / I_WRITE_MODULO;
             cout << " read_max_ms " << read_max_ms;
-
-            cout << "write_ms " << write_total_ms / I_WRITE_MODULO;
+            cout << " write_ms " << write_total_ms / I_WRITE_MODULO;
             cout << " write_max_ms " << write_max_ms;
 
             cout << endl;
