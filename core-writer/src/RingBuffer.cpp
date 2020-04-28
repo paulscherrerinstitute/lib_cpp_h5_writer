@@ -203,6 +203,26 @@ pair<shared_ptr<T>, char*> RingBuffer<T>::read()
         cout << " Received metadata for frame_index ";
         cout << frame_metadata->frame_index << endl;
     #endif
+
+    // Check if the references ring buffer slot is valid.
+    {
+        lock_guard<mutex> lock(ringbuffer_slots_mutex_);
+
+        if (!ringbuffer_slots_[frame_metadata->buffer_slot_index]) {
+            stringstream err_msg;
+
+            using namespace date;
+            using namespace chrono;
+            err_msg << "[" << system_clock::now() << "]";
+            err_msg << "[RingBuffer::read]";
+            err_msg << " Ring buffer slot";
+            err_msg << " referenced in message header ";
+            err_msg << frame_metadata->buffer_slot_index << " is empty.";
+            err_msg << endl;
+
+            throw runtime_error(err_msg.str());
+        }
+    }
             
     return {frame_metadata,
             get_buffer_slot_address(frame_metadata->buffer_slot_index)};
