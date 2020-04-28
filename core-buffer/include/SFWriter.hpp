@@ -20,9 +20,6 @@ class SFWriter {
     H5::DataSet daq_rec_dataset_;
     H5::DataSet n_received_packets_dataset_;
 
-    std::unique_ptr<char[]> image_buffer_;
-    size_t image_buffer_count_;
-
 public:
     SFWriter(
             const std::string& output_file,
