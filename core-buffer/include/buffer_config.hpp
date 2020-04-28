@@ -28,7 +28,11 @@ namespace core_buffer {
     // Size of sf_buffer RB in elements.
     const size_t BUFFER_RB_SIZE = 1000;
 
-    const int WRITER_ZMQ_IO_THREADS = 16;
+    // ZMQ threads for receiving data from sf_replay.
+    const int WRITER_ZMQ_IO_THREADS = 4;
+
+    // Size of buffer between the receiving and writing part of sf_writer
+    const int WRITER_RB_BUFFER_SLOTS = 100;
 
     // How many frames to buffer before flushing to file.
     const size_t WRITER_BUFFER_SIZE = 100;
