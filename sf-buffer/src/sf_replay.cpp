@@ -129,7 +129,7 @@ void sf_replay (
             auto ms_duration = chrono::duration_cast<chrono::milliseconds>(
                     end_time-start_time).count();
 
-            cout << "read_ms " << ms_duration << endl;
+            cout << "sf_replay:batch_read_ms " << ms_duration << endl;
 
             for (size_t i_frame=0; i_frame < REPLAY_BLOCK_SIZE; i_frame++) {
 

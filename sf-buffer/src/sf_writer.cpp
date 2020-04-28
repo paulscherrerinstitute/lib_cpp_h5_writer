@@ -154,8 +154,7 @@ int main (int argc, char *argv[])
     SFWriter writer(output_file, n_frames, n_modules);
 
     // TODO: Remove stats trash.
-    int i_write = 0;
-    int I_WRITE_MODULO = 1;
+    int stats_counter = 0;
 
     size_t read_total_ms = 0;
     size_t write_total_ms = 0;
@@ -199,7 +198,7 @@ int main (int argc, char *argv[])
         ring_buffer.release(metadata->buffer_slot_index);
         current_pulse_id++;
 
-        i_write++;
+        stats_counter++;
 
         auto write_end_time = chrono::steady_clock::now();
 
@@ -222,15 +221,15 @@ int main (int argc, char *argv[])
             write_max_ms = write_ms_duration;
         }
 
-        if (i_write==I_WRITE_MODULO) {
-            cout << "read_ms " << read_total_ms / I_WRITE_MODULO;
-            cout << " read_max_ms " << read_max_ms;
-            cout << " write_ms " << write_total_ms / I_WRITE_MODULO;
-            cout << " write_max_ms " << write_max_ms;
+        if (stats_counter == STATS_MODULO) {
+            cout << "sf_writer:read_ms " << read_total_ms / STATS_MODULO;
+            cout << " sf_writer:read_max_ms " << read_max_ms;
+            cout << " sf_writer:write_ms " << write_total_ms / STATS_MODULO;
+            cout << " sf_writer:write_max_ms " << write_max_ms;
 
             cout << endl;
 
-            i_write = 0;
+            stats_counter = 0;
             read_total_ms = 0;
             read_max_ms = 0;
             write_total_ms = 0;

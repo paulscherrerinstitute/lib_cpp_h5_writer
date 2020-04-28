@@ -34,8 +34,8 @@ int main (int argc, char *argv[]) {
     UdpRecvModule udp_module(ring_buffer);
     udp_module.start_recv(udp_port, JUNGFRAU_DATA_BYTES_PER_FRAME);
 
-    uint64_t n_stat_out(0);
-    uint64_t n_frames_with_missing_packets = 0;
+    uint64_t stats_counter(0);
+    uint64_t n_missed_packets = 0;
     uint64_t n_missed_frames = 0;
     uint64_t last_pulse_id = 0;
 
@@ -81,10 +81,10 @@ int main (int argc, char *argv[]) {
         ring_buffer.release(data.first->buffer_slot_index);
 
         // TODO: Make real statistics, please.
-        n_stat_out++;
+        stats_counter++;
 
         if (data.first->n_recv_packets < JUNGFRAU_N_PACKETS_PER_FRAME) {
-            n_frames_with_missing_packets +=
+            n_missed_packets +=
                     JUNGFRAU_N_PACKETS_PER_FRAME - data.first->n_recv_packets;
         }
 
@@ -93,16 +93,16 @@ int main (int argc, char *argv[]) {
         }
         last_pulse_id = pulse_id;
 
-        if (n_stat_out == 500) {
-            cout << "device_name " << device_name;
-            cout << " pulse_id " << pulse_id;
-            cout << " n_missed_frames " << n_missed_frames;
-            cout << " f_with_miss_p " << n_frames_with_missing_packets;
+        if (stats_counter == STATS_MODULO) {
+            cout << "sf_buffer:device_name " << device_name;
+            cout << " sf_buffer:pulse_id " << pulse_id;
+            cout << " sf_buffer:n_missed_frames " << n_missed_frames;
+            cout << " sf_buffer:n_missed_packets " << n_missed_packets;
             cout << endl;
 
 
-            n_stat_out = 0;
-            n_frames_with_missing_packets = 0;
+            stats_counter = 0;
+            n_missed_packets = 0;
             n_missed_frames = 0;
         }
     }
