@@ -155,8 +155,12 @@ int main (int argc, char *argv[])
 
     // TODO: Remove stats trash.
     int i_write = 0;
-    size_t total_ms = 0;
-    size_t max_ms = 0;
+    int I_WRITE_MODULO = 10;
+
+    size_t read_total_ms = 0;
+    size_t write_total_ms = 0;
+    size_t read_max_ms = 0;
+    size_t write_max_ms = 0;
 
     auto start_time = chrono::steady_clock::now();
 
@@ -189,29 +193,47 @@ int main (int argc, char *argv[])
             throw runtime_error(err_msg.str());
         }
 
+        auto read_end_time = chrono::steady_clock::now();
+
         writer.write(metadata, data);
         ring_buffer.release(metadata->buffer_slot_index);
         current_pulse_id++;
 
         i_write++;
 
-        auto end_time = chrono::steady_clock::now();
+        auto write_end_time = chrono::steady_clock::now();
 
         // TODO: Some poor statistics.
 
-        auto ms_duration = chrono::duration_cast<chrono::milliseconds>(
-                end_time-start_time).count();
-        total_ms += ms_duration;
-        if (ms_duration > max_ms) {
-            max_ms = ms_duration;
+        auto read_ms_duration = chrono::duration_cast<chrono::milliseconds>(
+                read_end_time-start_time).count();
+
+        auto write_ms_duration = chrono::duration_cast<chrono::milliseconds>(
+                write_end_time-start_time).count();
+
+        read_total_ms += read_ms_duration;
+        write_total_ms += read_ms_duration;
+
+        if (read_ms_duration > read_max_ms) {
+            read_max_ms = read_ms_duration;
         }
 
-        if (i_write==100) {
-            cout << "assembly_ms " << total_ms / 100;
-            cout << " max_ms " << max_ms << endl;
+        if (write_ms_duration > write_max_ms) {
+            write_max_ms = write_ms_duration;
+        }
+
+        if (i_write==I_WRITE_MODULO) {
+            cout << "read_ms " << read_total_ms / I_WRITE_MODULO;
+            cout << " read_max_ms " << read_max_ms;
+
+            cout << "write_ms " << write_total_ms / I_WRITE_MODULO;
+            cout << " write_max_ms " << write_max_ms;
+
             i_write = 0;
-            total_ms = 0;
-            max_ms = 0;
+            read_total_ms = 0;
+            read_max_ms = 0;
+            write_total_ms = 0;
+            write_max_ms = 0;
         }
 
         start_time = chrono::steady_clock::now();
