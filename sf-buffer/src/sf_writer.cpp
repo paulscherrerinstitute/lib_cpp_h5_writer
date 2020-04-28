@@ -13,14 +13,6 @@
 using namespace std;
 using namespace core_buffer;
 
-struct DetectorFrame
-{
-    uint64_t pulse_id;
-    uint64_t frame_index;
-    uint32_t daq_rec;
-    uint16_t n_received_packets;
-};
-
 void receive_replay(
         const string ipc_prefix,
         const size_t n_modules,
