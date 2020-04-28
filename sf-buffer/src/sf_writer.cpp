@@ -156,10 +156,10 @@ int main (int argc, char *argv[])
     // TODO: Remove stats trash.
     int stats_counter = 0;
 
-    size_t read_total_ms = 0;
-    size_t write_total_ms = 0;
-    size_t read_max_ms = 0;
-    size_t write_max_ms = 0;
+    size_t read_total_us = 0;
+    size_t write_total_us = 0;
+    size_t read_max_us = 0;
+    size_t write_max_us = 0;
 
     auto start_time = chrono::steady_clock::now();
 
@@ -193,8 +193,9 @@ int main (int argc, char *argv[])
         }
 
         auto read_end_time = chrono::steady_clock::now();
-        auto read_ms_duration = chrono::duration_cast<chrono::milliseconds>(
+        auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
                 read_end_time-start_time).count();
+
         start_time = chrono::steady_clock::now();
 
         writer.write(metadata, data);
@@ -204,33 +205,33 @@ int main (int argc, char *argv[])
         // TODO: Some poor statistics.
         stats_counter++;
         auto write_end_time = chrono::steady_clock::now();
-        auto write_ms_duration = chrono::duration_cast<chrono::milliseconds>(
+        auto write_us_duration = chrono::duration_cast<chrono::microseconds>(
                 write_end_time-start_time).count();
 
-        read_total_ms += read_ms_duration;
-        write_total_ms += read_ms_duration;
+        read_total_us += read_us_duration;
+        write_total_us += write_us_duration;
 
-        if (read_ms_duration > read_max_ms) {
-            read_max_ms = read_ms_duration;
+        if (read_us_duration > read_max_us) {
+            read_max_us = read_us_duration;
         }
 
-        if (write_ms_duration > write_max_ms) {
-            write_max_ms = write_ms_duration;
+        if (write_us_duration > write_max_us) {
+            write_max_us = write_us_duration;
         }
 
         if (stats_counter == STATS_MODULO) {
-            cout << "sf_writer:read_ms " << read_total_ms / STATS_MODULO;
-            cout << " sf_writer:read_max_ms " << read_max_ms;
-            cout << " sf_writer:write_ms " << write_total_ms / STATS_MODULO;
-            cout << " sf_writer:write_max_ms " << write_max_ms;
+            cout << "sf_writer:read_us " << read_total_us / STATS_MODULO;
+            cout << " sf_writer:read_max_us " << read_max_us;
+            cout << " sf_writer:write_us " << write_total_us / STATS_MODULO;
+            cout << " sf_writer:write_max_us " << write_max_us;
 
             cout << endl;
 
             stats_counter = 0;
-            read_total_ms = 0;
-            read_max_ms = 0;
-            write_total_ms = 0;
-            write_max_ms = 0;
+            read_total_us = 0;
+            read_max_us = 0;
+            write_total_us = 0;
+            write_max_us = 0;
         }
 
         start_time = chrono::steady_clock::now();
