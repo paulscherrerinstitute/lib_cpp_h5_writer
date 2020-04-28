@@ -6,6 +6,14 @@
 #include <H5Cpp.h>
 #include "RingBuffer.hpp"
 
+struct DetectorFrame
+{
+    uint64_t pulse_id;
+    uint64_t frame_index;
+    uint32_t daq_rec;
+    uint16_t n_received_packets;
+};
+
 class SFWriter {
 
     const size_t n_frames_;
@@ -26,7 +34,7 @@ public:
             const size_t n_frames,
             const size_t n_modules);
     ~SFWriter();
-    void write(std::shared_ptr<DetectorFrame> metadata, char* data);
+    void write(const DetectorFrame* metadata, const char* data);
     void close_file();
 };
 
