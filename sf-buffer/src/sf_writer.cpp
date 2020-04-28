@@ -229,6 +229,8 @@ int main (int argc, char *argv[])
             cout << "write_ms " << write_total_ms / I_WRITE_MODULO;
             cout << " write_max_ms " << write_max_ms;
 
+            cout << endl;
+
             i_write = 0;
             read_total_ms = 0;
             read_max_ms = 0;
