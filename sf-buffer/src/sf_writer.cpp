@@ -155,7 +155,7 @@ int main (int argc, char *argv[])
 
     // TODO: Remove stats trash.
     int i_write = 0;
-    int I_WRITE_MODULO = 10;
+    int I_WRITE_MODULO = 1;
 
     size_t read_total_ms = 0;
     size_t write_total_ms = 0;
