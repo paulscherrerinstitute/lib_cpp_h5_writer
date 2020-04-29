@@ -28,13 +28,16 @@ class SFWriter {
     H5::DataSet daq_rec_dataset_;
     H5::DataSet n_received_packets_dataset_;
 
+    std::unique_ptr<char[]> image_buffer_;
+    size_t image_buffer_count_;
+
 public:
     SFWriter(
             const std::string& output_file,
             const size_t n_frames,
             const size_t n_modules);
     ~SFWriter();
-    void write(const DetectorFrame* metadata, const char* data);
+    void write(const DetectorFrame* metadata, char* data);
     void close_file();
 };
 

@@ -15,7 +15,8 @@ SFWriter::SFWriter(
         const size_t n_modules) :
         n_frames_(n_frames),
         n_modules_(n_modules),
-        current_write_index_(0)
+        current_write_index_(0),
+        image_buffer_count_(0)
 {
     file_ = H5::H5File(output_file, H5F_ACC_TRUNC);
 
@@ -57,6 +58,10 @@ SFWriter::SFWriter(
             "n_received_packets",
             H5::PredType::NATIVE_UINT16,
             metadata_dataspace);
+
+    image_buffer_ = make_unique<char[]>(
+            n_modules_ * MODULE_N_BYTES * WRITER_BUFFER_SIZE);
+    image_buffer_count_ = 0;
 }
 
 SFWriter::~SFWriter()
@@ -75,27 +80,22 @@ void SFWriter::close_file()
     file_.close();
 }
 
-void SFWriter::write(const DetectorFrame* metadata, const char* data) {
+void SFWriter::write(const DetectorFrame* metadata, char* data) {
     auto pulse_id = metadata->pulse_id;
     auto frame_index = metadata->frame_index;
     auto daq_rec = metadata->daq_rec;
     auto n_received_packets = metadata->n_received_packets;
 
-//    hsize_t buff_dim[2] = {n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
-//    H5::DataSpace buffer_space (2, buff_dim);
-//
-//    hsize_t disk_dim[3] = {n_frames_, n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
-//    H5::DataSpace disk_space(3, disk_dim);
-//
-//    hsize_t count[] = {1, n_modules_*MODULE_Y_SIZE, MODULE_X_SIZE};
-//    hsize_t start[] = {current_write_index_, 0, 0};
-//    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
-//
-//    image_dataset_.write(data, H5::PredType::NATIVE_UINT16,
-//            buffer_space,
-//            disk_space);
+    if (image_buffer_count_ < WRITER_BUFFER_SIZE) {
+        char* buffer = image_buffer_.get();
 
+        memcpy(
+                (buffer + image_buffer_count_),
+                data,
+                MODULE_N_BYTES * n_modules_);
 
+        image_buffer_count_++;
+    } else {
         hsize_t offset[] = {current_write_index_, 0, 0};
 
         if( H5DOwrite_chunk(
@@ -103,8 +103,8 @@ void SFWriter::write(const DetectorFrame* metadata, const char* data) {
                 H5P_DEFAULT,
                 0,
                 offset,
-                MODULE_N_BYTES * n_modules_,
-                data))
+                MODULE_N_BYTES * n_modules_ * WRITER_BUFFER_SIZE,
+                image_buffer_.get()))
         {
             stringstream error_message;
             using namespace date;
@@ -115,5 +115,7 @@ void SFWriter::write(const DetectorFrame* metadata, const char* data) {
             throw runtime_error(error_message.str());
         }
 
-        current_write_index_ += 1;
+        current_write_index_ += WRITER_BUFFER_SIZE;
+        image_buffer_count_ = 0;
+    }
 }
