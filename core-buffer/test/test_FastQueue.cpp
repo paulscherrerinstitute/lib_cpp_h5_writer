@@ -69,3 +69,38 @@ TEST(FastQueue, queue_full)
     // After the release, the first slot is again ready for writing.
     ASSERT_EQ(queue.reserve(), 0);
 }
+
+TEST(FastQueue, data_transfer)
+{
+    size_t n_slots = 5;
+    size_t slot_data_n_bytes = MODULE_N_BYTES * 2;
+    FastQueue<DetectorFrame> queue(slot_data_n_bytes, n_slots);
+
+    int write_slot_id = queue.reserve();
+
+    auto w_metadata = queue.get_metadata_buffer(write_slot_id);
+    w_metadata->pulse_id = 1;
+    w_metadata->frame_index = 2;
+    w_metadata->daq_rec = 3;
+    w_metadata->n_received_packets = 4;
+
+    auto w_data = (uint16_t*)(queue.get_data_buffer(write_slot_id));
+    for (size_t i=0; i<MODULE_N_PIXELS; i++) {
+        w_data[i] = (uint16_t) i;
+    }
+
+    queue.commit();
+
+    auto read_slot_id = queue.read();
+
+    auto r_metadata = queue.get_metadata_buffer(read_slot_id);
+    EXPECT_EQ(w_metadata->pulse_id, r_metadata->pulse_id);
+    EXPECT_EQ(w_metadata->frame_index, r_metadata->frame_index);
+    EXPECT_EQ(w_metadata->daq_rec, r_metadata->daq_rec);
+    EXPECT_EQ(w_metadata->n_received_packets, r_metadata->n_received_packets);
+
+    auto r_data = (uint16_t*)(queue.get_data_buffer(read_slot_id));
+    for (size_t i=0; i<MODULE_N_PIXELS; i++) {
+        ASSERT_EQ(r_data[i], (uint16_t) i);
+    }
+}
