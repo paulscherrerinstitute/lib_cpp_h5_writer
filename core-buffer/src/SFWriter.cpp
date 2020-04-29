@@ -103,7 +103,7 @@ void SFWriter::write(const DetectorFrame* metadata, const char* data) {
                 H5P_DEFAULT,
                 0,
                 offset,
-                MODULE_N_BYTES * n_modules_,
+                MODULE_N_BYTES * n_modules_ * WRITER_N_FRAMES_BUFFER,
                 data))
         {
             stringstream error_message;
