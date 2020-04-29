@@ -49,19 +49,19 @@ SFWriter::SFWriter(
             metadata_dataspace,
             metadata_dataset_properties);
 
-    pulse_id_dataset_ = file_.createDataSet(
+    frame_index_dataset_ = file_.createDataSet(
             "frame_index",
             H5::PredType::NATIVE_UINT64,
             metadata_dataspace,
             metadata_dataset_properties);
 
-    pulse_id_dataset_ = file_.createDataSet(
+    daq_rec_dataset_ = file_.createDataSet(
             "daq_rec",
             H5::PredType::NATIVE_UINT32,
             metadata_dataspace,
             metadata_dataset_properties);
 
-    pulse_id_dataset_ = file_.createDataSet(
+    n_received_packets_dataset_ = file_.createDataSet(
             "n_received_packets",
             H5::PredType::NATIVE_UINT16,
             metadata_dataspace,
