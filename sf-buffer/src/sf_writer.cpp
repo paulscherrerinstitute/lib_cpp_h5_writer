@@ -24,7 +24,7 @@ void receive_replay(
         void *sockets[n_modules];
         for (size_t i = 0; i < n_modules; i++) {
             sockets[i] = zmq_socket(ctx, ZMQ_PULL);
-            int rcvhwm = REPLAY_BLOCK_SIZE;
+            int rcvhwm = REPLAY_READ_BLOCK_SIZE;
             if (zmq_setsockopt(sockets[i], ZMQ_RCVHWM, &rcvhwm,
                                sizeof(rcvhwm)) != 0) {
                 throw runtime_error(strerror(errno));
