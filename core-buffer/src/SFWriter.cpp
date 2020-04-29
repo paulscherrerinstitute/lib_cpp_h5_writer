@@ -41,7 +41,7 @@ SFWriter::SFWriter(
 
     hsize_t metadata_dataset_chunking[] = {1, 1};
     H5::DSetCreatPropList metadata_dataset_properties;
-    image_dataset_properties.setChunk(2, metadata_dataset_chunking);
+    metadata_dataset_properties.setChunk(2, metadata_dataset_chunking);
 
     pulse_id_dataset_ = file_.createDataSet(
             "pulse_id",
