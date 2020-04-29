@@ -77,12 +77,13 @@ void SFWriter::close_file()
 }
 
 void SFWriter::write(const DetectorFrame* metadata, const char* data) {
-    auto pulse_id = metadata->pulse_id;
-    auto frame_index = metadata->frame_index;
-    auto daq_rec = metadata->daq_rec;
-    auto n_received_packets = metadata->n_received_packets;
+    auto pulse_id_data = (char*)((metadata->pulse_id);
+    auto frame_index_data = (char*)(metadata->frame_index);
+    auto daq_rec_data = (char*)(metadata->daq_rec);
+    auto n_received_packets_data = (char*)(metadata->n_received_packets);
 
     hsize_t image_offset[] = {current_write_index_, 0, 0};
+    hsize_t metadata_offset [] = {current_write_index_, 0};
 
     if( H5DOwrite_chunk(
             image_dataset_.getId(),
@@ -92,13 +93,51 @@ void SFWriter::write(const DetectorFrame* metadata, const char* data) {
             MODULE_N_BYTES * n_modules_ * WRITER_N_FRAMES_BUFFER,
             data))
     {
-        stringstream error_message;
-        using namespace date;
-        error_message << "[" << std::chrono::system_clock::now() << "]";
-        error_message << "Error while writing data to file at offset ";
-        error_message << current_write_index_ << "." << endl;
+        throw runtime_error("Cannot write image dataset.");
+    }
 
-        throw runtime_error(error_message.str());
+    if( H5DOwrite_chunk(
+            pulse_id_dataset_.getId(),
+            H5P_DEFAULT,
+            0,
+            metadata_offset,
+            sizeof(uint64_t) * WRITER_N_FRAMES_BUFFER,
+            pulse_id_data))
+    {
+        throw runtime_error("Cannot write pulse_id dataset.");
+    }
+
+    if( H5DOwrite_chunk(
+            frame_index_dataset_.getId(),
+            H5P_DEFAULT,
+            0,
+            metadata_offset,
+            sizeof(uint64_t) * WRITER_N_FRAMES_BUFFER,
+            frame_index_data))
+    {
+        throw runtime_error("Cannot write frame_index dataset.");
+    }
+
+    if( H5DOwrite_chunk(
+            daq_rec_dataset_.getId(),
+            H5P_DEFAULT,
+            0,
+            metadata_offset,
+            sizeof(uint32_t) * WRITER_N_FRAMES_BUFFER,
+            daq_rec_data))
+    {
+        throw runtime_error("Cannot write daq_rec dataset.");
+    }
+
+    if( H5DOwrite_chunk(
+            n_received_packets_dataset_.getId(),
+            H5P_DEFAULT,
+            0,
+            metadata_offset,
+            sizeof(uint16_t) * WRITER_N_FRAMES_BUFFER,
+            n_received_packets_data))
+    {
+        throw runtime_error("Cannot write n_received_packets dataset.");
     }
 
     current_write_index_ += WRITER_N_FRAMES_BUFFER;
