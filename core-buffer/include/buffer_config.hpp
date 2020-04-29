@@ -35,7 +35,7 @@ namespace core_buffer {
     const int WRITER_RB_BUFFER_SLOTS = 5;
 
     // How many frames to buffer before flushing to file.
-    const int WRITER_N_FRAMES_BUFFER = 1;
+    const int WRITER_N_FRAMES_BUFFER = 10;
 
     // Number of pulses between each statistics print out.
     const size_t STATS_MODULO = 100;
