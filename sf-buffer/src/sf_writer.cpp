@@ -61,7 +61,7 @@ void receive_replay(
             for (size_t i = 0; i < n_modules; i++) {
                 auto n_bytes_metadata = zmq_recv(
                         sockets[i],
-                        (char*) frame_meta_buffer,
+                        module_meta_buffer.get(),
                         sizeof(ModuleFrame),
                         0);
 
