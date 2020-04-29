@@ -45,10 +45,11 @@ char* FastQueue<T>::get_data_buffer(const int slot_id)
 template<class T>
 int FastQueue<T>::reserve()
 {
+    int expected = SLOT_STATUS::EMPTY;
     // If (buffer_status==SLOT_EMPTY) buffer_status=SLOT_RESERVED.
     bool slot_reserved =
             buffer_status_[write_slot_id_].compare_exchange_strong(
-                SLOT_EMPTY, SLOT_RESERVED);
+                    expected, SLOT_STATUS::RESERVED);
 
     if (!slot_reserved) {
         return -1;
@@ -60,10 +61,11 @@ int FastQueue<T>::reserve()
 template<class T>
 void FastQueue<T>::commit()
 {
+    int expected = SLOT_STATUS::RESERVED;
     // If (buffer_status==SLOT_RESERVED) buffer_status=SLOT_READY.
     bool slot_ready =
             buffer_status_[write_slot_id_].compare_exchange_strong(
-                    SLOT_RESERVED, SLOT_READY);
+                    expected, SLOT_STATUS::READY);
 
     if (!slot_ready) {
         throw runtime_error("Slot should be reserved first.");
@@ -76,7 +78,7 @@ void FastQueue<T>::commit()
 template<class T>
 int FastQueue<T>::read()
 {
-    if (buffer_status_[read_slot_id_] != SLOT_READY) {
+    if (buffer_status_[read_slot_id_] != SLOT_STATUS::READY) {
         return -1;
     }
 
@@ -86,10 +88,11 @@ int FastQueue<T>::read()
 template<class T>
 void FastQueue<T>::release()
 {
+    int expected = SLOT_STATUS::READY;
     // If (buffer_status==SLOT_RESERVED) buffer_status=SLOT_READY.
     bool slot_empty =
             buffer_status_[read_slot_id_].compare_exchange_strong(
-                    SLOT_READY, SLOT_EMPTY);
+                    expected, SLOT_STATUS::EMPTY);
 
     if (!slot_empty) {
         throw runtime_error("Slot should be ready first.");

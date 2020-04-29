@@ -17,9 +17,11 @@ class FastQueue {
 
 public:
 
-    int SLOT_EMPTY=0;
-    int SLOT_RESERVED=1;
-    int SLOT_READY=1;
+    enum SLOT_STATUS {
+        EMPTY=0,
+        RESERVED=1,
+        READY=2
+    };
 
     FastQueue(const size_t slot_data_n_bytes, const uint16_t n_slots);
     virtual ~FastQueue();
