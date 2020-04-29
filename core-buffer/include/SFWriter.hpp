@@ -4,14 +4,14 @@
 #include <memory>
 #include <string>
 #include <H5Cpp.h>
-#include "RingBuffer.hpp"
+#include "buffer_config.hpp"
 
 struct DetectorFrame
 {
-    uint64_t pulse_id;
-    uint64_t frame_index;
-    uint32_t daq_rec;
-    uint16_t n_received_packets;
+    uint64_t pulse_id[core_buffer::WRITER_N_FRAMES_BUFFER];
+    uint64_t frame_index[core_buffer::WRITER_N_FRAMES_BUFFER];
+    uint32_t daq_rec[core_buffer::WRITER_N_FRAMES_BUFFER];
+    uint16_t n_received_packets[core_buffer::WRITER_N_FRAMES_BUFFER];
 };
 
 class SFWriter {
