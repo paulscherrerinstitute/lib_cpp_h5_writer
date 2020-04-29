@@ -45,5 +45,27 @@ TEST(FastQueue, basic_interaction)
 
 TEST(FastQueue, queue_full)
 {
+    size_t n_slots = 5;
+    size_t slot_data_n_bytes = MODULE_N_BYTES * 2;
+    FastQueue<DetectorFrame> queue(slot_data_n_bytes, n_slots);
 
+    // There is nothing to be read in the queue.
+    ASSERT_EQ(queue.read(), -1);
+
+    for (size_t i=0; i<n_slots; i++) {
+        // Business as usual here, we still have slots left.
+        ASSERT_NE(queue.reserve(), -1);
+        queue.commit();
+    }
+
+    // There are no more slots available.
+    ASSERT_EQ(queue.reserve(), -1);
+    // We now read the first slot.
+    ASSERT_EQ(queue.read(), 0);
+    // But until we release it we cannot re-use it.
+    ASSERT_EQ(queue.reserve(), -1);
+
+    queue.release();
+    // After the release, the first slot is again ready for writing.
+    ASSERT_EQ(queue.reserve(), 0);
 }
