@@ -87,7 +87,7 @@ void SFWriter::write(const DetectorFrame* metadata, char* data) {
     auto n_received_packets = metadata->n_received_packets;
 
     if (image_buffer_count_ < WRITER_BUFFER_SIZE) {
-        char* buffer = image_buffer_.get();
+        char *buffer = image_buffer_.get();
 
         memcpy(
                 (buffer + image_buffer_count_),
@@ -95,7 +95,10 @@ void SFWriter::write(const DetectorFrame* metadata, char* data) {
                 MODULE_N_BYTES * n_modules_);
 
         image_buffer_count_++;
-    } else {
+    }
+
+    if (image_buffer_count_ == WRITER_BUFFER_SIZE) {
+
         hsize_t offset[] = {current_write_index_, 0, 0};
 
         if( H5DOwrite_chunk(
