@@ -9,6 +9,8 @@
 #include "SFWriter.hpp"
 #include <config.hpp>
 #include <FastQueue.hpp>
+#include <cstring>
+#include "date.h"
 
 using namespace std;
 using namespace core_buffer;
@@ -78,17 +80,17 @@ void receive_replay(
 
                     // Initialize buffers in first iteration for each pulse_id.
                     if (i_module == 0) {
-                        frame_meta_buffer->pulse_id =
+                        frame_meta_buffer->pulse_id[i_buffer] =
                                 module_meta_buffer->pulse_id;
-                        frame_meta_buffer->frame_index =
+                        frame_meta_buffer->frame_index[i_buffer] =
                                 module_meta_buffer->frame_index;
-                        frame_meta_buffer->daq_rec =
+                        frame_meta_buffer->daq_rec[i_buffer] =
                                 module_meta_buffer->daq_rec;
-                        frame_meta_buffer->n_received_packets =
+                        frame_meta_buffer->n_received_packets[i_buffer] =
                                 module_meta_buffer->n_received_packets;
                     }
 
-                    if (frame_meta_buffer->pulse_id !=
+                    if (frame_meta_buffer->pulse_id[i_buffer] !=
                         module_meta_buffer->pulse_id) {
                         throw runtime_error("Unexpected pulse_id received.");
                     }
