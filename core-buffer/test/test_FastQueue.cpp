@@ -5,7 +5,6 @@ using namespace core_buffer;
 
 TEST(FastQueue, basic_interaction)
 {
-
     size_t n_slots = 5;
     size_t slot_data_n_bytes = MODULE_N_BYTES * 2;
     FastQueue<DetectorFrame> queue(slot_data_n_bytes, n_slots);
@@ -35,11 +34,16 @@ TEST(FastQueue, basic_interaction)
     slot_id = queue.read();
     // Once the slot is committed we should be able to read it.
     ASSERT_NE(slot_id, -1);
-    // But you cannot read the next slot until you release the current.
-    ASSERT_EQ(queue.read(), -1);
+    // You can read the same slot multiple times.
+    ASSERT_NE(queue.read(), -1);
     // The 2 buffers should match the committed slot.
     ASSERT_EQ(meta_ptr, (char*)(queue.get_metadata_buffer(slot_id)));
     ASSERT_EQ(data_ptr, (char*)(queue.get_data_buffer(slot_id)));
 
     queue.release();
+}
+
+TEST(FastQueue, queue_full)
+{
+
 }
