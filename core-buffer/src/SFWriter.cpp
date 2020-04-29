@@ -77,7 +77,7 @@ void SFWriter::close_file()
 }
 
 void SFWriter::write(const DetectorFrame* metadata, const char* data) {
-    auto pulse_id_data = (char*)((metadata->pulse_id);
+    auto pulse_id_data = (char*)(metadata->pulse_id);
     auto frame_index_data = (char*)(metadata->frame_index);
     auto daq_rec_data = (char*)(metadata->daq_rec);
     auto n_received_packets_data = (char*)(metadata->n_received_packets);
