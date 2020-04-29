@@ -195,20 +195,21 @@ int main (int argc, char *argv[])
         auto metadata = queue.get_metadata_buffer(slot_id);
         auto data = queue.get_data_buffer(slot_id);
 
-        if (metadata->pulse_id != current_pulse_id) {
-            stringstream err_msg;
-
-            using namespace date;
-            using namespace chrono;
-            err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[sf_writer::main]";
-            err_msg << " Read unexpected pulse_id. ";
-            err_msg << " Expected " << current_pulse_id;
-            err_msg << " received " << metadata->pulse_id;
-            err_msg << endl;
-
-            throw runtime_error(err_msg.str());
-        }
+        // TODO: This verification should go in the recv part.
+//        if (metadata->pulse_id != current_pulse_id) {
+//            stringstream err_msg;
+//
+//            using namespace date;
+//            using namespace chrono;
+//            err_msg << "[" << system_clock::now() << "]";
+//            err_msg << "[sf_writer::main]";
+//            err_msg << " Read unexpected pulse_id. ";
+//            err_msg << " Expected " << current_pulse_id;
+//            err_msg << " received " << metadata->pulse_id;
+//            err_msg << endl;
+//
+//            throw runtime_error(err_msg.str());
+//        }
 
         auto read_end_time = chrono::steady_clock::now();
         auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
