@@ -7,118 +7,10 @@
 #include <thread>
 #include <chrono>
 #include "SFWriter.hpp"
-#include <config.hpp>
 #include <FastQueue.hpp>
 
 using namespace std;
 using namespace core_buffer;
-
-void receive_replay(
-        const string ipc_prefix,
-        const size_t n_modules,
-        FastQueue<DetectorFrame>& queue,
-        void* ctx)
-{
-    try {
-
-        void *sockets[n_modules];
-        for (size_t i = 0; i < n_modules; i++) {
-            sockets[i] = zmq_socket(ctx, ZMQ_PULL);
-            int rcvhwm = REPLAY_BLOCK_SIZE;
-            if (zmq_setsockopt(sockets[i], ZMQ_RCVHWM, &rcvhwm,
-                               sizeof(rcvhwm)) != 0) {
-                throw runtime_error(strerror(errno));
-            }
-            int linger = 0;
-            if (zmq_setsockopt(sockets[i], ZMQ_LINGER, &linger,
-                               sizeof(linger)) != 0) {
-                throw runtime_error(strerror(errno));
-            }
-
-            stringstream ipc_addr;
-            ipc_addr << ipc_prefix << i;
-            const auto ipc = ipc_addr.str();
-
-            if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
-                throw runtime_error(strerror(errno));
-            }
-        }
-
-        auto module_meta_buffer = make_unique<ModuleFrame>();
-
-        while (true) {
-
-            auto slot_id = queue.reserve();
-
-            if (slot_id == -1){
-                this_thread::sleep_for(chrono::milliseconds(5));
-                continue;
-            }
-
-            auto frame_meta_buffer = queue.get_metadata_buffer(slot_id);
-            auto frame_buffer = queue.get_data_buffer(slot_id);
-
-            for (size_t i = 0; i < n_modules; i++) {
-                auto n_bytes_metadata = zmq_recv(
-                        sockets[i],
-                        module_meta_buffer.get(),
-                        sizeof(ModuleFrame),
-                        0);
-
-                if (n_bytes_metadata != sizeof(ModuleFrame)) {
-                    // TODO: Make nicer expcetion.
-                    throw runtime_error(strerror(errno));
-                }
-
-                // Initialize buffers in first iteration for each pulse_id.
-                if (i == 0) {
-                    frame_meta_buffer->pulse_id =
-                            module_meta_buffer->pulse_id;
-                    frame_meta_buffer->frame_index =
-                            module_meta_buffer->frame_index;
-                    frame_meta_buffer->daq_rec =
-                            module_meta_buffer->daq_rec;
-                    frame_meta_buffer->n_received_packets =
-                            module_meta_buffer->n_received_packets;
-                }
-
-                if (frame_meta_buffer->pulse_id !=
-                        module_meta_buffer->pulse_id) {
-                    throw runtime_error("Unexpected pulse_id received.");
-                }
-
-                auto n_bytes_image = zmq_recv(
-                        sockets[i],
-                        (frame_buffer + (MODULE_N_PIXELS * i)),
-                        MODULE_N_BYTES,
-                        0);
-
-                if (n_bytes_image != MODULE_N_BYTES) {
-                    // TODO: Make nicer expcetion.
-                    throw runtime_error("Unexpected number of bytes in image.");
-                }
-            }
-
-            queue.commit();
-        }
-
-        for (size_t i = 0; i < n_modules; i++) {
-            zmq_close(sockets[i]);
-        }
-
-        zmq_ctx_destroy(ctx);
-    } catch (const std::exception& e) {
-        using namespace date;
-        using namespace chrono;
-
-        cout << "[" << system_clock::now() << "]";
-        cout << "[sf_h5_writer::receive_replay]";
-        cout << " Stopped because of exception: " << endl;
-        cout << e.what() << endl;
-
-        throw;
-    }
-}
 
 int main (int argc, char *argv[])
 {
@@ -141,20 +33,32 @@ int main (int argc, char *argv[])
 
     size_t n_modules = 32;
 
-    FastQueue<DetectorFrame> queue(
-            n_modules * MODULE_N_BYTES,
-            WRITER_RB_BUFFER_SLOTS);
-
     string ipc_prefix = "ipc://sf-replay-";
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, WRITER_ZMQ_IO_THREADS);
 
-    thread replay_receive_thread(
-            receive_replay,
-            ipc_prefix,
-            n_modules,
-            ref(queue),
-            ctx);
+    void *sockets[n_modules];
+    for (size_t i = 0; i < n_modules; i++) {
+        sockets[i] = zmq_socket(ctx, ZMQ_PULL);
+        int rcvhwm = REPLAY_BLOCK_SIZE;
+        if (zmq_setsockopt(sockets[i], ZMQ_RCVHWM, &rcvhwm,
+                           sizeof(rcvhwm)) != 0) {
+            throw runtime_error(strerror(errno));
+        }
+        int linger = 0;
+        if (zmq_setsockopt(sockets[i], ZMQ_LINGER, &linger,
+                           sizeof(linger)) != 0) {
+            throw runtime_error(strerror(errno));
+        }
+
+        stringstream ipc_addr;
+        ipc_addr << ipc_prefix << i;
+        const auto ipc = ipc_addr.str();
+
+        if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
+            throw runtime_error(strerror(errno));
+        }
+    }
 
     size_t n_frames = stop_pulse_id - start_pulse_id;
     SFWriter writer(output_file, n_frames, n_modules);
@@ -167,35 +71,54 @@ int main (int argc, char *argv[])
     size_t read_max_us = 0;
     size_t write_max_us = 0;
 
+    auto module_meta_buffer = make_unique<ModuleFrame>();
+    auto frame_meta_buffer = make_unique<DetectorFrame>();
+    auto frame_buffer = make_unique<char[]>(MODULE_N_BYTES * n_modules);
+
     auto start_time = chrono::steady_clock::now();
 
     auto current_pulse_id = start_pulse_id;
     while (current_pulse_id <= stop_pulse_id) {
 
-        auto slot_id = queue.read();
+        for (size_t i = 0; i < n_modules; i++) {
+            auto n_bytes_metadata = zmq_recv(
+                    sockets[i],
+                    module_meta_buffer.get(),
+                    sizeof(ModuleFrame),
+                    0);
 
-        if(slot_id == -1) {
-            this_thread::sleep_for(chrono::milliseconds(
-                    config::ring_buffer_read_retry_interval));
-            continue;
-        }
+            if (n_bytes_metadata != sizeof(ModuleFrame)) {
+                // TODO: Make nicer expcetion.
+                throw runtime_error(strerror(errno));
+            }
 
-        auto metadata = queue.get_metadata_buffer(slot_id);
-        auto data = queue.get_data_buffer(slot_id);
+            // Initialize buffers in first iteration for each pulse_id.
+            if (i == 0) {
+                frame_meta_buffer->pulse_id =
+                        module_meta_buffer->pulse_id;
+                frame_meta_buffer->frame_index =
+                        module_meta_buffer->frame_index;
+                frame_meta_buffer->daq_rec =
+                        module_meta_buffer->daq_rec;
+                frame_meta_buffer->n_received_packets =
+                        module_meta_buffer->n_received_packets;
+            }
 
-        if (metadata->pulse_id != current_pulse_id) {
-            stringstream err_msg;
+            if (frame_meta_buffer->pulse_id !=
+                module_meta_buffer->pulse_id) {
+                throw runtime_error("Unexpected pulse_id received.");
+            }
 
-            using namespace date;
-            using namespace chrono;
-            err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[sf_writer::main]";
-            err_msg << " Read unexpected pulse_id. ";
-            err_msg << " Expected " << current_pulse_id;
-            err_msg << " received " << metadata->pulse_id;
-            err_msg << endl;
+            auto n_bytes_image = zmq_recv(
+                    sockets[i],
+                    ((frame_buffer.get()) + (MODULE_N_PIXELS * i)),
+                    MODULE_N_BYTES,
+                    0);
 
-            throw runtime_error(err_msg.str());
+            if (n_bytes_image != MODULE_N_BYTES) {
+                // TODO: Make nicer exception.
+                throw runtime_error("Unexpected number of bytes in image.");
+            }
         }
 
         auto read_end_time = chrono::steady_clock::now();
@@ -204,8 +127,7 @@ int main (int argc, char *argv[])
 
         start_time = chrono::steady_clock::now();
 
-        writer.write(metadata, data);
-        queue.release();
+        writer.write(frame_meta_buffer.get(), frame_buffer.get());
         current_pulse_id++;
 
         // TODO: Some poor statistics.
@@ -244,6 +166,11 @@ int main (int argc, char *argv[])
     }
 
     writer.close_file();
+
+    for (size_t i = 0; i < n_modules; i++) {
+        zmq_close(sockets[i]);
+    }
+    zmq_ctx_destroy(ctx);
 
     return 0;
 }
