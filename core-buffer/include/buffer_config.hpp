@@ -29,10 +29,10 @@ namespace core_buffer {
     const size_t BUFFER_RB_SIZE = 1000;
 
     // ZMQ threads for receiving data from sf_replay.
-    const int WRITER_ZMQ_IO_THREADS = 4;
+    const int WRITER_ZMQ_IO_THREADS = 2;
 
     // Size of buffer between the receiving and writing part of sf_writer
-    const int WRITER_RB_BUFFER_SLOTS = 10;
+    const int WRITER_RB_BUFFER_SLOTS = 5;
 
     // How many frames to buffer before flushing to file.
     const size_t WRITER_BUFFER_SIZE = 100;
