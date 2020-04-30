@@ -168,6 +168,15 @@ void ProcessManager::write_h5()
 
     uint64_t last_pulse_id = 0;
     
+
+    // if the n_frames needs offset adjust based on the first frame_index
+    // pco.edge file-number
+    auto n_frames_offset = 0;
+    if(adjust_n_frames){
+        n_frames_offset = writer_manager.get_n_frames_offset();
+    }
+
+
     // Run until the running flag is set or the ring_buffer is empty.  
     while(writer_manager.is_running() || !ring_buffer.is_empty()) {
         
@@ -206,7 +215,7 @@ void ProcessManager::write_h5()
 
         // Write image data.
         writer->write_data(raw_frames_dataset_name,
-                           received_data.first->frame_index, 
+                           received_data.first->frame_index-n_frames_offset, 
                            received_data.second,
                            received_data.first->frame_shape,
                            received_data.first->frame_bytes_size, 

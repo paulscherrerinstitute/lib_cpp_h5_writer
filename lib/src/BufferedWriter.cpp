@@ -25,11 +25,8 @@ BufferedWriter::BufferedWriter(const std::string& filename, size_t total_frames,
 
 void BufferedWriter::cache_metadata(string name, uint64_t frame_index, const char* data, uint64_t initial_frame_offset)
 {
-    cout << "get_relative_data_index " << endl;
     auto relative_frame_index = get_relative_data_index(frame_index);
-    cout << " AFTER " << endl;
     metadata_buffer->add_metadata_to_buffer(name, relative_frame_index, data, initial_frame_offset);
-    
 }
 
 void BufferedWriter::write_metadata_to_file()
