@@ -219,6 +219,11 @@ size_t WriterManager::get_n_frames()
 
 void WriterManager::set_n_frames_offset(size_t new_n_frames)
 {
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[WriterManager::set_n_frames_offset] Setting Frame index offset " << received_data.first->frame_index;
+    #endif
     n_frames_offset = new_n_frames;
 }
 
