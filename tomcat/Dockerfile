@@ -7,9 +7,7 @@ RUN rm -rf /lib_cpp_h5_writer/ \
   && git fetch \
   && git checkout tomcat \
   && cd /lib_cpp_h5_writer/tomcat \
-  && make \
-  && ln -s /lib_cpp_h5_writer/lib/bin/libcpp_h5_writer.so /lib64/ \
-  && tar -zxf /lib_cpp_h5_writer/tomcat/pco.edge.tar.gz
+  && make
 
 RUN ["chmod", "+x", "/lib_cpp_h5_writer/tomcat/test_simulation_h5_writer.sh"]
 
