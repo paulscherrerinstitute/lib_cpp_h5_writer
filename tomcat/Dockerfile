@@ -1,7 +1,8 @@
 FROM lhdamiani/tomcat_docker:latest
 LABEL maintainer="Leonardo Hax <leonardo.hax@psi.ch>"
 WORKDIR /
-RUN git clone https://github.com/paulscherrerinstitute/lib_cpp_h5_writer.git \
+RUN rm -rf /lib_cpp_h5_writer/ \
+  && git clone https://github.com/paulscherrerinstitute/lib_cpp_h5_writer.git \
   && cd /lib_cpp_h5_writer \
   && git fetch \
   && git checkout tomcat \
