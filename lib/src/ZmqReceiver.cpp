@@ -91,8 +91,11 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
         throw runtime_error(error_message.str());
     }
 
+    // warning: ‘bool zmq::detail::socket_base::recv(zmq::message_t*, int)’ is deprecated: from 4.3.1, 
+    //use recv taking a reference to message_t and recv_flags [-Wdeprecated-declarations]
+    int flags = 0 
     // Get the message header.
-    if (!receiver->recv(&message_header)){
+    if (!receiver->recv(&message_header, flags)){
         return {NULL, NULL};
     }
 
