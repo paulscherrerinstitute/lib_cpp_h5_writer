@@ -10,5 +10,6 @@ RUN rm -rf /lib_cpp_h5_writer/ \
   && make
 
 RUN ["chmod", "+x", "/lib_cpp_h5_writer/tomcat/test_simulation_h5_writer.sh"]
+RUN ["chmod", "+x", "/lib_cpp_h5_writer/tomcat/docker-entrypoint.sh"]
 
 ENTRYPOINT ["/bin/bash", "-c", "./lib_cpp_h5_writer/tomcat/docker-entrypoint.sh"]
