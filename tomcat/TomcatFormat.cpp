@@ -28,12 +28,12 @@ class TomcatFormat : public H5Format
             {
                 {config::raw_image_dataset_name, "detector/" + dataset_name},
                 {"htype", "detector/htype"},
-                {"tag", "detector/tag"},
-                {"source", "detector/source"},
+                // {"tag", "detector/tag"},
+                // {"source", "detector/source"},
                 {"shape", "detector/shape"},
                 {"frame", "detector/frame"},
                 {"type", "detector/type"},
-                {"endianess", "detector/endianess"},
+                // {"endianess", "detector/endianess"},
             }));
 
 
