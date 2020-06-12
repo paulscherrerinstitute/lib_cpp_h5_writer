@@ -30,7 +30,7 @@ int main (int argc, char *argv[])
     int n_frames =  atoi(argv[3]);
     int user_id = atoi(argv[4]);
     int n_modules = atoi(argv[5]);
-    int rest_port = 1000;
+    int rest_port = 5050;
     string bsread_rest_address = "http://localhost:9999/";
 
     if (user_id != -1) {
@@ -43,13 +43,13 @@ int main (int argc, char *argv[])
     auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>(new unordered_map<string, HeaderDataType> {
         {"frame", HeaderDataType("uint64")},
         {"htype", HeaderDataType("uint64", n_modules)},
-        // {"tag", HeaderDataType("uint64", n_modules)},
-        // {"source", HeaderDataType("uint64", n_modules)},
+        {"tag", HeaderDataType("uint64", n_modules)},
+        {"source", HeaderDataType("uint64", n_modules)},
 
         {"shape", HeaderDataType("uint64", n_modules)},
 
         {"type", HeaderDataType("uint64", n_modules)},
-        // {"endianess", HeaderDataType("uint64", n_modules)},
+        {"endianess", HeaderDataType("uint64", n_modules)},
     });
 
     TomcatFormat format("images");
