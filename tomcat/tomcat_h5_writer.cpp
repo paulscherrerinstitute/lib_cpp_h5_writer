@@ -43,13 +43,13 @@ int main (int argc, char *argv[])
     auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>(new unordered_map<string, HeaderDataType> {
         {"frame", HeaderDataType("uint64")},
         {"htype", HeaderDataType("uint64", n_modules)},
-        {"tag", HeaderDataType("uint64", n_modules)},
-        {"source", HeaderDataType("uint64", n_modules)},
-
         {"shape", HeaderDataType("uint64", n_modules)},
-
         {"type", HeaderDataType("uint64", n_modules)},
-        {"endianess", HeaderDataType("uint64", n_modules)},
+        
+        // deactivated while using chunk protocol
+        // {"tag", HeaderDataType("uint64", n_modules)},
+        // {"source", HeaderDataType("uint64", n_modules)},
+        // {"endianess", HeaderDataType("uint64", n_modules)},
     });
 
     TomcatFormat format("images");
