@@ -133,7 +133,7 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
         }
 
         // Array 1.0 specified little endian as the default encoding.
-        // header_data->endianness = json_header.get("endianness", "little");
+        header_data->endianness = json_header.get("endianness", "little");
 
         header_data->type = json_header.get<string>("type");
 

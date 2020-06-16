@@ -11,16 +11,17 @@
 
 int main (int argc, char *argv[])
 {
-    if (argc != 6) {
+    if (argc != 8) {
         cout << endl;
-        cout << "Usage: tomcat_h5_writer [connection_address] [output_file] [n_frames] [user_id] [n_modules]" << endl;
+        cout << "Usage: tomcat_h5_writer [connection_address] [output_file] [n_frames] [user_id] [n_modules] [rest_api_port] [dataset_name]" << endl;
         // cout << " [output_file] [n_frames] [rest_port] [user_id] [n_modules]" << endl;
         cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\toutput_file: Name of the output file." << endl;
         cout << "\tn_frames: Number of images to acquire. 0 for infinity (until /stop is called)." << endl;
         cout << "\tuser_id: uid under which to run the writer. -1 to leave it as it is." << endl;
-        // cout << "\trest_port: Port to start the REST Api on." << endl;
         cout << "\tn_modules: Number of detector modules to be written." << endl;
+        cout << "\trest_port: Port to start the REST Api on." << endl;
+        cout << "\tdataset_name: Definition of the dataset name" << endl;
         cout << endl;
         exit(-1);
     }
@@ -30,7 +31,8 @@ int main (int argc, char *argv[])
     int n_frames =  atoi(argv[3]);
     int user_id = atoi(argv[4]);
     int n_modules = atoi(argv[5]);
-    int rest_port = 5050;
+    int rest_port = atoi(argv[6]);
+    string dataset_name = string(argv[7]);
     string bsread_rest_address = "http://localhost:9999/";
 
     if (user_id != -1) {
@@ -52,7 +54,7 @@ int main (int argc, char *argv[])
         {"endianess", HeaderDataType("uint64", n_modules)},
     });
 
-    TomcatFormat format("images");
+    TomcatFormat format(dataset_name);
 
     WriterManager writer_manager(format.get_input_value_type(), output_file, n_frames);
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
