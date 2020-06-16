@@ -30,7 +30,7 @@ int main (int argc, char *argv[])
     int n_frames =  atoi(argv[3]);
     int user_id = atoi(argv[4]);
     int n_modules = atoi(argv[5]);
-    int rest_port = 1000;
+    int rest_port = 5050;
     string bsread_rest_address = "http://localhost:9999/";
 
     if (user_id != -1) {
