@@ -289,10 +289,9 @@ void ProcessManager::write_h5()
         while (!writer_manager.are_all_parameters_set() && !writer_manager.is_killed()) {
             boost::this_thread::sleep_for(boost::chrono::milliseconds(config::parameters_read_retry_interval));
         }
-        
-
+        writer->set_n_received_frames(writer_manager.get_n_received_frames());
         writer->write_metadata_to_file();
-        
+
         write_h5_format(writer->get_h5_file());
     }
     

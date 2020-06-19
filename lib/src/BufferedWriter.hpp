@@ -8,11 +8,13 @@ class BufferedWriter : public H5Writer
 {
     size_t total_frames;
     std::unique_ptr<MetadataBuffer> metadata_buffer;
+    uint64_t n_received_frames;
 
     public:
         BufferedWriter(const std::string& filename, size_t total_frames, std::unique_ptr<MetadataBuffer>&& metadata_buffer, 
             hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
         virtual void cache_metadata(std::string name, uint64_t frame_index, const char* data, uint64_t initial_frame_offset=0);
+        void set_n_received_frames(uint64_t n_rec_frames);
         virtual void write_metadata_to_file();
 };
 
@@ -44,6 +46,7 @@ class DummyBufferedWriter : public BufferedWriter, public DummyH5Writer
         
         bool is_data_for_current_file(const size_t data_index) override
             { return DummyH5Writer::is_data_for_current_file(data_index); }
+
 };
 
 std::unique_ptr<BufferedWriter> get_buffered_writer(const std::string& filename, size_t total_frames, 
