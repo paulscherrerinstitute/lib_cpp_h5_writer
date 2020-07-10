@@ -34,12 +34,6 @@ def start_pco_writer():
             for key in default_args:
                 tomcat_args.append(args[key])
             p = subprocess.run(tomcat_args)
-            #p = multiprocessing.Process(target=tomcat_pco_writer, args=request.data.decode())
-            #p.start()
-        #p.join()
-    elif request.method == 'GET':
-        print("Verify if writer service is running... // todo ")
-
     return response
 
 if __name__ == '__main__':
