@@ -14,7 +14,10 @@ namespace config {
     // Allow for a couple of seconds (file creation might be slow).
     size_t ring_buffer_n_slots = 1000;
     // Delay before trying again to get data from the ring buffer.
-    uint32_t ring_buffer_read_retry_interval = 5;
+    size_t ring_buffer_read_retry_interval = 5;
+
+    // Delay before trying again to get statistics from the statistics writer buffer
+    size_t statistics_buffer_adv_interval = 10;//milliseconds
 
     std::string raw_image_dataset_name = "raw_data";
     

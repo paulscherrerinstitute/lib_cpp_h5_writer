@@ -14,9 +14,9 @@
 
 using namespace std;
 
-ProcessManager::ProcessManager(WriterManager& writer_manager, ZmqReceiver& receiver, RingBuffer& ring_buffer, 
+ProcessManager::ProcessManager(WriterManager& writer_manager, ZmqSender& sender, ZmqReceiver& receiver, RingBuffer& ring_buffer, 
     const H5Format& format, uint16_t rest_port, const string& bsread_rest_address, hsize_t frames_per_file, uint16_t adjust_n_frames):
-        writer_manager(writer_manager), receiver(receiver), ring_buffer(ring_buffer), format(format), rest_port(rest_port), 
+        writer_manager(writer_manager), sender(sender), receiver(receiver), ring_buffer(ring_buffer), format(format), rest_port(rest_port), 
         bsread_rest_address(bsread_rest_address), frames_per_file(frames_per_file), adjust_n_frames(adjust_n_frames)
 {
 }
@@ -27,7 +27,6 @@ void ProcessManager::notify_first_pulse_id(uint64_t pulse_id)
     // First pulse_id should be an async operation - we do not want to make the writer wait.
     async(launch::async, [pulse_id, &request_address]{
         try {
-
             cout << "Sending first received pulse_id " << pulse_id << " to bsread_rest_address " << request_address << endl;
 
             stringstream request;
@@ -43,7 +42,6 @@ void ProcessManager::notify_first_pulse_id(uint64_t pulse_id)
 
             system(request_call.c_str());
         } catch (...){}
-        
     });
 }
 
@@ -65,6 +63,8 @@ void ProcessManager::notify_last_pulse_id(uint64_t pulse_id)
             cout << "[" << std::chrono::system_clock::now() << "]";
             cout << "[ProcessManager::notify_last_pulse_id] Sending request (" << request_call << ")." << endl;
         #endif
+        // time of the last pulse_id
+        writer_manager.set_time_end();
 
         system(request_call.c_str());
     } catch (...){}
@@ -72,7 +72,6 @@ void ProcessManager::notify_last_pulse_id(uint64_t pulse_id)
 
 void ProcessManager::run_writer()
 {
-
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
@@ -81,6 +80,7 @@ void ProcessManager::run_writer()
         cout << endl;
     #endif
 
+    boost::thread sender_thread(&ProcessManager::send_writer_stats, this);
     boost::thread receiver_thread(&ProcessManager::receive_zmq, this);
     boost::thread writer_thread(&ProcessManager::write_h5, this);
 
@@ -97,6 +97,7 @@ void ProcessManager::run_writer()
 
     receiver_thread.join();
     writer_thread.join();
+    sender_thread.join();
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
@@ -110,9 +111,9 @@ void ProcessManager::receive_zmq()
     receiver.connect();
 
     while (writer_manager.is_running()) {
-        
+
         auto frame = receiver.receive();
-        
+
         // In case no message is available before the timeout, both pointers are NULL.
         if (!frame.first){
             continue;
@@ -141,6 +142,12 @@ void ProcessManager::receive_zmq()
             }
         }
 
+
+        // checks if ring buffer is initialized, if not, it defines the
+        // statistics writer to send the start statistics
+        if (!ring_buffer.is_initialized()){
+            writer_manager.create_writer_stats_2queue("start");
+        }
         // Commit the frame to the buffer.
         ring_buffer.write(frame_metadata, frame_data);
 
@@ -168,17 +175,17 @@ void ProcessManager::write_h5()
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
 
     uint64_t last_pulse_id = 0;
-    
+
     // Run until the running flag is set or the ring_buffer is empty.  
     while(writer_manager.is_running() || !ring_buffer.is_empty()) {
-        
         if (ring_buffer.is_empty()) {
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(config::ring_buffer_read_retry_interval));
+            std::this_thread::sleep_for(std::chrono::milliseconds(config::ring_buffer_read_retry_interval));
             continue;
         }
+        std::chrono::system_clock::time_point start_processing_rate = std::chrono::system_clock::now();
 
         const pair< shared_ptr<FrameMetadata>, char* > received_data = ring_buffer.read();
-        
+
         // NULL pointer means that the ringbuffer->read() timeouted. Faster than rising an exception.
         if(!received_data.first) {
             continue;
@@ -236,9 +243,7 @@ void ProcessManager::write_h5()
         // Write image metadata if mapping specified.
         auto header_values_type = receiver.get_header_values_type();
         if (header_values_type) {
-
             for (const auto& header_type : *header_values_type) {
-
                 auto& name = header_type.first;
                 auto value = received_data.first->header_values.at(name);
 
@@ -269,8 +274,12 @@ void ProcessManager::write_h5()
             cout << "[ProcessManager::write_h5] Frame metadata index "; 
             cout << received_data.first->frame_index << " written in " << metadata_diff_ms << " ms." << endl;
         #endif
-        
         writer_manager.written_frame(received_data.first->frame_index);
+        // setting the mode to adv
+        auto frame_time_difference = std::chrono::system_clock::now() - start_processing_rate;
+        auto frame_diff_ms = std::chrono::duration<float, milli>(frame_time_difference).count();
+        writer_manager.set_processing_rate(frame_diff_ms);
+        writer_manager.create_writer_stats_2queue("adv");
     }
 
     // Send the last_pulse_id only if it was set.
@@ -278,6 +287,12 @@ void ProcessManager::write_h5()
         notify_last_pulse_id(last_pulse_id);
     }
 
+    // before killing it, sends the end statistics
+    writer_manager.create_writer_stats_2queue("end");
+    // waits for all the statistics to be sent
+    while (!writer_manager.is_stats_queue_empty()){
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
     if (writer->is_file_open()) {
         #ifdef DEBUG_OUTPUT
             using namespace date;
@@ -287,9 +302,11 @@ void ProcessManager::write_h5()
 
         // Wait until all parameters are set or writer is killed.
         while (!writer_manager.are_all_parameters_set() && !writer_manager.is_killed()) {
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(config::parameters_read_retry_interval));
+            std::this_thread::sleep_for(std::chrono::milliseconds(config::parameters_read_retry_interval));
         }
         writer->set_n_received_frames(writer_manager.get_n_received_frames());
+
+
         writer->write_metadata_to_file();
 
         write_h5_format(writer->get_h5_file());
@@ -300,7 +317,7 @@ void ProcessManager::write_h5()
         cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::write] Closing file " << writer_manager.get_output_file() << endl;
     #endif
-    
+
     writer->close_file();
 
     #ifdef DEBUG_OUTPUT
@@ -332,4 +349,47 @@ void ProcessManager::write_h5_format(H5::H5File& file) {
         std::cout << "[" << std::chrono::system_clock::now() << "]";
         std::cout << "[ProcessManager::write_h5_format] Error while trying to write file format: "<< ex.what() << endl;
     }
+}
+
+void ProcessManager::send_writer_stats()
+{
+    sender.bind();
+
+    while (writer_manager.is_running()) 
+    {
+        if (writer_manager.is_stats_queue_empty()){
+            continue;
+        }
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
+            cout << "[ProcessManager::send_writer_stats] size of queue " << writer_manager.is_stats_queue_empty() << endl;
+        #endif
+        // fetches the statistic from the writer manager
+        // and sends the filter + statistics json to the sender
+        auto stats_str = writer_manager.get_stats_from_queue();
+        cout << " STATS " << stats_str << endl;
+        auto filter = writer_manager.get_filter();
+        sender.send(filter , stats_str);
+        writer_manager.set_last_statistics_timestamp();
+
+   }
+
+    // sleeps for 1 seconds before verifying statistics again
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+   // if writer is not running anymore, still needs to send out possible
+   // stuff from statistics queue
+   while (!writer_manager.is_stats_queue_empty())
+   {
+        auto stats_str = writer_manager.get_stats_from_queue();
+        auto filter = writer_manager.get_filter();
+        sender.send(filter , stats_str);
+        writer_manager.set_last_statistics_timestamp();
+   }
+
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[ProcessManager::send_writer_stats] Sender zmq statistics thread stopped." << endl;
+    #endif
 }

@@ -99,7 +99,6 @@ void RingBuffer::write(shared_ptr<FrameMetadata> frame_metadata, const char* dat
 
             // Keep track of the number of used slots.
             buffer_used_slots++;
-
         } else {
             stringstream error_message;
             using namespace date;
@@ -230,9 +229,19 @@ void RingBuffer::release(size_t buffer_slot_index)
     }
 }
 
+size_t RingBuffer::free_slots()
+{
+    lock_guard<mutex> lock(ringbuffer_slots_mutex);
+    return buffer_size - buffer_used_slots;
+}
+
 bool RingBuffer::is_empty()
 {
     lock_guard<mutex> lock(ringbuffer_slots_mutex);
-    
     return buffer_used_slots == 0;
+}
+
+bool RingBuffer::is_initialized()
+{
+    return ring_buffer_initialized;
 }

@@ -49,9 +49,9 @@ void writer_utils::create_destination_folder(const string& output_file)
 }
 
 WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type, 
-    const string& output_file, uint64_t n_frames):
-        parameters_type(parameters_type), output_file(output_file), n_frames(n_frames), 
-        running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0), n_lost_frames(0)
+    const string& output_file, int user_id, uint64_t n_frames):
+        parameters_type(parameters_type), output_file(output_file), n_frames(n_frames),
+        running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0), n_lost_frames(0), user_id(user_id)
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
@@ -84,11 +84,6 @@ void WriterManager::kill()
     killed_flag = true;
 
     stop();
-}
-
-uint64_t WriterManager::get_n_received_frames() const
-{
-    return n_received_frames;
 }
 
 
@@ -127,6 +122,11 @@ unordered_map<string, boost::any> WriterManager::get_parameters()
     lock_guard<mutex> lock(parameters_mutex);
 
     return parameters;
+}
+
+void WriterManager::set_processing_rate(float diff)
+{
+    processing_rate = diff;
 }
 
 void WriterManager::set_parameters(const unordered_map<string, boost::any>& new_parameters)
@@ -212,7 +212,7 @@ bool WriterManager::are_all_parameters_set()
     return true;
 }
 
-size_t WriterManager::get_n_frames()
+size_t WriterManager::get_n_frames() const
 {
     return n_frames;
 }
@@ -225,4 +225,147 @@ void WriterManager::set_n_frames_offset(size_t new_n_frames)
 size_t WriterManager::get_n_frames_offset()
 {
     return n_frames_offset;
+}
+std::string WriterManager::get_filter() const
+{
+    return "statisticsWriter";
+}
+
+void WriterManager::set_stat_flag(bool new_mode, std::string new_cat){
+    lock_guard<mutex> lock(statistics_mutex);
+    mode_category = std::make_tuple(new_mode, new_cat);
+    if (new_cat == "start")
+    {
+        set_time_start();
+    }
+    if (new_cat == "end")
+    {
+        set_time_end();
+    }
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[WriterManager::set_stat_flag] Setting flag, statistics should be sent! " << std::get<0>(mode_category) << " " << std::get<1>(mode_category);
+        cout << "." << endl;
+    #endif
+}
+
+std::tuple<bool, std::string> WriterManager::get_stat_flag()
+{
+    lock_guard<mutex> lock(statistics_mutex);
+    return mode_category;
+}
+
+int WriterManager::get_user_id() const
+{
+    return user_id;
+}
+
+uint64_t WriterManager::get_n_lost_frames() const
+{
+    return n_lost_frames;
+}
+
+size_t WriterManager::get_n_written_frames() const
+{
+    return n_written_frames;
+}
+
+size_t WriterManager::get_n_received_frames() const
+{
+    return n_received_frames;
+}
+
+void WriterManager::set_time_end()
+{
+    time_end = std::chrono::system_clock::now();
+}
+
+void WriterManager::set_time_start()
+{
+    time_start = std::chrono::system_clock::now();
+}
+
+bool WriterManager::is_stats_queue_empty()
+{
+    return (stats_queue.empty());
+}
+
+std::chrono::system_clock::time_point WriterManager::get_last_statistics_timestamp() const
+{
+    return last_statistics_timestamp;
+}
+
+void WriterManager::set_last_statistics_timestamp()
+{
+     last_statistics_timestamp = std::chrono::system_clock::now();
+}
+
+
+
+std::string WriterManager::get_stats_from_queue()
+{
+    
+    auto stats_str_from_queue = stats_queue.front();
+    stats_queue.pop_front();
+    return stats_str_from_queue;
+}
+
+void WriterManager::create_writer_stats_2queue(const std::string category)
+{
+
+    lock_guard<mutex> lock(statistics_mutex);
+    pt::ptree root;
+    pt::ptree stats_json;
+    bool always_add = false;
+    if (category == "start"){
+        time_t tt;
+        tt = std::chrono::system_clock::to_time_t(time_start);
+        stats_json.put("first_frame_id", first_pulse_id);
+        stats_json.put("n_frames", get_n_frames() );
+        stats_json.put("output_file", get_output_file());
+        stats_json.put("user_id", get_user_id());
+        stats_json.put("start_time", ctime(&tt));
+        stats_json.put("compression_method", "test");
+        root.add_child("statistics_wr_start", stats_json);
+        always_add = true;
+    } else if (category == "adv"){
+        // calculates the elapsed time from beginning
+        auto now = std::chrono::system_clock::now();
+        auto time_diff = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(now - time_start).count();
+        // received_rate = total number of received frames / elapsed time
+        auto receiving_rate = get_n_received_frames() / time_diff;
+        // writting_rate = total number of written frames / elapsed time
+        auto writting_rate = get_n_written_frames() / time_diff;
+        stats_json.put("n_written_frames", get_n_written_frames());
+        stats_json.put("n_received_frames", get_n_received_frames());
+        stats_json.put("n_free_slots", "-1");
+        stats_json.put("enable", "true");
+        stats_json.put("processing_rate", processing_rate);
+        stats_json.put("receiving_rate", receiving_rate);
+        stats_json.put("writting_rate", writting_rate);
+        stats_json.put("avg_compressed_size", "0.0");
+        root.add_child("statistics_wr_adv", stats_json);
+    } else if (category == "end") {
+        // creates the finish statistics json
+        time_t tt;
+        tt = std::chrono::system_clock::to_time_t(time_end);
+        stats_json.put("end_time", ctime(&tt));
+        stats_json.put("enable", "true");
+        stats_json.put("n_lost_frames", get_n_lost_frames());
+        stats_json.put("n_total_written_frames", get_n_written_frames());
+        root.add_child("statistics_wr_finish", stats_json);
+        always_add = true;
+    } else {
+        stats_json.put("problem", "unidentified_mode");
+        root.add_child("unidentified_mode", stats_json);
+    }
+    auto now = std::chrono::system_clock::now();
+    auto diff = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(now - get_last_statistics_timestamp()).count();
+    if (always_add || diff >= config::statistics_buffer_adv_interval)
+    {
+        std::ostringstream buf;
+        pt::write_json(buf, root, false);
+        stats_queue.push_back(buf.str());
+    }
 }

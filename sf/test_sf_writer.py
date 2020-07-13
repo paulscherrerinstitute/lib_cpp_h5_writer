@@ -9,7 +9,7 @@ def main():
     parser = argparse.ArgumentParser(description='Generate SF detector test stream.')
     parser.add_argument("-o", '--stream_address', default="tcp://127.0.0.1:8888", help="Address to bind the stream.")
     parser.add_argument("-i", '--n_images', default=100, help="Number of images to generate.")
-    parser.add_argument('-m', '--n_modules', default=5, help="Number of modules to simulate.")
+    parser.add_argument('-m', '--n_modules', type=int, default=5, help="Number of modules to simulate.")
 
     arguments = parser.parse_args()
 
