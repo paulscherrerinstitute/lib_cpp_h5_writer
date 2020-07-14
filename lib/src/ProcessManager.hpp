@@ -12,8 +12,8 @@
 class ProcessManager 
 {
     WriterManager& writer_manager;
-    ZmqReceiver& receiver;
     ZmqSender& sender;
+    ZmqReceiver& receiver;
     RingBuffer& ring_buffer;
     const H5Format& format;
 

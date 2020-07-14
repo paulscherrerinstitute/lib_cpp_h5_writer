@@ -368,7 +368,6 @@ void ProcessManager::send_writer_stats()
         // fetches the statistic from the writer manager
         // and sends the filter + statistics json to the sender
         auto stats_str = writer_manager.get_stats_from_queue();
-        cout << " STATS " << stats_str << endl;
         auto filter = writer_manager.get_filter();
         sender.send(filter , stats_str);
         writer_manager.set_last_statistics_timestamp();

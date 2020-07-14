@@ -4,6 +4,7 @@
 
 #include "config.hpp"
 #include "H5Format.hpp"
+#include "ZmqSender.hpp"
 
 using namespace std;
 using s_ptr = shared_ptr<h5_base>;

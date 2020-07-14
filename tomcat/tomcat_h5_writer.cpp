@@ -5,16 +5,17 @@
 #include "config.hpp"
 #include "WriterManager.hpp"
 #include "ZmqReceiver.hpp"
+#include "ZmqSender.hpp"
 #include "ProcessManager.hpp"
 
 #include "TomcatFormat.cpp"
 
 int main (int argc, char *argv[])
 {
-    if (argc != 9) {
+    if (argc != 10) {
         cout << endl;
         cout << "Usage: tomcat_h5_writer [connection_address] [output_file] [n_frames] [user_id]" << endl;
-        cout << " [n_modules] [rest_api_port] [dataset_name] [max_frames_per_file]" << endl;
+        cout << " [n_modules] [rest_api_port] [dataset_name] [max_frames_per_file] [statistics_monitor_address" << endl;
         cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\toutput_file: Name of the output file." << endl;
         cout << "\tn_frames: Number of images to acquire. 0 for infinity (until /stop is called)." << endl;
@@ -35,6 +36,8 @@ int main (int argc, char *argv[])
     int rest_port = atoi(argv[6]);
     string dataset_name = string(argv[7]);
     hsize_t frames_per_file = atoi(argv[8]);
+    string statistics_monitor_address = string(argv[9]);
+
     string bsread_rest_address = "http://localhost:9999/";
 
     if (user_id != -1) {
@@ -60,12 +63,12 @@ int main (int argc, char *argv[])
 
     WriterManager writer_manager(format.get_input_value_type(), output_file, n_frames);
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
-
+    ZmqSender sender(statistics_monitor_address, config::zmq_n_io_threads);
     RingBuffer ring_buffer(config::ring_buffer_n_slots);
     uint16_t adjust_n_frames = 1;
     
 
-    ProcessManager process_manager(writer_manager, receiver, ring_buffer, format, rest_port, bsread_rest_address, frames_per_file, adjust_n_frames);
+    ProcessManager process_manager(writer_manager, sender, receiver, ring_buffer, format, rest_port, bsread_rest_address, frames_per_file, adjust_n_frames);
     
     process_manager.run_writer();
 
