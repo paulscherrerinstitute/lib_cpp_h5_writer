@@ -15,7 +15,7 @@ int main (int argc, char *argv[])
     if (argc != 10) {
         cout << endl;
         cout << "Usage: tomcat_h5_writer [connection_address] [output_file] [n_frames] [user_id]" << endl;
-        cout << " [n_modules] [rest_api_port] [dataset_name] [max_frames_per_file] [statistics_monitor_address" << endl;
+        cout << " [n_modules] [rest_api_port] [dataset_name] [max_frames_per_file] [statistics_monitor_address]" << endl;
         cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\toutput_file: Name of the output file." << endl;
         cout << "\tn_frames: Number of images to acquire. 0 for infinity (until /stop is called)." << endl;
@@ -24,6 +24,7 @@ int main (int argc, char *argv[])
         cout << "\trest_port: Port to start the REST Api on." << endl;
         cout << "\tdataset_name: Definition of the dataset name." << endl;
         cout << "\tframes_per_file: Maximum number of frames for each h5 file." << endl;
+        cout << "\tstatistics_monitor_address: TCP address to send writer's statistics." << endl;
         cout << endl;
         exit(-1);
     }

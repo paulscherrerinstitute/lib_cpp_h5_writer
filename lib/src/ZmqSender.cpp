@@ -26,9 +26,9 @@ void ZmqSender::bind()
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[ZmqSender::bind] Binding to address " << connect_address;
-        cout << " with n_io_threads " << n_io_threads << endl;
+        std::cout <<  "[" << std::chrono::system_clock::now() << "]";
+        std::cout <<  "[ZmqSender::bind] Binding to address " << connect_address;
+        std::cout <<  " with n_io_threads " << n_io_threads << endl;
     #endif
 
     context = make_shared<zmq::context_t>(n_io_threads);
@@ -80,7 +80,7 @@ void ZmqSender::send(const std::string& filter, const std::string& message_data)
     // verifies the return value
     if (!rv0 || !rv1) {
         using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[ZmqSender::send] Error while sending statistics via ZMQ. " << endl; 
+        std::cout << "[" << std::chrono::system_clock::now() << "]";
+        std::cout << "[ZmqSender::send] Error while sending statistics via ZMQ. " << endl; 
     }
 }
