@@ -1,5 +1,8 @@
 #include <iostream>
 #include <stdexcept>
+#include <string>
+#include <boost/algorithm/string.hpp>
+
 
 #include "ZmqSender.hpp"
 #include "config.hpp"
@@ -48,6 +51,12 @@ bool ZmqSender::get_stat() const
 std::string ZmqSender::get_mode() const
 {
     return mode;
+}
+
+bool ZmqSender::get_valid_tcp_stats_address() const{
+    std::string t("tcp://");
+    bool b = boost::algorithm::contains(connect_address, t);
+    return b;
 }
 
 void ZmqSender::set_stat_mode(const bool stat_param, const std::string& mode_indication){

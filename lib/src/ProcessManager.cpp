@@ -353,38 +353,45 @@ void ProcessManager::write_h5_format(H5::H5File& file) {
 
 void ProcessManager::send_writer_stats()
 {
-    sender.bind();
+    if (sender.get_valid_tcp_stats_address() ){
+        sender.bind();
 
-    while (writer_manager.is_running()) 
-    {
-        if (writer_manager.is_stats_queue_empty()){
-            continue;
+        while (writer_manager.is_running()) 
+        {
+            if (writer_manager.is_stats_queue_empty()){
+                continue;
+            }
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
+                cout << "[ProcessManager::send_writer_stats] size of queue " << writer_manager.is_stats_queue_empty() << endl;
+            #endif
+            // fetches the statistic from the writer manager
+            // and sends the filter + statistics json to the sender
+            auto stats_str = writer_manager.get_stats_from_queue();
+            auto filter = writer_manager.get_filter();
+            sender.send(filter , stats_str);
+            writer_manager.set_last_statistics_timestamp();
         }
+
+        // sleeps for 1 seconds before verifying statistics again
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        // if writer is not running anymore, still needs to send out possible
+        // stuff from statistics queue
+        while (!writer_manager.is_stats_queue_empty())
+        {
+                auto stats_str = writer_manager.get_stats_from_queue();
+                auto filter = writer_manager.get_filter();
+                sender.send(filter , stats_str);
+                writer_manager.set_last_statistics_timestamp();
+        }
+    }else{
         #ifdef DEBUG_OUTPUT
             using namespace date;
             cout << "[" << std::chrono::system_clock::now() << "]";
-            cout << "[ProcessManager::send_writer_stats] size of queue " << writer_manager.is_stats_queue_empty() << endl;
+            cout << "[ProcessManager::send_writer_stats] Sender zmq statistics thread stopping since the tcp address is not valid." << endl;
         #endif
-        // fetches the statistic from the writer manager
-        // and sends the filter + statistics json to the sender
-        auto stats_str = writer_manager.get_stats_from_queue();
-        auto filter = writer_manager.get_filter();
-        sender.send(filter , stats_str);
-        writer_manager.set_last_statistics_timestamp();
-
-   }
-
-    // sleeps for 1 seconds before verifying statistics again
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-   // if writer is not running anymore, still needs to send out possible
-   // stuff from statistics queue
-   while (!writer_manager.is_stats_queue_empty())
-   {
-        auto stats_str = writer_manager.get_stats_from_queue();
-        auto filter = writer_manager.get_filter();
-        sender.send(filter , stats_str);
-        writer_manager.set_last_statistics_timestamp();
-   }
+    }
 
     #ifdef DEBUG_OUTPUT
         using namespace date;

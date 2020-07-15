@@ -28,6 +28,7 @@ class ZmqSender
     public:
     ZmqSender(const std::string& connect_address, 
                 const int n_io_threads);
+    
     virtual ~ZmqSender(){};
 
     void bind();
@@ -37,6 +38,8 @@ class ZmqSender
     void set_stat_mode(bool stat, const std::string& mode_indication);
 
     bool get_stat() const;
+
+    bool get_valid_tcp_stats_address() const;
 
     std::string get_mode() const;
 

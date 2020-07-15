@@ -44,6 +44,7 @@ void writer_utils::create_destination_folder(const string& output_file)
         cout << "[writer_utils::create_destination_folder] Creating folder " << output_folder << endl;
 
         string create_folder_command("mkdir -p " + output_folder);
+        cout << create_folder_command.c_str() << endl;
         system(create_folder_command.c_str());
     }
 }
