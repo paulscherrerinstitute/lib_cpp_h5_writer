@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" /><meta content="This library is used for creating C++ based stream writer for H5 files. It focuses on the functionality and performance needed for high performance detectors integrations." lang="en" name="description" xml:lang="en" />
+
+    <title>Welcome to TOMCAT pco writer documentation &#8212; LIB_CPP_H5_WRITER Tomcat (PCO CAMERA)</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-tomcat-pco-writer-documentation">
+<h1>Welcome to TOMCAT pco writer documentation<a class="headerlink" href="#welcome-to-tomcat-pco-writer-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This library is used for creating C++ based stream writer for H5 files. It focuses on the functionality and performance needed for high performance detectors integrations.</p>
+<dl class="simple">
+<dt>Key features:</dt><dd><ul class="simple">
+<li><p>Get data from ZMQ stream (Array-1.0 protocol) - htypes specification</p></li>
+<li><p>Write Nexus complaint H5 file (User specified) - nexus format</p></li>
+<li><p>Specify additional zmq stream parameters to write to file.</p></li>
+<li><p>Receive additional parameters to write to file via REST api.</p></li>
+<li><p>Interaction with the writer over REST api (stop, kill, get_statistics).</p></li>
+</ul>
+</dd>
+</dl>
+<p>TOMCAT pco writer:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Based on a configuration file, TOMCAT pco writer will receive a zmq stream that is sent from the pco camera and store it into a H5 file.</p></li>
+<li><p>The writer runs on xbl-daq-32 and is controlled by the pco_rclient remotely on any console or machine within tomcat’s gateway (x06sa-gw).</p></li>
+</ul>
+</div></blockquote>
+<p>It is developed using <a href="#id1"><span class="problematic" id="id2">`c++`_</span></a> on an open-source project (<a class="reference external" href="https://github.com/paulscherrerinstitute/lib_cpp_h5_writer/tree/tomcat/">github repository</a>) and documented here using readthedocs.</p>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started with Gitutils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#tomcat-pco-writer">TOMCAT PCO Writer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#installation-for-distribution">Installation for distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#building-the-conda-package">Building the conda package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#contribute-and-create-a-merge-request">Contribute and create a merge request</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">LIB_CPP_H5_WRITER Tomcat (PCO CAMERA)</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started with Gitutils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="installation.html" title="next chapter">Installation</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Leonardo hax Damiani.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
