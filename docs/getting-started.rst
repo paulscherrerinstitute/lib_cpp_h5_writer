@@ -96,4 +96,4 @@ The direct calls to the REST Api will be shown with cURL.
 .. code-block:: python
 
     # Get writer status.
-    curl -X GET http://xbl-daq-29:9555/status
+    curl -X GET http://xbl-daq-32:9555/status
