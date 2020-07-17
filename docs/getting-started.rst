@@ -78,7 +78,7 @@ From there, create a tomcat writer pco configuration file (*.pco) according to y
     max_frames_per_file = 20000
 
     # TCP ZMQ output statistics address
-    tcp://*:8081
+    statistics_monitor_address = tcp://*:8081
 
 .. note::
     If the output file exists, data will be appended to it:
