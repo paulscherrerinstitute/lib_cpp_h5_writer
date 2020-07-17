@@ -50,3 +50,4 @@ The service can be controlled with the following commands (using sudo or root):
     * systemctl start pco_writer_1 (start the flask server)
     * systemctl stop pco_writer_1 (stop the flask server)
     * journalctl -u pco_writer_1 -f (check the flask logs)
+    * systemctl is-active --quiet pco_writer_1  && echo PCO flask server is running || echo Pco flask server is not running (check if flask server is runnign)
