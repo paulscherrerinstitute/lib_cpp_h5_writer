@@ -63,13 +63,13 @@ From there, create a tomcat writer pco configuration file (*.pco) according to y
     n_frames = 0
 
     # User id
-    user_id = -1
+    user_id = 503
 
     # Number of n_modules
     n_modules = 1
 
     # Rest api port (that will connect with the pco_rclient )
-    rest_api_port = 8082
+    rest_api_port = 9555
 
     # Dataset file name
     dataset_name = data
@@ -87,3 +87,13 @@ From there, create a tomcat writer pco configuration file (*.pco) according to y
     If the **n_frames** is 0, the writer will not stop until the client command is issued.
     If you don't know what the parameters means, we recommend to not change it.
 
+
+TOMCAT PCO writer Rest API
+------------------------------------
+
+The direct calls to the REST Api will be shown with cURL.
+
+.. code-block:: python
+
+    # Get writer status.
+    curl -X GET http://xbl-daq-29:9555/status
