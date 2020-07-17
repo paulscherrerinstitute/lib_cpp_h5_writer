@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Installation &#8212; LIB_CPP_H5_WRITER Tomcat (PCO CAMERA)</title>
+    <title>Installation &#8212; Tomcat PCO Writer</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -13,7 +13,7 @@
     <script src="_static/doctools.js"></script>
     <script src="_static/language_data.js"></script>
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Getting started with Gitutils" href="getting-started.html" />
+    <link rel="next" title="Getting started with TOMCAT pco writer" href="getting-started.html" />
     <link rel="prev" title="Welcome to TOMCAT pco writer documentation" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -33,7 +33,34 @@
             
   <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>todo</p>
+<div class="section" id="tomcat-pco-writer">
+<h2>Tomcat pco writer<a class="headerlink" href="#tomcat-pco-writer" title="Permalink to this headline">¶</a></h2>
+<p>Tomcat pco writer is deployed and installed on xbl-daq-32 using <a class="reference external" href="https://www.ansible.com/">ansible</a>. The <a class="reference external" href="https://git.psi.ch/HPDI/daq_server_deployment/tree/master/ansible">ansible configuration</a> shows the remote connection to the server and allows to easily deploy new versions of the writer library.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/pco_writer_setup.sh">pco setup script</a> is used to install the TOMCAT pco writer. It will create the home folder for the specified user on the specified machine, create the conda environment based on <a class="reference external" href="https://git.psi.ch/hpdi_configs/sls/tree/master/hosts/xbl-daq-32">conda exported file</a>, clone the repository (for the branch named tomcat) and compile the core library and the tomcat’s format and configuration writer.</p></li>
+<li><p><a class="reference external" href="https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/">pco start script</a> activates the environment and starts the service that starts a <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/">python flask server</a>. The flask server is listening to commands issued using the pco_rclient.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="tomcat-pco-writer-client">
+<h2>Tomcat pco writer client<a class="headerlink" href="#tomcat-pco-writer-client" title="Permalink to this headline">¶</a></h2>
+<p>Tomcat’s pco writer controller is hosted on the psi conda channel and is installed using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda install -c paulscherrerinstitute pco_rclient
+</pre></div>
+</div>
+<dl class="simple">
+<dt>For more information/details about the pco_rclient, please check:</dt><dd><ul class="simple">
+<li><p>pco_rclient <a class="reference external" href="https://github.com/paulscherrerinstitute/pco_rclient">repository</a></p></li>
+<li><p>pco_rclient <a class="reference external" href="https://anaconda.org/paulscherrerinstitute/pco_rclient">conda package</a></p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>pco_rclient needs to have access to xbl-daq-32 (where the flask server and the writer run).</p>
+</div>
+</div>
 </div>
 
 
@@ -43,7 +70,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">LIB_CPP_H5_WRITER Tomcat (PCO CAMERA)</a></h1>
+<h1 class="logo"><a href="index.html">Tomcat PCO Writer</a></h1>
 
 
 
@@ -54,11 +81,14 @@
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started with Gitutils</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tomcat-pco-writer">Tomcat pco writer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tomcat-pco-writer-client">Tomcat pco writer client</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started with TOMCAT pco writer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
 </ul>
 
@@ -67,7 +97,7 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Welcome to TOMCAT pco writer documentation</a></li>
-      <li>Next: <a href="getting-started.html" title="next chapter">Getting started with Gitutils</a></li>
+      <li>Next: <a href="getting-started.html" title="next chapter">Getting started with TOMCAT pco writer</a></li>
   </ul></li>
 </ul>
 </div>
@@ -94,7 +124,7 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2020, Leonardo hax Damiani.
+      &copy;.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>

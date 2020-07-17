@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Usage &#8212; LIB_CPP_H5_WRITER Tomcat (PCO CAMERA)</title>
+    <title>Usage &#8212; Tomcat PCO Writer</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -14,7 +14,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Development" href="development.html" />
-    <link rel="prev" title="Getting started with Gitutils" href="getting-started.html" />
+    <link rel="prev" title="Getting started with TOMCAT pco writer" href="getting-started.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -33,9 +33,27 @@
             
   <div class="section" id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="tomcat-pco-writer">
-<h2>TOMCAT PCO Writer<a class="headerlink" href="#tomcat-pco-writer" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<div class="section" id="tomcat-pco-writer-client-usage">
+<h2>TOMCAT PCO Writer client usage<a class="headerlink" href="#tomcat-pco-writer-client-usage" title="Permalink to this headline">¶</a></h2>
+<p>To start an acquisition use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pco_rclient start &lt;path/to/config/file.pco&gt;
+</pre></div>
+</div>
+<p>To stop/kill/status use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pco_rclient &lt;stop/kill/status&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="tomcat-pco-writer-log">
+<h2>TOMCAT PCO Writer log<a class="headerlink" href="#tomcat-pco-writer-log" title="Permalink to this headline">¶</a></h2>
+<p>To verify the log of the writer:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ journalctl -u pco_writer_1 -f
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>journalctl allows  the usage of, for example: <strong>–since “1 hour ago”</strong> to apply filters on the output file. For more instructions check <a class="reference external" href="https://www.loggly.com/ultimate-guide/using-journalctl/">journalct guide</a>.</p>
+</div>
 </div>
 </div>
 
@@ -46,7 +64,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">LIB_CPP_H5_WRITER Tomcat (PCO CAMERA)</a></h1>
+<h1 class="logo"><a href="index.html">Tomcat PCO Writer</a></h1>
 
 
 
@@ -58,13 +76,13 @@
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started with Gitutils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started with TOMCAT pco writer</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#tomcat-pco-writer">TOMCAT PCO Writer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tomcat-pco-writer-client-usage">TOMCAT PCO Writer client usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tomcat-pco-writer-log">TOMCAT PCO Writer log</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
 </ul>
 
@@ -72,7 +90,7 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="getting-started.html" title="previous chapter">Getting started with Gitutils</a></li>
+      <li>Previous: <a href="getting-started.html" title="previous chapter">Getting started with TOMCAT pco writer</a></li>
       <li>Next: <a href="development.html" title="next chapter">Development</a></li>
   </ul></li>
 </ul>
@@ -100,7 +118,7 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2020, Leonardo hax Damiani.
+      &copy;.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>

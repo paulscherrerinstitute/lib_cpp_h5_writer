@@ -46,7 +46,8 @@ TOMCAT PCO writer configuration file
 ------------------------------------
 From there, create a tomcat writer pco configuration file (*.pco) according to your needs. We recommend starting with the following template and adjust it to your needs:
 
-.. code-block:: bash
+.. code-block:: python
+   :linenos:
 
     ######################################
     # PCO.EDGE WRITER CONFIGURATION FILE #

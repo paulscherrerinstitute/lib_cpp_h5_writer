@@ -18,7 +18,6 @@ To stop/kill/status use:
     
     $ pco_rclient <stop/kill/status>
 
-
 TOMCAT PCO Writer log
 ---------------------
 
