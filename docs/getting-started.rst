@@ -16,12 +16,13 @@ PCO client controller (pco_rclient)
 
 Verify if the pco_rclient is installed and working:
 
-:: code-block:: bash
+.. code-block:: bash
+    
     $ pco_rclient -h
 
 Output:
 
-:: code-block:: bash
+.. code-block:: bash
 
     usage: pco_rclient [-h] {start,stop,kill,status} ...
 
@@ -45,7 +46,7 @@ TOMCAT PCO writer configuration file
 ------------------------------------
 From there, create a tomcat writer pco configuration file (*.pco) according to your needs. We recommend starting with the following template and adjust it to your needs:
 
-:: code-block:: bash
+.. code-block:: bash
 
     ######################################
     # PCO.EDGE WRITER CONFIGURATION FILE #

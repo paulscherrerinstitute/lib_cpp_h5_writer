@@ -7,13 +7,15 @@ TOMCAT PCO Writer client usage
 
 To start an acquisition use:
 
-:: code-block:: bash
+.. code-block:: bash
+    
     $ pco_rclient start <path/to/config/file.pco>
 
 
 To stop/kill/status use:
 
-:: code-block:: bash
+.. code-block:: bash
+    
     $ pco_rclient <stop/kill/status>
 
 
@@ -22,7 +24,8 @@ TOMCAT PCO Writer log
 
 To verify the log of the writer:
 
-:: code-block:: bash
+.. code-block:: bash
+    
     $ journalctl -u pco_writer_1 -f
 
 

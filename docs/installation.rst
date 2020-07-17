@@ -15,7 +15,8 @@ Tomcat pco writer client
 ------------------------
 Tomcat's pco writer controller is hosted on the psi conda channel and is installed using:
 
-:: code-block:: bash
+.. code-block:: bash
+
     $ conda install -c paulscherrerinstitute pco_rclient
 
 For more information/details about the pco_rclient, please check:
