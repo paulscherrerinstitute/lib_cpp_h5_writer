@@ -8,7 +8,7 @@ import sys
 
 tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
 
-default_args = ['connection_address', 'output_file', 'n_frames', 'user_id', 'n_modules', 'rest_api_port', 'dataset_name', 'max_frames_per_file']
+default_args = ['connection_address', 'output_file', 'n_frames', 'user_id', 'n_modules', 'rest_api_port', 'dataset_name', 'max_frames_per_file', 'statistics_monitor_address']
 
 app = Flask(__name__)
 
@@ -37,7 +37,9 @@ def start_pco_writer():
             args= json.loads(request_json)
             for key in default_args:
                 tomcat_args.append(args[key])
-            p = subprocess.run(tomcat_args)
+            #p = subprocess.run(tomcat_args)
+            print(tomcat_args)
+            p = subprocess.Popen(tomcat_args,shell=False,stdin=None,stdout=None,stderr=None,close_fds=True)
     return response
 
 @app.route('/status', methods=['GET', 'POST'])
@@ -49,7 +51,7 @@ def get_status():
             return validate_response(response)
         except Exception as e:
             msg = "\nWriter is not running. Please start it first using:\n      $ pco_rclient start <path/to/config.pco>.\n"
-            return msg
+            return {'success':True, 'value':msg}
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=9900)
+    app.run(debug=True, host='0.0.0.0', port=9901)
