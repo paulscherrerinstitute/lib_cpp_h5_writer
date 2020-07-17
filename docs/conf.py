@@ -17,15 +17,14 @@ add_function_parentheses = True
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
-project = u'LIB_CPP_H5_WRITER Tomcat (PCO CAMERA)'
-copyright = u'2020, Leonardo hax Damiani'
+project = u'Tomcat PCO Writer'
 
 version = '0.1.0'
 release = ''
 
 # -- Options for HTML output ---------------------------------------------------
 
-html_title = "LIB_CPP_H5_WRITER Tomcat (PCO CAMERA)"
+html_title = "Tomcat PCO Writer"
 html_static_path = ['_static']
 html_domain_indices = False
 html_use_index = False
@@ -39,6 +38,7 @@ html_theme_options = {
 
 # -- Options for Code Examples output ---------------------------------------------------
 
+code_example_dir = "code-example"
 
 ################################################################################
 

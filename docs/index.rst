@@ -27,7 +27,7 @@ It is developed using c++ on an open-source project (`github repository`_) and d
 .. _nexus format : https://www.nexusformat.org/
 .. _pco_rclient : https://github.com/paulscherrerinstitute/pco_rclient
 .. _ansible configuration : https://git.psi.ch/HPDI/daq_server_deployment/tree/master/ansible
-.. _conda_env : https://git.psi.ch/hpdi_configs/sls
+.. _conda env : https://git.psi.ch/hpdi_configs/sls
 .. _github repository : https://github.com/paulscherrerinstitute/lib_cpp_h5_writer/tree/tomcat/
 
 Contents:
