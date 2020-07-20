@@ -14,6 +14,7 @@ using namespace std;
 
 std::unique_ptr<H5Writer> get_h5_writer(
     const string& filename, 
+    const string& dataset_name, 
     hsize_t frames_per_file, 
     hsize_t initial_dataset_size, 
     hsize_t dataset_increase_step)
@@ -23,6 +24,7 @@ std::unique_ptr<H5Writer> get_h5_writer(
     } else {
         return unique_ptr<H5Writer>(
             new H5Writer(filename, 
+                         dataset_name,
                          frames_per_file, 
                          initial_dataset_size, 
                          dataset_increase_step)
@@ -32,10 +34,12 @@ std::unique_ptr<H5Writer> get_h5_writer(
 
 H5Writer::H5Writer(
     const std::string& filename, 
+    const std::string& dataset_name,
     hsize_t frames_per_file, 
     hsize_t initial_dataset_size, 
     hsize_t dataset_increase_step) :
         filename(filename), 
+        dataset_name(dataset_name),
         frames_per_file(frames_per_file), 
         initial_dataset_size(initial_dataset_size),   
         dataset_increase_step(dataset_increase_step)
@@ -47,6 +51,7 @@ H5Writer::H5Writer(
         cout << "[" << system_clock::now() << "]";
         cout << "[H5Writer::H5Writer] Creating chunked writer"; 
         cout << " with filename " << filename;
+        cout << " with dataset_name " << dataset_name;
         cout << " and frames_per_file " << frames_per_file;
         cout << " and initial_dataset_size " << initial_dataset_size;
         cout << endl;
@@ -221,10 +226,38 @@ void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& 
         dataset_data_type.setOrder(H5T_ORDER_LE);
     }
 
-    auto dataset = file.createDataSet(dataset_name.c_str(), dataset_data_type, dataspace, dataset_properties);
-    
-    datasets.insert({dataset_name, dataset});
-    datasets_current_size.insert({dataset_name, initial_dataset_size});
+    try{
+        auto dataset = file.createDataSet(dataset_name.c_str(), dataset_data_type, dataspace, dataset_properties);
+
+        datasets.insert({dataset_name, dataset});
+        datasets_current_size.insert({dataset_name, initial_dataset_size});
+    }catch(...){
+        // if something went wrong. delete link and try again
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
+            cout << "[H5Writer::create_dataset] There was a problem creating the dataset... Previously existing dataset is going to be unlinked." << endl;
+        #endif
+        try{
+            std::string channelName = dataset_name.c_str();
+            int result = H5Ldelete(file.getId(), channelName.data(), H5P_DEFAULT);
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
+                if (result <0 ){
+                    cout << "[H5Writer::create_dataset] There was a problem unlinking dataset.";
+                }else{
+                    cout << "[H5Writer::create_dataset] Dataset successfully unlinked.";
+                }                
+            #endif
+        }catch (...) {
+                #ifdef DEBUG_OUTPUT
+                    using namespace date;
+                    cout << "[" << std::chrono::system_clock::now() << "]";
+                    cout << "[H5Writer::create_dataset H5Ldelete] There was a problem with H5::H5Ldelete.";
+                #endif
+        }
+    }    
 }
 
 void H5Writer::create_file(hsize_t frame_chunk) 
@@ -235,6 +268,7 @@ void H5Writer::create_file(hsize_t frame_chunk)
     }
 
     auto target_filename = filename;
+    auto target_dataset_name = dataset_name;
 
     // In case frames_per_file is > 0, the filename variable is a template for the filename.
     if (frames_per_file) {
@@ -251,13 +285,37 @@ void H5Writer::create_file(hsize_t frame_chunk)
         target_filename = string(buffer);
     }
 
+    bool exists = (access( target_filename.c_str(), F_OK ) != -1 );
     #ifdef DEBUG_OUTPUT
+        // verifies if dataset_name is valid and not existing
+        H5::Exception::dontPrint();
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[H5Writer::create_file] Creating filename " << target_filename << endl;
+        if (exists) {
+            cout << "[H5Writer::create_file] Appending filename " << target_filename << endl;
+        }else{
+            cout << "[H5Writer::create_file] Creating filename " << target_filename << endl;
+        }
     #endif
 
-    file = H5::H5File(target_filename.c_str(), H5F_ACC_TRUNC);
+
+    if (exists) {
+        file = H5::H5File(target_filename.c_str(), H5F_ACC_RDWR);
+        // verifies if dataset_name is valid and not existing
+        H5::Exception::dontPrint();
+        try {  // to determine if the dataset exists in the group
+            std::string check_group = "measurement/acquisition/" + target_dataset_name;
+            auto group_measurement = H5::Group(file.openGroup(check_group));
+            // PROBLEM Dataset found - halting execution
+            dataset_name_taken = true;
+        }catch(...) {
+            // name's not taken, all good to go -> Creating group
+            H5FormatUtils::create_group(file, "measurement/acquisition/" + target_dataset_name);
+        }
+    }else{
+        file = H5::H5File(target_filename.c_str(), H5F_ACC_TRUNC);
+    }
+
 
     if (file.getId() == -1) {
        stringstream error_message;
@@ -270,12 +328,17 @@ void H5Writer::create_file(hsize_t frame_chunk)
     
     // New file created - set this files chunk number.
     current_frame_chunk = frame_chunk;
-
+    
 }
 
 bool H5Writer::is_file_open() const
 {
     return (file.getId() != -1);
+}
+
+bool H5Writer::get_dataset_name_taken() const
+{
+    return dataset_name_taken;
 }
 
 inline size_t H5Writer::get_relative_data_index(const size_t data_index) 

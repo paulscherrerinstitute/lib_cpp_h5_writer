@@ -114,6 +114,8 @@ namespace H5FormatUtils
     H5::Group create_group(H5::Group& target, const std::string& name);
     const H5::PredType& get_dataset_data_type(const std::string& type);
 
+    
+
     H5::DataSet write_dataset(H5::Group& target, const h5_dataset& dataset, 
         const std::unordered_map<std::string, boost::any>& values);
 
@@ -122,6 +124,8 @@ namespace H5FormatUtils
     H5::DataSet write_dataset(H5::Group& target, const std::string& name, int value);
 
     H5::DataSet write_dataset(H5::Group& target, const std::string& name, const std::string& value);
+
+    // bool check_group_exists(H5::Group& target, const std::string& name);
 
     void write_attribute(H5::H5Object& target, const h5_attr& attribute, 
         const std::unordered_map<std::string, boost::any>& values);

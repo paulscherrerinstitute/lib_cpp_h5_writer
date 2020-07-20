@@ -34,6 +34,7 @@ class WriterManager
     // Initialize in constructor.
     const std::unordered_map<std::string, DATA_TYPE>& parameters_type;
     std::string output_file;
+    std::string dataset_name;
     size_t n_frames;
     size_t n_frames_offset;
     std::atomic_bool running_flag;
@@ -43,7 +44,7 @@ class WriterManager
     std::atomic<uint64_t> n_lost_frames;
 
     public:
-        WriterManager(const std::unordered_map<std::string, DATA_TYPE>& parameters_type, const std::string& output_file, int user_id, uint64_t n_frames=0);
+        WriterManager(const std::unordered_map<std::string, DATA_TYPE>& parameters_type, const std::string& output_file, const std::string& dataset_name, int user_id, uint64_t n_frames=0);
         virtual ~WriterManager();
 
         void stop();
@@ -53,6 +54,7 @@ class WriterManager
         std::string get_status();
         bool are_all_parameters_set();
         std::string get_output_file() const;
+        std::string get_dataset_name() const;
 
         const std::unordered_map<std::string, DATA_TYPE>& get_parameters_type() const;
         std::unordered_map<std::string, boost::any> get_parameters();

@@ -13,6 +13,7 @@ class H5Writer
     protected:
         // Initialized in constructor.
         const std::string filename;
+        const std::string dataset_name;
         hsize_t frames_per_file;
         hsize_t initial_dataset_size;
         hsize_t dataset_increase_step = 0;
@@ -20,6 +21,9 @@ class H5Writer
         // State variables.
         hsize_t max_data_index = 0;
         hsize_t current_frame_chunk = 0;
+
+        // dataset_name taken
+        bool dataset_name_taken = false;
 
         H5::H5File file;
         std::unordered_map<std::string, H5::DataSet> datasets;
@@ -34,7 +38,7 @@ class H5Writer
         size_t get_relative_data_index(const size_t data_index);
 
     public:
-        H5Writer(const std::string& filename, hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
+        H5Writer(const std::string& filename, const std::string& dataset_name,  hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
         virtual ~H5Writer();
         virtual bool is_file_open() const;
         virtual void create_file(const hsize_t frame_chunk=1);
@@ -43,7 +47,7 @@ class H5Writer
             const size_t data_bytes_size, const std::string& data_type, const std::string& endianness);
         virtual H5::H5File& get_h5_file();
         virtual bool is_data_for_current_file(const size_t data_index);
-        
+        virtual bool get_dataset_name_taken() const;
 };
 
 class DummyH5Writer : public H5Writer
@@ -65,9 +69,11 @@ class DummyH5Writer : public H5Writer
 
         bool is_data_for_current_file(const size_t data_index) override
             { return true; }
+
+        bool get_dataset_name_taken();
 };
 
-std::unique_ptr<H5Writer> get_h5_writer(const std::string& filename, hsize_t frames_per_file=0, 
+std::unique_ptr<H5Writer> get_h5_writer(const std::string& filename, const std::string& dataset_name, hsize_t frames_per_file=0, 
     hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
 
 #endif

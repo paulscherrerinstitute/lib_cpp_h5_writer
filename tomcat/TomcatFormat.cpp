@@ -24,17 +24,25 @@ class TomcatFormat : public H5Format
             input_value_type.reset(new unordered_map<string, DATA_TYPE>());
             default_values.reset(new unordered_map<string, boost::any>());
 
+            std::string htype_str = "htype";
+            std::string tag_str = "tag";
+            std::string source_str ="source";
+            std::string shape_str ="shape";
+            std::string frame_str ="frame";
+            std::string type_str ="type";
+            std::string endianess_str ="endianess";
+
             // After format has been writen, where to move the raw datasets.
             dataset_move_mapping.reset(new std::unordered_map<string, string>(
             {
                 {config::raw_image_dataset_name, "exchange/" + dataset_name},
-                {"htype", "measurement/acquisition/"+dataset_name+"/htype"},
-                {"tag", "measurement/acquisition/"+dataset_name+"/tag"},
-                {"source", "measurement/acquisition/"+dataset_name+"/source"},
-                {"shape", "measurement/acquisition/"+dataset_name+"/shape"},
-                {"frame", "measurement/acquisition/"+dataset_name+"/frame"},
-                {"type", "measurement/acquisition/"+dataset_name+"/type"},
-                {"endianess", "measurement/acquisition/"+dataset_name+"/endianess"},
+                {htype_str, "measurement/acquisition/"+dataset_name+"/htype"},
+                {tag_str, "measurement/acquisition/"+dataset_name+"/tag"},
+                {source_str, "measurement/acquisition/"+dataset_name+"/source"},
+                {shape_str, "measurement/acquisition/"+dataset_name+"/shape"},
+                {frame_str, "measurement/acquisition/"+dataset_name+"/frame"},
+                {type_str, "measurement/acquisition/"+dataset_name+"/type"},
+                {endianess_str, "measurement/acquisition/"+dataset_name+"/endianess"},
             }));
 
 

@@ -337,7 +337,7 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
                 auto sub_attribute = dynamic_cast<const h5_attr&>(item);
                 
                 H5FormatUtils::write_attribute(node_group, sub_attribute, values);
-
+                
             } else if (item.node_type == DATASET) {
                 auto sub_dataset = dynamic_cast<const h5_dataset&>(item);
                 auto current_dataset = H5FormatUtils::write_dataset(node_group, sub_dataset, values);
@@ -356,7 +356,7 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
                     }
 
                     auto sub_attribute = dynamic_cast<const h5_attr&>(dataset_attr);
-
+                    
                     H5FormatUtils::write_attribute(current_dataset, sub_attribute, values);
                 }
             }
@@ -364,8 +364,16 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
     };
 
     if (format_node.node_type == GROUP) {
-        auto x = H5FormatUtils::create_group(file_node, format_node.name);
-        process_items(x);
+        try {
+            auto x = H5FormatUtils::create_group(file_node, format_node.name);
+            process_items(x);
+        }catch(H5::FileIException &file_exists_err) {
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
+                cout << "[H5FormatUtils::write_format_data] Group already exists in output file. "<< endl;
+            #endif
+        }
     }else {
         process_items(file_node);
     }
@@ -377,7 +385,7 @@ void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format,
 {
     auto format_definition = format.get_format_definition();
     auto default_values = format.get_default_values();
-
+    
     auto format_values(default_values);
     
     format.add_input_values(format_values, input_values);
@@ -386,6 +394,15 @@ void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format,
     write_format_data(file, format_definition, format_values);
 
     for (const auto& mapping : format.get_dataset_move_mapping()) {
-        file.move(mapping.first, mapping.second);
+        try{
+            file.move(mapping.first, mapping.second);
+        }catch ( H5::FileIException ){
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
+                cout << "[H5FormatUtils::write_format_data] Problem while moving datasets. "<< endl;
+            #endif
+        }
     }
+    
 }

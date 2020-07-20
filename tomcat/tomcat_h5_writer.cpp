@@ -62,7 +62,7 @@ int main (int argc, char *argv[])
 
     TomcatFormat format(dataset_name);
 
-    WriterManager writer_manager(format.get_input_value_type(), output_file, n_frames);
+    WriterManager writer_manager(format.get_input_value_type(), output_file, dataset_name, n_frames);
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
     ZmqSender sender(statistics_monitor_address, config::zmq_n_io_threads);
     RingBuffer ring_buffer(config::ring_buffer_n_slots);

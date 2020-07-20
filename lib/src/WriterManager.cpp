@@ -50,8 +50,8 @@ void writer_utils::create_destination_folder(const string& output_file)
 }
 
 WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type, 
-    const string& output_file, int user_id, uint64_t n_frames):
-        parameters_type(parameters_type), output_file(output_file), n_frames(n_frames),
+    const string& output_file, const string& dataset_name, int user_id, uint64_t n_frames):
+        parameters_type(parameters_type), output_file(output_file), dataset_name(dataset_name), n_frames(n_frames),
         running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0), n_lost_frames(0), user_id(user_id)
 {
     #ifdef DEBUG_OUTPUT
@@ -106,6 +106,10 @@ string WriterManager::get_output_file() const
     return output_file;
 }
 
+string WriterManager::get_dataset_name() const
+{
+    return dataset_name;
+}
 
 
 unordered_map<string, uint64_t> WriterManager::get_statistics() const

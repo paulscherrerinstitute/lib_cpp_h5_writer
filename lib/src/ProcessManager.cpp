@@ -94,7 +94,6 @@ void ProcessManager::run_writer()
 
     // In case SIGINT stopped the rest_api.
     writer_manager.stop();
-
     receiver_thread.join();
     writer_thread.join();
     sender_thread.join();
@@ -107,7 +106,8 @@ void ProcessManager::run_writer()
 }
 
 void ProcessManager::receive_zmq()
-{
+{   
+
     receiver.connect();
 
     while (writer_manager.is_running()) {
@@ -167,11 +167,20 @@ void ProcessManager::write_h5()
     size_t metadata_buffer_size = frames_per_file != 0 ? frames_per_file : writer_manager.get_n_frames();
     auto metadata_buffer = unique_ptr<MetadataBuffer>(new MetadataBuffer(metadata_buffer_size, receiver.get_header_values_type()));
 
-    auto writer = get_buffered_writer(writer_manager.get_output_file(), writer_manager.get_n_frames(), move(metadata_buffer), 
+    auto writer = get_buffered_writer(writer_manager.get_output_file(), writer_manager.get_dataset_name(), writer_manager.get_n_frames(), move(metadata_buffer), 
         frames_per_file, config::dataset_increase_step);
-
+    
     writer->create_file();
-        
+
+    if ( writer->get_dataset_name_taken() ) {
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
+            cout << "[ProcessManager::write_h5] Dataset name is taken, halting execution." << endl;
+        #endif
+        writer_manager.stop();
+    }
+
     auto raw_frames_dataset_name = config::raw_image_dataset_name;
 
     uint64_t last_pulse_id = 0;
@@ -293,7 +302,7 @@ void ProcessManager::write_h5()
     while (!writer_manager.is_stats_queue_empty()){
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
-    if (writer->is_file_open()) {
+    if (writer->is_file_open() && !writer->get_dataset_name_taken()) {
         #ifdef DEBUG_OUTPUT
             using namespace date;
             cout << "[" << std::chrono::system_clock::now() << "]";

@@ -6,9 +6,9 @@
 
 using namespace std;
 
-BufferedWriter::BufferedWriter(const std::string& filename, size_t total_frames, unique_ptr<MetadataBuffer>&& metadata_buffer, 
+BufferedWriter::BufferedWriter(const std::string& filename, const std::string& dataset_name, size_t total_frames, unique_ptr<MetadataBuffer>&& metadata_buffer, 
     hsize_t frames_per_file, hsize_t initial_dataset_size, hsize_t dataset_increase_step) : 
-        H5Writer(filename, frames_per_file, initial_dataset_size, dataset_increase_step), 
+        H5Writer(filename, dataset_name, frames_per_file, initial_dataset_size, dataset_increase_step), 
         total_frames(total_frames), metadata_buffer(move(metadata_buffer))
 {
     #ifdef DEBUG_OUTPUT
@@ -64,7 +64,7 @@ void BufferedWriter::write_metadata_to_file()
     }
 }
 
-std::unique_ptr<BufferedWriter> get_buffered_writer(const string& filename, size_t total_frames, 
+std::unique_ptr<BufferedWriter> get_buffered_writer(const string& filename, const string& dataset_name, size_t total_frames, 
     std::unique_ptr<MetadataBuffer> metadata_buffer, hsize_t frames_per_file, hsize_t dataset_increase_step)
 {
     size_t initial_dataset_size = frames_per_file != 0 ? frames_per_file : total_frames;
@@ -72,7 +72,7 @@ std::unique_ptr<BufferedWriter> get_buffered_writer(const string& filename, size
     if (filename == "/dev/null") {
         return unique_ptr<BufferedWriter>(new DummyBufferedWriter());
     } else {
-        return unique_ptr<BufferedWriter>(new BufferedWriter(filename, total_frames, move(metadata_buffer),
+        return unique_ptr<BufferedWriter>(new BufferedWriter(filename, dataset_name, total_frames, move(metadata_buffer),
             frames_per_file, initial_dataset_size, dataset_increase_step));
     }
 }
