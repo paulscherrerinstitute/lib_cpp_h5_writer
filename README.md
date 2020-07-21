@@ -227,7 +227,7 @@ in the file format. See chapter [H5Format](#h5_format) for more info.
 <a id="h5_writer"></a>
 ## H5Writer
 
-Not yet here :(
+
 
 <a id="h5_format"></a>
 ## H5Format
@@ -250,7 +250,19 @@ Not yet here :(
 
 ### dataset\_move\_mapping
 
-Not yet here :(
+According to the [Scientific Exchange Data format](https://pubmed.ncbi.nlm.nih.gov/25343788/), the structure of the dataset inside the hdf5 file will be:
+
+config::raw_image_dataset_name : "exchange/" + dataset_name
+htype : "measurement/acquisition/"+dataset_name+"/htype"
+tag : "measurement/acquisition/"+dataset_name+"/tag"
+source : "measurement/acquisition/"+dataset_name+"/source"
+shape : "measurement/acquisition/"+dataset_name+"/shape"
+frame : "measurement/acquisition/"+dataset_name+"/frame"
+type : "measurement/acquisition/"+dataset_name+"/type"
+endianess : "measurement/acquisition/"+dataset_name+"/endianess"
+
+⋅⋅⋅ This is defined on TomcatFormat.cpp.⋅⋅
+
 
 ### file\_format
 
@@ -269,9 +281,61 @@ Not yet here :(
 <a id="rest_interface"></a>
 # REST interface
 
-Not yet here :(
+The REST interface will start and be available while the writer is running on the port given as parameter when initializing the writer. The table below shows the currently available endpoints:
+
+| Endpoint | Description |
+| --- | --- |
+| `kill` | Kills the writer app. |
+| `stop` | Stops the writer manager and exists. |
+| `status` | Gets the status from the writer manager.  |
+| `statistics` | Gets the statistics from the writer manager.  |
+| `parameters` | [GET/POST] Allows to get and post parameters from the writer manager. |
+
+The rest interface can be used directly using cURL command or with the client developed specifically to control it [pco_rclient](https://github.com/paulscherrerinstitute/pco_rclient).
+
+### Get writer status using curl command:
+curl -X GET http://<address:port>/<endpoint>
+
+### PCO_RCLIENT
+
+```
+    usage: pco_rclient [-h] {start,stop,kill,status} ...
+
+    Rest api pco writer
+
+    optional arguments:
+      -h, --help            show this help message and exit
+
+    command:
+      valid commands
+
+      {start,stop,kill,status}
+                            commands
+        start               start the writer
+        stop                stop the writer
+        kill                kill the writer
+        status              Retrieve the status of the writer
+```
 
 <a id="examples"></a>
 # Examples
 
-Not yet here :(
+The tomcat's version of the library usage example is displayed below:
+```
+    Usage: tomcat_h5_writer [connection_address] [output_file] [n_frames] [user_id]  [n_modules] [rest_api_port] [dataset_name] [max_frames_per_file] [statistics_monitor_address] 
+
+    ./tomcat_h5_writer tcp://pc9808:9999 output.h5 0 -1 1 9555 data_white 20000 tcp://*:8088
+```
+
+| Parameter | Description |
+| --- | --- |
+| `connection_address` | Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000 |
+| `output_file` | Name of the output file. |
+| `n_frames` | Number of images to acquire. 0 for infinity (until /stop is called). |
+| `user_id` | uid under which to run the writer. -1 to leave it as it is. |
+| `n_modules` | Number of detector modules to be written. |
+| `rest_port` | Port to start the REST Api on. |
+| `dataset_name` | Definition of the dataset name. |
+| `frames_per_file` | Maximum number of frames for each h5 file. |
+| `statistics_monitor_address` | TCP address to send writer's statistics. |
+
