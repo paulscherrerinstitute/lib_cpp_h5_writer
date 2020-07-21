@@ -1,5 +1,3 @@
-[![Build Status](https://api.travis-ci.org/paulscherrerinstitute/lib_cpp_h5_writer.svg?branch=master)](https://travis-ci.org/paulscherrerinstitute/lib_cpp_h5_writer/) 
-
 # lib_cpp_h5_writer
 This library is used for creating C++ based stream writer for H5 files. It focuses on the functionality 
 and performance needed for high performance detectors integrations.
@@ -37,15 +35,17 @@ To create your own stream writer you need to specify:
 - The mapping between the stream header metadata and your H5 file format.
 - Additional metadata that is transfer in the stream message header.
 
-Under **sf/** and **csaxs/** you can see examples of this. Feel free to use any of this folders as a template.
+Under **sf/**, **csaxs/** and **tomcat/** you can see examples of this. Feel free to use any of this folders as a template.
 
 **IMPORTANT**: We are using a monorepo for this project (all implementations should live in this git repository).
-To create a new implementation, please add a folder to the root of the proejct (like sf/ and csaxs/).
+To create a new implementation, please add a folder to the root of the proejct (like sf/, csaxs/ and tomcat/ ).
 
 The minimum you need to implement your own writer is:
 - Writer runner (example: csaxs/csaxs\_h5\_writer.cpp)
 - File format (example: csaxs/CsaxsFormat.cpp)
 - Build file (example: csaxs/Makefile)
+
+For extra documentation, template, usage: [read the docs documentation](https://lib-cpp-h5-writer.readthedocs.io/en/tomcat/index.html)
 
 ## Writer runner
 Example: **csaxs/csaxs\_h5\_writer.cpp**
