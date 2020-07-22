@@ -41,3 +41,6 @@ obj/
 *.exe
 *.out
 *.app
+
+# mflow dump stream
+*.raw
