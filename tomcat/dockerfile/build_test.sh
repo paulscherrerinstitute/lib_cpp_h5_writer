@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # remove previously existing image
 ID=$(docker images | grep lhdamiani/tomcat_writer | grep dev | awk '{print $3}')
 if [[ ! -z "$ID" ]]
