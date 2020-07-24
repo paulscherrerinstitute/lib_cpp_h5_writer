@@ -1,4 +1,4 @@
-FROM lhdamiani/tomcat_docker:latest
+FROM lhdamiani/tomcat_writer:latest
 LABEL maintainer="Leonardo Hax <leonardo.hax@psi.ch>"
 WORKDIR /
 
