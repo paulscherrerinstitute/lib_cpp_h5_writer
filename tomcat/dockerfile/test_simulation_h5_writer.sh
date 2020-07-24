@@ -53,12 +53,11 @@ export PATH="/root/miniconda2/bin:$PATH"
 
 yes | conda update conda
 
-yes | conda env create -f /tomcat_env.yml 
-yes | conda env create -f /mflow_env.yml 
+yes | conda env create -f /lib_cpp_h5_writer/tomcat/dockerfile/tomcat_env.yml 
+yes | conda env create -f /lib_cpp_h5_writer/tomcat/dockerfile/mflow_env.yml 
 
 source activate tomcat_env
-git clone https://github.com/paulscherrerinstitute/lib_cpp_h5_writer.git && cd lib_cpp_h5_writer && git fetch && git checkout tomcat && cd /lib_cpp_h5_writer/lib && make debug deploy && cd /lib_cpp_h5_writer/tomcat && make debug && cd /lib_cpp_h5_writer/tomcat/test && tar xzf ./dump.tar.gz 
-cd /lib_cpp_h5_writer/tomcat/
+cd /lib_cpp_h5_writer/lib && make debug deploy && cd /lib_cpp_h5_writer/tomcat && make debug && cd /lib_cpp_h5_writer/tomcat/test && tar xzf ./dump.tar.gz  && cd /lib_cpp_h5_writer/tomcat/
 
 # send stream data
 receive_stream "data"
