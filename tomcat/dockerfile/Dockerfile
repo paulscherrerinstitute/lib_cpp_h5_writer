@@ -10,8 +10,8 @@ RUN if [ -d "/lib_cpp_h5_writer" ]; then rm -Rf /lib_cpp_h5_writer; fi \
   && git fetch \
   && git checkout tomcat \
 
-RUN ["/bin/bash", "-c", "chmod +x /lib_cpp_h5_writer/tomcat/dockerfile/test_simulation_h5_writer.sh"]
+CMD chmod +x /lib_cpp_h5_writer/tomcat/dockerfile/test_simulation_h5_writer.sh
 
-RUN ["/bin/bash", "-c", "/lib_cpp_h5_writer/tomcat/dockerfile/test_simulation_h5_writer.sh"
+CMD /lib_cpp_h5_writer/tomcat/dockerfile/test_simulation_h5_writer.sh
 
 ENTRYPOINT ["/bin/bash"]
