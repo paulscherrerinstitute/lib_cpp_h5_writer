@@ -39,11 +39,13 @@ if [ -f "$FILE" ]; then
     yes | rm $FILE
 fi
 
-# curl -O https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh
+curl -O https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh
 
-# bash Miniconda2-latest-Linux-x86_64.sh -b -p /root/miniconda2/
+if [ -d "/root/miniconda2/" ]; then rm -Rf /root/miniconda2/; fi
 
-# export PATH="/root/miniconda2/bin:$PATH"
+bash Miniconda2-latest-Linux-x86_64.sh -b -p /root/miniconda2/
+
+export PATH="/root/miniconda2/bin:$PATH"
 
 yes | conda update conda
 
