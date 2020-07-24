@@ -1,8 +1,8 @@
 FROM lhdamiani/tomcat_docker:latest
 LABEL maintainer="Leonardo Hax <leonardo.hax@psi.ch>"
 WORKDIR /
-WORKING_DIR=/lib_cpp_h5_writer
-RUN if [ -d "$WORKING_DIR" ]; then rm -Rf $WORKING_DIR; fi \
+
+RUN if [ -d "/lib_cpp_h5_writer" ]; then rm -Rf /lib_cpp_h5_writer; fi \
   && git clone https://github.com/paulscherrerinstitute/lib_cpp_h5_writer.git \
   && cd /lib_cpp_h5_writer \
   && git fetch \
