@@ -39,12 +39,6 @@ if [ -f "$FILE" ]; then
     yes | rm $FILE
 fi
 
-# compile library
-if [ -d "/lib_cpp_h5_writer" ]; then
-    echo "Deleting previously existant lib_cpp_h5_writer folder..."
-    yes | rm -rf /lib_cpp_h5_writer
-fi
-
 curl -O https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh
 
 bash Miniconda2-latest-Linux-x86_64.sh -b -p /root/miniconda2/
