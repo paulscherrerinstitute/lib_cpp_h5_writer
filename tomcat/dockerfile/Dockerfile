@@ -10,5 +10,6 @@ RUN if [ -d "/lib_cpp_h5_writer" ]; then rm -Rf /lib_cpp_h5_writer; fi \
 
 RUN ["/bin/bash", "-c", "chmod +x /lib_cpp_h5_writer/tomcat/dockerfile/test_simulation_h5_writer.sh"]
 
-# ENTRYPOINT ["/bin/bash"]
-ENTRYPOINT ["/bin/bash", "-c", "/lib_cpp_h5_writer/tomcat/dockerfile/test_simulation_h5_writer.sh"]
+RUN /lib_cpp_h5_writer/tomcat/dockerfile/test_simulation_h5_writer.sh
+
+ENTRYPOINT ["/bin/bash"]
