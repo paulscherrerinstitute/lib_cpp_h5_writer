@@ -1,3 +1,6 @@
+![language](https://img.shields.io/github/languages/top/paulscherrerinstitute/lib_cpp_h5_writer) ![auto](https://img.shields.io/docker/cloud/automated/lhdamiani/tomcat_writer.svg) ![build](https://img.shields.io/docker/cloud/build/lhdamiani/tomcat_writer.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/paulscherrerinstitute/lib_cpp_h5_writer) ![release](https://img.shields.io/github/v/release/paulscherrerinstitute/lib_cpp_h5_writer)
+
+
 # lib_cpp_h5_writer
 This library is used for creating C++ based stream writer for H5 files. It focuses on the functionality 
 and performance needed for high performance detectors integrations.
