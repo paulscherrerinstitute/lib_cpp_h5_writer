@@ -5,12 +5,27 @@ import requests
 import json
 import subprocess
 import sys
+import os
 
-tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
+if os.uname()[1] != 'xbl-daq-32.psi.ch':
+    tomcat_pco_writer = '/home/hax_l/software/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
+    endpoint = 'http://127.0.0.1:9555'
+else:
+    tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
+    endpoint = 'http://xbl-daq-32:9555'
+
 
 default_args = ['connection_address', 'output_file', 'n_frames', 'user_id', 'n_modules', 'rest_api_port', 'dataset_name', 'max_frames_per_file', 'statistics_monitor_address']
 
 app = Flask(__name__)
+
+def validate_response(server_response):
+    if not server_response['success']:
+        print(server_response['value'])
+        quit()
+    print("\nPCO Writer trigger successfully submitted to the server. Retrieving writer's status...\n")
+    time.sleep(0.5)
+    return True
 
 def validate_start_parameters(json_parameters):
     data = json.loads(json_parameters)
@@ -45,12 +60,12 @@ def start_pco_writer():
 @app.route('/status', methods=['GET', 'POST'])
 def get_status():
     if request.method == 'GET':
-        request_url = 'http://xbl-daq-32:9555/status'
+        request_url = endpoint+'/status'
         try:
             response = requests.get(request_url).json()
             return validate_response(response)
         except Exception as e:
-            msg = "\nWriter is not running. Please start it first using:\n      $ pco_rclient start <path/to/config.pco>.\n"
+            msg = "\nWriter is not running. Please start it first using the pco_controller.start() method or via pco_rclient start <path/to/config.pco>.\n"
             return {'success':True, 'value':msg}
 
 if __name__ == '__main__':
