@@ -373,7 +373,7 @@ void ProcessManager::send_writer_stats()
             #ifdef DEBUG_OUTPUT
                 using namespace date;
                 cout << "[" << std::chrono::system_clock::now() << "]";
-                cout << "[ProcessManager::send_writer_stats] size of queue " << writer_manager.is_stats_queue_empty() << endl;
+                cout << "[ProcessManager::send_writer_stats] Sending item from queue. Queue size:  "<< writer_manager.get_queue_size()  << endl;
             #endif
             // fetches the statistic from the writer manager
             // and sends the filter + statistics json to the sender

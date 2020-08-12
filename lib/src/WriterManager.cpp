@@ -50,14 +50,14 @@ void writer_utils::create_destination_folder(const string& output_file)
 }
 
 WriterManager::WriterManager(const unordered_map<string, DATA_TYPE>& parameters_type, 
-    const string& output_file, const string& dataset_name, int user_id, uint64_t n_frames):
+    const string& output_file, const string& dataset_name, int user_id, size_t n_frames):
         parameters_type(parameters_type), output_file(output_file), dataset_name(dataset_name), n_frames(n_frames),
         running_flag(true), killed_flag(false), n_received_frames(0), n_written_frames(0), n_lost_frames(0), user_id(user_id)
 {
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[WriterManager::WriterManager] Writer manager for n_frames " << n_frames << endl;
+        cout << "[WriterManager::WriterManager] Writer manager for n_frames " << get_n_frames() << endl;
     #endif
 }
 
@@ -281,6 +281,15 @@ size_t WriterManager::get_n_received_frames() const
     return n_received_frames;
 }
 
+size_t WriterManager::get_n_free_slots() const
+{
+    if (n_frames != 0){
+        return n_frames - n_written_frames;
+    }else{
+        return -1;
+    }
+}
+
 void WriterManager::set_time_end()
 {
     time_end = std::chrono::system_clock::now();
@@ -294,6 +303,11 @@ void WriterManager::set_time_start()
 bool WriterManager::is_stats_queue_empty()
 {
     return (stats_queue.empty());
+}
+
+int WriterManager::get_queue_size()
+{
+    return stats_queue.size();
 }
 
 std::chrono::system_clock::time_point WriterManager::get_last_statistics_timestamp() const
@@ -318,7 +332,11 @@ std::string WriterManager::get_stats_from_queue()
 
 void WriterManager::create_writer_stats_2queue(const std::string category)
 {
-
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[WriterManager::_stats_2queue] New stats being sent out... " << endl;;
+    #endif
     lock_guard<mutex> lock(statistics_mutex);
     pt::ptree root;
     pt::ptree stats_json;
@@ -331,25 +349,24 @@ void WriterManager::create_writer_stats_2queue(const std::string category)
         stats_json.put("output_file", get_output_file());
         stats_json.put("user_id", get_user_id());
         stats_json.put("start_time", ctime(&tt));
-        stats_json.put("compression_method", "test");
         root.add_child("statistics_wr_start", stats_json);
         always_add = true;
     } else if (category == "adv"){
         // calculates the elapsed time from beginning
-        auto now = std::chrono::system_clock::now();
-        auto time_diff = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(now - time_start).count();
+        auto frame_time_difference = std::chrono::system_clock::now() - time_start;
+        auto time_diff_ms = std::chrono::duration<float, milli>(frame_time_difference).count();
         // received_rate = total number of received frames / elapsed time
-        auto receiving_rate = get_n_received_frames() / time_diff;
+        auto receiving_rate = get_n_received_frames() / time_diff_ms;
         // writting_rate = total number of written frames / elapsed time
-        auto writting_rate = get_n_written_frames() / time_diff;
+        auto writting_rate = get_n_written_frames()  / time_diff_ms;
         stats_json.put("n_written_frames", get_n_written_frames());
         stats_json.put("n_received_frames", get_n_received_frames());
-        stats_json.put("n_free_slots", "-1");
+        stats_json.put("n_free_slots", get_n_free_slots());
         stats_json.put("enable", "true");
         stats_json.put("processing_rate", processing_rate);
         stats_json.put("receiving_rate", receiving_rate);
         stats_json.put("writting_rate", writting_rate);
-        stats_json.put("avg_compressed_size", "0.0");
+        stats_json.put("avg_compressed_size", "-1.0");
         root.add_child("statistics_wr_adv", stats_json);
     } else if (category == "end") {
         // creates the finish statistics json
@@ -367,7 +384,7 @@ void WriterManager::create_writer_stats_2queue(const std::string category)
     }
     auto now = std::chrono::system_clock::now();
     auto diff = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(now - get_last_statistics_timestamp()).count();
-    if (always_add || diff >= config::statistics_buffer_adv_interval)
+    if (always_add || diff >= (int)config::statistics_buffer_adv_interval)
     {
         std::ostringstream buf;
         pt::write_json(buf, root, false);

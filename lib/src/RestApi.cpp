@@ -33,6 +33,8 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
         crow::json::wvalue result;
 
         result["status"] = writer_manager.get_status();
+        result["success"] = "True";
+        result["value"] = "Ok";
 
         return result;
     });

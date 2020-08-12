@@ -84,6 +84,7 @@ class WriterManager
 
         // statistics methods
         bool is_stats_queue_empty();
+        int get_queue_size();
         std::string get_stats_from_queue();
         std::tuple<bool, std::string> get_stat_flag();
         std::string get_filter() const;
@@ -92,6 +93,7 @@ class WriterManager
         int get_user_id() const;
         size_t get_n_written_frames() const;
         size_t get_n_received_frames() const;
+        size_t get_n_free_slots() const;
         uint64_t get_n_lost_frames() const;
         void set_processing_rate(float diff);
         void set_time_end();
