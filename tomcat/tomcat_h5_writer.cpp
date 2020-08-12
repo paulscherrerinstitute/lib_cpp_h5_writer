@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
 
     string connect_address = string(argv[1]);
     string output_file = string(argv[2]);
-    int n_frames =  atoi(argv[3]);
+    uint64_t n_frames =  atoi(argv[3]);
     int user_id = atoi(argv[4]);
     int n_modules = atoi(argv[5]);
     int rest_port = atoi(argv[6]);
@@ -62,7 +62,7 @@ int main (int argc, char *argv[])
 
     TomcatFormat format(dataset_name);
 
-    WriterManager writer_manager(format.get_input_value_type(), output_file, dataset_name, n_frames);
+    WriterManager writer_manager(format.get_input_value_type(), output_file, dataset_name, user_id, n_frames);
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
     ZmqSender sender(statistics_monitor_address, config::zmq_n_io_threads);
     RingBuffer ring_buffer(config::ring_buffer_n_slots);
