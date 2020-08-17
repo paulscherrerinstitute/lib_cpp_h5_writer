@@ -7,13 +7,8 @@ import subprocess
 import sys
 import os
 
-if os.uname()[1] != 'xbl-daq-32.psi.ch':
-    tomcat_pco_writer = '/home/hax_l/software/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
-    endpoint = 'http://127.0.0.1:9555'
-else:
-    tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
-    endpoint = 'http://xbl-daq-32:9555'
-
+tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
+endpoint = 'http://xbl-daq-32:9555'
 
 default_args = ['connection_address', 'output_file', 'n_frames', 'user_id', 'n_modules', 'rest_api_port', 'dataset_name', 'max_frames_per_file', 'statistics_monitor_address']
 
@@ -24,7 +19,6 @@ def validate_response(server_response):
         print(server_response['value'])
         quit()
     print("\nPCO Writer trigger successfully submitted to the server. Retrieving writer's status...\n")
-    time.sleep(0.5)
     return True
 
 def validate_start_parameters(json_parameters):
@@ -36,11 +30,8 @@ def validate_start_parameters(json_parameters):
     return {'success':True, 'value':"OK"}
 
 def validate_response_from_writer(writer_response):
-    if writer_response['status'] != "receiving":
-        print("\nWriter is not receiving. Current status: %s.\n" % writer_response['status'])
-    else:
-        msg = "\nWriter is not running. Please start it first using:\n      $ pco_rclient start <path/to/config.pco>.\n"
-        return msg
+    val = {'success':True, 'value':writer_response['status']}
+    return val
 
 @app.route('/start_pco_writer', methods=['GET', 'POST'])
 def start_pco_writer():
@@ -53,7 +44,7 @@ def start_pco_writer():
             for key in default_args:
                 tomcat_args.append(args[key])
             #p = subprocess.run(tomcat_args)
-            print(tomcat_args)
+            # print(tomcat_args)
             p = subprocess.Popen(tomcat_args,shell=False,stdin=None,stdout=None,stderr=None,close_fds=True)
     return response
 
@@ -63,9 +54,9 @@ def get_status():
         request_url = endpoint+'/status'
         try:
             response = requests.get(request_url).json()
-            return validate_response(response)
+            return validate_response_from_writer(response)
         except Exception as e:
-            msg = "\nWriter is not running. Please start it first using the pco_controller.start() method or via pco_rclient start <path/to/config.pco>.\n"
+            msg = "\nWriter is not running. Please start it using the start() method.\n"
             return {'success':True, 'value':msg}
 
 if __name__ == '__main__':

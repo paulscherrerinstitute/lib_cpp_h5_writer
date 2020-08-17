@@ -16,7 +16,7 @@ namespace config {
     // Delay before trying again to get data from the ring buffer.
     size_t ring_buffer_read_retry_interval = 5;
 
-    // Delay before trying again to get statistics from the statistics writer buffer
+    // Delay to get statistics from the statistics writer buffer
     size_t statistics_buffer_adv_interval = 5;//milliseconds
 
     std::string raw_image_dataset_name = "raw_data";
