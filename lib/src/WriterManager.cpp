@@ -7,7 +7,6 @@ using namespace std;
 
 void writer_utils::set_process_id(int user_id)
 {
-
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
@@ -324,7 +323,6 @@ void WriterManager::set_last_statistics_timestamp()
 
 std::string WriterManager::get_stats_from_queue()
 {
-    
     auto stats_str_from_queue = stats_queue.front();
     stats_queue.pop_front();
     return stats_str_from_queue;

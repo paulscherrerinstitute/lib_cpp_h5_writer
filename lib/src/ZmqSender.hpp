@@ -42,7 +42,6 @@ class ZmqSender
     bool get_valid_tcp_stats_address() const;
 
     std::string get_mode() const;
-
 };
 
 #endif

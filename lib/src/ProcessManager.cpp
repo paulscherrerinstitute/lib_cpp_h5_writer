@@ -107,11 +107,9 @@ void ProcessManager::run_writer()
 
 void ProcessManager::receive_zmq()
 {   
-
     receiver.connect();
 
     while (writer_manager.is_running()) {
-
         auto frame = receiver.receive();
 
         // In case no message is available before the timeout, both pointers are NULL.
@@ -159,7 +157,6 @@ void ProcessManager::receive_zmq()
         cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::receive_zmq] Receiver thread stopped." << endl;
     #endif
-
 }
 
 void ProcessManager::write_h5()
@@ -213,8 +210,7 @@ void ProcessManager::write_h5()
 
             writer->write_metadata_to_file();
 
-            write_h5_format(writer->get_h5_file());
-            
+            write_h5_format(writer->get_h5_file());            
         }
         #ifdef PERF_OUTPUT
             using namespace date;
@@ -266,16 +262,12 @@ void ProcessManager::write_h5()
                     }
                 }
                 
-                writer->cache_metadata(name, received_data.first->frame_index, value.get(), writer_manager.get_n_frames_offset());
-                
-            }
-            
+                writer->cache_metadata(name, received_data.first->frame_index, value.get(), writer_manager.get_n_frames_offset());   
+            }   
         }
-
         #ifdef PERF_OUTPUT
             using namespace date;
             using namespace std::chrono;
-
             auto metadata_time_difference = std::chrono::system_clock::now() - start_time_metadata;
             auto metadata_diff_ms = duration<float, milli>(metadata_time_difference).count();
 
@@ -340,12 +332,10 @@ void ProcessManager::write_h5()
 }
 
 void ProcessManager::write_h5_format(H5::H5File& file) {
-
     if (!writer_manager.are_all_parameters_set()) {
         using namespace date;
         std::cout << "[" << std::chrono::system_clock::now() << "]";
         std::cout << "[ProcessManager::write_h5_format] Cannot write file format - REST parameters not set."<< endl;
-
         return;
     }
 

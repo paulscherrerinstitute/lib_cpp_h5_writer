@@ -46,8 +46,6 @@ class DummyBufferedWriter : public BufferedWriter, public DummyH5Writer
         
         bool is_data_for_current_file(const size_t data_index) override
             { return DummyH5Writer::is_data_for_current_file(data_index); }
-
-
 };
 
 std::unique_ptr<BufferedWriter> get_buffered_writer(const std::string& filename, const std::string& dataset_name, size_t total_frames, 

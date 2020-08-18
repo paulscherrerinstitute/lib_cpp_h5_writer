@@ -215,7 +215,6 @@ CONSTCD11 month_day_last operator/(const month& m, last_spec) NOEXCEPT;
 CONSTCD11 month_day_last operator/(int          m, last_spec) NOEXCEPT;
 CONSTCD11 month_day_last operator/(last_spec, const month& m) NOEXCEPT;
 CONSTCD11 month_day_last operator/(last_spec, int          m) NOEXCEPT;
-
 CONSTCD11 month_weekday operator/(const month& m, const weekday_indexed& wdi) NOEXCEPT;
 CONSTCD11 month_weekday operator/(int          m, const weekday_indexed& wdi) NOEXCEPT;
 CONSTCD11 month_weekday operator/(const weekday_indexed& wdi, const month& m) NOEXCEPT;
@@ -931,10 +930,8 @@ operator<<(std::basic_ostream<CharT, Traits>& os, const year_month_weekday_last&
 #if !defined(_MSC_VER) || (_MSC_VER >= 1900)
 inline namespace literals
 {
-
 CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
 CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
-
 }  // inline namespace literals
 #endif // !defined(_MSC_VER) || (_MSC_VER >= 1900)
 
@@ -1833,7 +1830,6 @@ operator<<(std::basic_ostream<CharT, Traits>& os, const weekday& wd)
 #if !defined(_MSC_VER) || (_MSC_VER >= 1900)
 inline namespace literals
 {
-
 CONSTCD11
 inline
 date::day
@@ -3759,7 +3755,6 @@ public:
     using precision = std::chrono::duration<rep>;
     static auto CONSTDATA width = make_precision<rep, w>::width;
 private:
-
     std::chrono::seconds s_;
 
 public:
@@ -4794,7 +4789,6 @@ to_stream(std::basic_ostream<CharT, Traits>& os, const CharT* fmt,
                         os << d << ' '
                            << make_time(duration_cast<seconds>(fds.tod.to_duration()))
                            << ' ' << fds.ymd.year();
-
                     }
                     else  // *fmt == 'x'
                     {
@@ -7647,7 +7641,6 @@ public:
         , abbrev_(abbrev)
         , offset_(offset)
         {}
-
 };
 
 template <class Parsable, class CharT, class Traits, class Alloc>

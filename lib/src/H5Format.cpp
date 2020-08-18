@@ -87,7 +87,6 @@ const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_
         #endif
 
         return values.at(reference_string);
-
     } catch (const boost::bad_any_cast& exception) {
         stringstream error_message;
         using namespace date;
@@ -95,7 +94,6 @@ const boost::any& H5FormatUtils::get_value_from_reference(const string& dataset_
         error_message << "Cannot convert dataset " << dataset_name << " value reference to string." << endl;
 
         throw runtime_error(error_message.str());
-
     } catch (const out_of_range& exception){
         stringstream error_message;
         using namespace date;
@@ -325,7 +323,6 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
 {
     auto process_items = [&format_node, &values](H5::Group& node_group){
         for (const auto item_ptr : format_node.items) {
-
             const h5_base& item = *item_ptr;
 
             if (item.node_type == GROUP) {
@@ -377,7 +374,6 @@ void H5FormatUtils::write_format_data(H5::Group& file_node, const h5_parent& for
     }else {
         process_items(file_node);
     }
-    
 }
 
 void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format, 
@@ -403,6 +399,5 @@ void H5FormatUtils::write_format(H5::H5File& file, const H5Format& format,
                 cout << "[H5FormatUtils::write_format_data] Problem while moving datasets. "<< endl;
             #endif
         }
-    }
-    
+    }    
 }

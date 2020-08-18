@@ -2195,7 +2195,6 @@ static const int8_t unhex[256] =
 
       case s_header_value:
       {
-
         if (ch == CROW_CR) {
           parser->state = s_header_almost_done;
           CROW_CALLBACK_DATA(header_value);
@@ -5034,7 +5033,6 @@ namespace crow
                         if (found)
                             return {true, *view};
                     }
-
                 }
                 static json::wvalue empty_str;
                 empty_str = "";
@@ -6174,8 +6172,7 @@ template <typename F, typename Set>
             static const size_t arity = parent_t::arity;
             using result_type = typename parent_t::result_type;
             template <size_t i>
-            using arg = typename parent_t::template arg<i>;
-        
+            using arg = typename parent_t::template arg<i>;        
         };  
 #endif
 
@@ -6353,7 +6350,6 @@ namespace crow
 
         template <typename T>
         T get(unsigned) const;
-
     };
 
     template<>
@@ -6467,7 +6463,6 @@ namespace crow
         {
             io_service->dispatch(handler);
         }
-
     };
 }
 
@@ -7816,7 +7811,6 @@ namespace crow
             ((self_t*)this)->methods_ |= 1 << (int)method;
             return (self_t&)*this;
         }
-
     };
 
     class DynamicRule : public BaseRule, public RuleParameterTraits<DynamicRule>
@@ -7889,7 +7883,6 @@ namespace crow
         }
     private:
         std::function<void(const request&, response&, const routing_params&)> erased_handler_;
-
     };
 
     template <typename ... Args>
@@ -8000,7 +7993,6 @@ namespace crow
 
     private:
         std::function<void(const crow::request&, crow::response&, Args...)> handler_;
-
     };
 
     const int RULE_SPECIAL_REDIRECT_SLASH = 1;
@@ -9017,7 +9009,6 @@ namespace crow
                 buffers_.emplace_back(seperator.data(), seperator.size());
                 buffers_.emplace_back(kv.second.data(), kv.second.size());
                 buffers_.emplace_back(crlf.data(), crlf.size());
-
             }
 
             if (!res.headers.count("content-length"))
@@ -9285,7 +9276,6 @@ namespace crow
             for(uint16_t i = 0; i < concurrency_; i ++)
                 v.push_back(
                         std::async(std::launch::async, [this, i, &init_count]{
-
                             // thread local date string get function
                             auto last = std::chrono::steady_clock::now();
 

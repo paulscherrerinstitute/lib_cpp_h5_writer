@@ -119,7 +119,6 @@ pair<shared_ptr<FrameMetadata>, char*> ZmqReceiver::receive()
 shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
 {   
     try {
-
         stringstream header_stream;
         header_stream << header << endl;
         pt::read_json(header_stream, json_header);
@@ -139,7 +138,6 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
 
         if (header_values_type) {
             for (const auto& value_mapping : *header_values_type) {
-                
                 const auto& name = value_mapping.first;
                 const auto& header_data_type = value_mapping.second;
                 
@@ -149,7 +147,6 @@ shared_ptr<FrameMetadata> ZmqReceiver::read_json_header(const string& header)
             }
         }
         return header_data;
-
     } catch (...) {
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";

@@ -40,7 +40,6 @@ void ZmqSender::bind()
     sender->bind(connect_address);
     //  Ensure subscriber connection has time to complete
     std::this_thread::sleep_for(std::chrono::seconds(1));
-
 }
 
 bool ZmqSender::get_stat() const

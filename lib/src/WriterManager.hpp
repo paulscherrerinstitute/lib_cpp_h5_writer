@@ -26,7 +26,6 @@ namespace writer_utils {
 
 class WriterManager
 {
-
     std::unordered_map<std::string, boost::any> parameters = {};
     std::mutex parameters_mutex;
     std::mutex statistics_mutex;
@@ -100,7 +99,6 @@ class WriterManager
         void set_time_start();
         void set_last_statistics_timestamp();
         std::chrono::system_clock::time_point get_last_statistics_timestamp() const;
-
 };
 
 #endif

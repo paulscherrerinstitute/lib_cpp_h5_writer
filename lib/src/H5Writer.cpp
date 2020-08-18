@@ -66,7 +66,6 @@ H5Writer::~H5Writer()
 void H5Writer::close_file()
 {
     if (is_file_open()) {
-
         #ifdef DEBUG_OUTPUT
             using namespace date;
             using namespace chrono;
@@ -135,7 +134,6 @@ void H5Writer::write_data(const string& dataset_name, const size_t data_index, c
     const std::vector<size_t>& data_shape, const size_t data_bytes_size, const string& data_type, const string& endianness)
 {
     try {
-
         // Define the ofset of the currently received image in the file.
         hsize_t relative_data_index = prepare_storage_for_data(dataset_name, data_index, data_shape, data_type, endianness);
 
@@ -261,8 +259,7 @@ void H5Writer::create_dataset(const string& dataset_name, const vector<size_t>& 
 }
 
 void H5Writer::create_file(hsize_t frame_chunk) 
-{
-    
+{    
     if (file.getId() != -1) {
         close_file();
     }
@@ -325,10 +322,8 @@ void H5Writer::create_file(hsize_t frame_chunk)
 
        throw runtime_error(error_message.str());
     }
-    
     // New file created - set this files chunk number.
-    current_frame_chunk = frame_chunk;
-    
+    current_frame_chunk = frame_chunk;    
 }
 
 bool H5Writer::is_file_open() const

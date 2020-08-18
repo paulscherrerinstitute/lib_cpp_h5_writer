@@ -21,7 +21,6 @@ void write_frame(H5Writer& writer, size_t index, char* buffer, size_t buffer_len
                       "little");
 
     for (size_t meta_index=0; meta_index < n_metadata; meta_index++) {
-        
         writer.write_data(to_string(meta_index),
                           index, 
                           metadata_buffer,
@@ -71,7 +70,6 @@ int main (int argc, char *argv[])
     auto start_time_frame = std::chrono::system_clock::now();
     
     for (int index=0; index<n_frames; index++) {
-        
         write_frame(writer, index, buffer, buffer_length, metadata_buffer, metadata_buffer_length, n_metadata, n_modules);
 
         auto time_diff = duration<float, milli>(std::chrono::system_clock::now() - start_time_frame).count();

@@ -56,7 +56,6 @@ class TomcatFormat : public H5Format
                 })), 
                 s_ptr(new h5_group("exchange", {}))
             }));
-
         }
 
         const h5_parent& get_format_definition() const override
@@ -94,5 +93,4 @@ class TomcatFormat : public H5Format
         const unordered_map<string, string>& get_dataset_move_mapping() const override {
             return *dataset_move_mapping;
         }
-
 };

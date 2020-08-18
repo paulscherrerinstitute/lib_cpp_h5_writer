@@ -8,7 +8,6 @@ using namespace std;
 
 void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
 {
-
     #ifdef DEBUG_OUTPUT
         cout << "[rest_interface::start_rest_api] Starting rest interface on port " << port << endl;
     #endif
@@ -70,7 +69,6 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
         auto parameters_type = writer_manager.get_parameters_type();
 
         if (req.method == "GET"_method) {
-
             for (const auto& item : writer_manager.get_parameters()) {
                 auto parameter_name = item.first;
                 auto parameter_value = item.second;
@@ -87,7 +85,6 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
                     } else if (parameter_type == NX_INT) {
                         result[parameter_name] = boost::any_cast<int>(parameter_value);
                     }
-
                 } catch (const boost::bad_any_cast& exception) {
                     stringstream error_message;
                     using namespace date;
@@ -95,7 +92,6 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
                     error_message << "[RestApi::parameters(get)] Cannot cast parameter " << parameter_name << " into specified type." << endl;
 
                     throw runtime_error(error_message.str());
-
                 } catch (const out_of_range& exception){
                     stringstream error_message;
                     using namespace date;
@@ -133,7 +129,6 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
 
                         throw runtime_error(error_message.str());
                     }
-                    
                 } catch (const out_of_range& exception){
                     stringstream error_message;
                     using namespace date;
@@ -141,7 +136,6 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
                     error_message << "[RestApi::parameters(post)] No type mapping for received parameter " << parameter_name << " in file format."<< endl;
                     
                     throw runtime_error(error_message.str());
-
                 } catch (const boost::bad_any_cast& exception) {
                     stringstream error_message;
                     using namespace date;
@@ -149,7 +143,6 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
                     error_message << "[RestApi::parameters(post)] Cannot cast parameter " << parameter_name << " into specified type." << endl;
 
                     throw runtime_error(error_message.str());
-
                 }
             }
             
