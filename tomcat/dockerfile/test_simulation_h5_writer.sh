@@ -36,7 +36,7 @@ FILE=/lib_cpp_h5_writer/tomcat/test/output.h5
 # FILE=/home/hax_l/software/lib_cpp_h5_writer/tomcat/test/output.h5
 if [ -f "$FILE" ]; then
     echo "Deleting previously existant output file..."
-    yes | rm $FILE
+    rm -f $FILE
 fi
 
 curl -O https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh
@@ -63,16 +63,16 @@ receive_stream "data_white"
 receive_stream "data_black"
 
 # Baisc verification - if both files have the same size
-I=`stat -c%s /lib_cpp_h5_writer/tomcat/output.h5 `
+I=$(stat -c%s /lib_cpp_h5_writer/tomcat/output.h5 )
 # I=`stat -c%s /home/hax_l/software/lib_cpp_h5_writer/tomcat/test/output.h5 `
 cd /lib_cpp_h5_writer/tomcat/test/
 tar xzf ./output_ref.tar.gz 
-J=`stat -c%s /lib_cpp_h5_writer/tomcat/test/output_ref.h5 `
+J=$(stat -c%s /lib_cpp_h5_writer/tomcat/test/output_ref.h5 )
 # J=`stat -c%s /home/hax_l/software/lib_cpp_h5_writer/tomcat/test/output_ref.h5 `
 if [[ ! "$I" -eq "$J" ]] ; 
 then
     echo "FILES ARE NOT THE SAME SIZE $I $J"  
-    exit -1
+    exit 1
 fi
 echo "FINISHING.... FILES ARE THE SAME SIZE $I $J"  
 # all good

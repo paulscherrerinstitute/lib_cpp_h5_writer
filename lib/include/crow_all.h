@@ -292,11 +292,7 @@ namespace crow
     public:
         static const int MAX_KEY_VALUE_PAIRS_COUNT = 256;
 
-        query_string()
-        {
-
-        }
-
+        query_string(){}
         query_string(const query_string& qs)
             : url_(qs.url_)
         {
@@ -358,7 +354,6 @@ namespace crow
             }
             os << " ]";
             return os;
-
         }
 
         char* get (const std::string& name) const
@@ -865,7 +860,6 @@ do {                                                                 \
 
 enum state
   { s_dead = 1 /* important that this is > 0 */
-
   , s_start_req_or_res
   , s_res_or_resp_H
   , s_start_res
@@ -1388,7 +1382,6 @@ static const int8_t unhex[256] =
 
     reexecute_byte:
     switch (parser->state) {
-
       case s_dead:
         /* this state is used after a 'Connection: close' message
          * the parser will error out if it reads another message
@@ -4053,7 +4046,6 @@ namespace crow
             {
                 switch(r.t_)
                 {
-
                 case type::Null: os << "null"; break;
                 case type::False: os << "false"; break;
                 case type::True: os << "true"; break;
@@ -4544,9 +4536,7 @@ namespace crow
             std::unique_ptr<std::vector<wvalue>> l;
             std::unique_ptr<std::unordered_map<std::string, wvalue>> o;
         public:
-
             wvalue() {}
-
             wvalue(const rvalue& r)
             {
                 t_ = r.t();
@@ -5046,12 +5036,10 @@ namespace crow
                     }
 
                 }
-
                 static json::wvalue empty_str;
                 empty_str = "";
                 return {false, empty_str};
             }
-
             void escape(const std::string& in, std::string& out)
             {
                 out.reserve(out.size() + in.size());
@@ -5230,7 +5218,6 @@ namespace crow
             }
 
         private:
-
             void parse()
             {
                 std::string tag_open = "{{";
@@ -5540,7 +5527,6 @@ namespace crow
     };
 
     class logger {
-
         private:
             //
             static std::string timestamp()
@@ -5561,13 +5547,10 @@ namespace crow
             }
 
         public:
-
-
             logger(std::string prefix, LogLevel level) : level_(level) {
     #ifdef CROW_ENABLE_LOGGING
                     stringstream_ << "(" << timestamp() << ") [" << prefix << "] ";
     #endif
-
             }
             ~logger() {
     #ifdef CROW_ENABLE_LOGGING
@@ -5581,15 +5564,13 @@ namespace crow
             //
             template <typename T>
             logger& operator<<(T const &value) {
-
-    #ifdef CROW_ENABLE_LOGGING
-                if(level_ >= get_current_log_level()) {
-                    stringstream_ << value;
-                }
-    #endif
+                #ifdef CROW_ENABLE_LOGGING
+                            if(level_ >= get_current_log_level()) {
+                                stringstream_ << value;
+                            }
+                #endif
                 return *this;
             }
-
             //
             static void setLogLevel(LogLevel level) {
                 get_log_level_ref() = level;
@@ -5716,7 +5697,6 @@ namespace crow
             }
 
         private:
-
             int tick{5};
             boost::asio::io_service* io_service_{};
             std::deque<std::pair<decltype(std::chrono::steady_clock::now()), std::function<void()>>> dq_;
@@ -6203,7 +6183,6 @@ template <typename F, typename Set>
         struct function_traits<R(ClassType::*)(Args...) const>
         {
             static const size_t arity = sizeof...(Args);
-
             typedef R result_type;
 
             template <size_t i>
@@ -6382,7 +6361,6 @@ namespace crow
     {
         return int_params[index];
     }
-
     template<>
     inline uint64_t routing_params::get<uint64_t>(unsigned index) const
     {
@@ -6633,7 +6611,6 @@ namespace crow
                 }
 
             protected:
-
                 std::string build_header(int opcode, size_t size)
                 {
                     char buf[2+8] = "\x80\x00";
@@ -7845,7 +7822,6 @@ namespace crow
     class DynamicRule : public BaseRule, public RuleParameterTraits<DynamicRule>
     {
     public:
-
         DynamicRule(std::string rule)
             : BaseRule(std::move(rule))
         {
@@ -8048,7 +8024,6 @@ namespace crow
                         [](unsigned x){ return !x; });
             }
         };
-
         Trie() : nodes_(1)
         {
         }
@@ -9074,7 +9049,6 @@ namespace crow
                 buffers_.emplace_back(keep_alive_tag.data(), keep_alive_tag.size());
                 buffers_.emplace_back(crlf.data(), crlf.size());
             }
-
             buffers_.emplace_back(crlf.data(), crlf.size());
             res_body_copy_.swap(res.body);
             buffers_.emplace_back(res_body_copy_.data(), res_body_copy_.size());

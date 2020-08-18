@@ -1,5 +1,5 @@
 package:
-    name: lib_cpp_h5_writer 
+    name: lib_cpp_h5_writer
     version: 0.1.0
 
 build:
