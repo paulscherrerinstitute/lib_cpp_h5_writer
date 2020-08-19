@@ -15,16 +15,13 @@ int main (int argc, char *argv[])
     if (argc != 10) {
         cout << endl;
         cout << "Usage: tomcat_h5_writer [connection_address] [output_file] [n_frames] [user_id]" << endl;
-        cout << " [n_modules] [rest_api_port] [dataset_name] [max_frames_per_file] [statistics_monitor_address]" << endl;
+        cout << " [n_modules] [rest_api_port] [dataset_name] [max_frames_per_file]" << endl;
         cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\toutput_file: Name of the output file." << endl;
         cout << "\tn_frames: Number of images to acquire. 0 for infinity (until /stop is called)." << endl;
         cout << "\tuser_id: uid under which to run the writer. -1 to leave it as it is." << endl;
-        cout << "\tn_modules: Number of detector modules to be written." << endl;
-        cout << "\trest_port: Port to start the REST Api on." << endl;
         cout << "\tdataset_name: Definition of the dataset name." << endl;
         cout << "\tframes_per_file: Maximum number of frames for each h5 file." << endl;
-        cout << "\tstatistics_monitor_address: TCP address to send writer's statistics." << endl;
         cout << endl;
         exit(-1);
     }
@@ -33,11 +30,11 @@ int main (int argc, char *argv[])
     string output_file = string(argv[2]);
     uint64_t n_frames =  atoi(argv[3]);
     int user_id = atoi(argv[4]);
-    int n_modules = atoi(argv[5]);
-    int rest_port = atoi(argv[6]);
+    int n_modules = 1;
+    int rest_port = 9555;
     string dataset_name = string(argv[7]);
     hsize_t frames_per_file = atoi(argv[8]);
-    string statistics_monitor_address = string(argv[9]);
+    string statistics_monitor_address = "tcp://*:8088";
 
     string bsread_rest_address = "http://localhost:9999/";
 

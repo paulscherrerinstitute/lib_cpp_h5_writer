@@ -10,7 +10,7 @@ import os
 tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
 endpoint = 'http://xbl-daq-32:9555'
 
-default_args = ['connection_address', 'output_file', 'n_frames', 'user_id', 'n_modules', 'rest_api_port', 'dataset_name', 'max_frames_per_file', 'statistics_monitor_address']
+default_args = ['connection_address', 'output_file', 'n_frames', 'user_id', 'dataset_name', 'max_frames_per_file']
 
 app = Flask(__name__)
 
