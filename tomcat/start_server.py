@@ -7,7 +7,9 @@ import subprocess
 import sys
 import os
 
+# writer's executable
 tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
+# writer's rest api address:port
 endpoint = 'http://xbl-daq-32:9555'
 
 default_args = ['connection_address', 'output_file', 'n_frames', 'user_id', 'dataset_name', 'max_frames_per_file']
@@ -43,8 +45,6 @@ def start_pco_writer():
             args= json.loads(request_json)
             for key in default_args:
                 tomcat_args.append(args[key])
-            #p = subprocess.run(tomcat_args)
-            # print(tomcat_args)
             p = subprocess.Popen(tomcat_args,shell=False,stdin=None,stdout=None,stderr=None,close_fds=True)
     return response
 
@@ -56,8 +56,8 @@ def get_status():
             response = requests.get(request_url).json()
             return validate_response_from_writer(response)
         except Exception as e:
-            msg = "\nWriter is not running. Please start it using the start() method.\n"
+            msg = "\nWriter is not running. Please start it using the start_writer() method.\n"
             return {'success':True, 'value':msg}
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=9901)
+    app.run(host='0.0.0.0', port=9901)

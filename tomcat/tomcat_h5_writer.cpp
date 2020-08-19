@@ -30,12 +30,11 @@ int main (int argc, char *argv[])
     string output_file = string(argv[2]);
     uint64_t n_frames =  atoi(argv[3]);
     int user_id = atoi(argv[4]);
+    string dataset_name = string(argv[5]);
+    hsize_t frames_per_file = atoi(argv[6]);
     int n_modules = 1;
     int rest_port = 9555;
-    string dataset_name = string(argv[7]);
-    hsize_t frames_per_file = atoi(argv[8]);
     string statistics_monitor_address = "tcp://*:8088";
-
     string bsread_rest_address = "http://localhost:9999/";
 
     if (user_id != -1) {
@@ -43,7 +42,7 @@ int main (int argc, char *argv[])
     }
 
 
-    writer_utils::create_destination_folder(output_file);   
+    writer_utils::create_destination_folder(output_file);
 
     auto header_values = shared_ptr<unordered_map<string, HeaderDataType>>(new unordered_map<string, HeaderDataType> {
         {"frame", HeaderDataType("uint64")},
@@ -64,10 +63,10 @@ int main (int argc, char *argv[])
     ZmqSender sender(statistics_monitor_address, config::zmq_n_io_threads);
     RingBuffer ring_buffer(config::ring_buffer_n_slots);
     uint16_t adjust_n_frames = 1;
-    
+
 
     ProcessManager process_manager(writer_manager, sender, receiver, ring_buffer, format, rest_port, bsread_rest_address, frames_per_file, adjust_n_frames);
-    
+
     process_manager.run_writer();
 
     return 0;
