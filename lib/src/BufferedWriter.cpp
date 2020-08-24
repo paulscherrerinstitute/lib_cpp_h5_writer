@@ -14,7 +14,7 @@ BufferedWriter::BufferedWriter(const std::string& filename, const std::string& d
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[BufferedWriter::BufferedWriter] Creating buffered writer"; 
+        cout << "[Buffuffered writer"; 
         cout << " with filename " << filename;
         cout << " and total_frames " << total_frames;
         cout << " and frames_per_file " << frames_per_file;
@@ -23,10 +23,10 @@ BufferedWriter::BufferedWriter(const std::string& filename, const std::string& d
     #endif
 }
 
-void BufferedWriter::cache_metadata(string name, uint64_t frame_index, const char* data, uint64_t initial_frame_offset)
+void BufferedWriter::cache_metadata(string name, uint64_t frame_index, const char* data)
 {
     auto relative_frame_index = get_relative_data_index(frame_index);
-    metadata_buffer->add_metadata_to_buffer(name, relative_frame_index, data, initial_frame_offset);
+    metadata_buffer->add_metadata_to_buffer(name, relative_frame_index, data);
 }
 
 void BufferedWriter::set_n_received_frames(uint64_t n_rec_frames)
@@ -34,9 +34,15 @@ void BufferedWriter::set_n_received_frames(uint64_t n_rec_frames)
     n_received_frames = n_rec_frames;
 }
 
-void BufferedWriter::write_metadata_to_file()
+void BufferedWriter::write_metadata_to_file(uint64_t n_rec_frames)
 {
     auto header_values_type = metadata_buffer->get_header_values_type();
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[BufferedWriter::write_metadata_to_file] Writing metadata to file..." ;
+        cout << " header_values_type: " << header_values_type << endl; 
+    #endif
 
     if (header_values_type) {
         for (const auto& header_type : *header_values_type) {
@@ -47,9 +53,15 @@ void BufferedWriter::write_metadata_to_file()
 
             auto dataset_size = metadata_buffer->get_n_images();
 
-            if ((dataset_size == 0) or (dataset_size > n_received_frames)){
-                dataset_size = n_received_frames;
+            if ((dataset_size == 0) or (dataset_size > n_rec_frames)){
+                dataset_size = n_rec_frames;
             }
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
+                cout << "[BufferedWriter::write_metadata_to_file] Dataset_size: " ;
+                cout << dataset_size << endl; 
+            #endif
 
             create_dataset(dataset_name, data_shape, header_data_type.type, header_data_type.endianness, false, 
                 dataset_size);

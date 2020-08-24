@@ -9,6 +9,11 @@ using namespace std;
 MetadataBuffer::MetadataBuffer(uint64_t n_images, shared_ptr<unordered_map<string, HeaderDataType>> header_values_type) :
     n_images(n_images), header_values_type(header_values_type)
 {
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[MetadataBuffer::MetadataBuffer] Initializing metadata_buffer with size: " << n_images << endl;
+    #endif
     if (header_values_type) {
         for (const auto& header_type : *header_values_type) {
             auto& name = header_type.first;
@@ -24,9 +29,9 @@ MetadataBuffer::MetadataBuffer(uint64_t n_images, shared_ptr<unordered_map<strin
     }
 }
 
-void MetadataBuffer::add_metadata_to_buffer(string name, uint64_t frame_index, const char* data, uint64_t initial_frame_offset)
+void MetadataBuffer::add_metadata_to_buffer(string name, uint64_t frame_index, const char* data)
 {
-    if (frame_index >= n_images + initial_frame_offset) {
+    if (frame_index >= n_images) {
         stringstream error_message;
         using namespace date;
         error_message << "[" << std::chrono::system_clock::now() << "] ";
@@ -49,11 +54,10 @@ void MetadataBuffer::add_metadata_to_buffer(string name, uint64_t frame_index, c
     }
 
     size_t bytes_size_per_frame = metadata_length_bytes.at(name);
-    size_t buffer_offset = (frame_index-initial_frame_offset) * bytes_size_per_frame;
+    size_t buffer_offset = (frame_index) * bytes_size_per_frame;
 
     char* buffer = metadata->second.get();
     buffer += buffer_offset;
-
     memcpy(buffer, data, bytes_size_per_frame); 
 }
 

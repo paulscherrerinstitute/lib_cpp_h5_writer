@@ -70,7 +70,7 @@ void H5Writer::close_file()
             using namespace date;
             using namespace chrono;
             cout << "[" << system_clock::now() << "]";
-            cout << "[H5Writer::close_file] Closing file." << endl;
+            cout << "[H5Writer::close_file] Closing file. Current_frame_chunk:" << current_frame_chunk << endl;
         #endif
 
         hsize_t min_frame_in_dataset = 0;
@@ -342,23 +342,37 @@ inline size_t H5Writer::get_relative_data_index(const size_t data_index)
     if (frames_per_file == 0) {
         return data_index;
     }
-
     size_t destination_file_index = data_index / frames_per_file;
-    size_t relative_data_index =  data_index - (destination_file_index * frames_per_file);
-
+    size_t relative_data_index =  data_index - (destination_file_index * frames_per_file) ;
+    #ifdef DEBUG_OUTPUT
+        // verifies if dataset_name is valid and not existing
+        H5::Exception::dontPrint();
+        cout << "[H5Writer::get_relative_data_index ] Destination_file_index: " << destination_file_index << ", relative_data_index: " << relative_data_index << endl;
+    #endif
     return relative_data_index;
 }
 
 inline bool H5Writer::is_data_for_current_file(const size_t data_index)
 {
     if (frames_per_file) {
+
         hsize_t frame_chunk = (data_index / frames_per_file) + 1;
 
         // This frames does not go into this file.
         if (frame_chunk != current_frame_chunk) {
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
+                cout << "[H5Writer::is_data_for_current_file] frame_chunk != current_frame_chunk (frame_chunk: " << frame_chunk << ", data_index: " << data_index <<", frames_per_file: " << frames_per_file <<" current_frame_chunk: " << current_frame_chunk << ")" << endl;
+            #endif
             return false;
         }
     }
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[H5Writer::is_data_for_current_file] frame_chunk == current_frame_chunk" << endl;
+    #endif
 
     return true;
 }
@@ -368,18 +382,33 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
 {
     // Check if we have to create a new file.
     if (!is_data_for_current_file(data_index)) {
+        
         // Calculate to which file (1 based) the data_index belongs.
         hsize_t frame_chunk = (data_index / frames_per_file) + 1;
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
+            cout << "[H5Writer::prepare_storage_for_data] !is_data_for_current_file(data_index: " << data_index << ", frame_chunk: " << frame_chunk << ")" << endl;
+        #endif
         create_file(frame_chunk);
     }
 
     // Open the file if needed.
     if (!is_file_open()) {
         create_file();
-    }
+   } 
 
     // Create the dataset if we don't have it yet.
     if (datasets.find(dataset_name) == datasets.end()) {
+        #ifdef DEBUG_OUTPUT
+           using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
+            cout << "[H5Writer::prepare_storage_for_data] creating new dataset..." ;
+            cout << "dataset_name " << dataset_name;
+            cout << "dataset_type " << data_type;
+            cout << "endianess " << endianness;
+            cout << "initial_dataset_size " << initial_dataset_size << endl;
+        #endif
         create_dataset(dataset_name, 
                        data_shape, 
                        data_type, 
@@ -391,7 +420,11 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
     hsize_t current_dataset_size = datasets_current_size.at(dataset_name);
 
     hsize_t relative_data_index = get_relative_data_index(data_index);
-
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << "[" << std::chrono::system_clock::now() << "]";
+        cout << "[H5Writer::prepare_storage_for_data] current_dataset_size: " << current_dataset_size << ", relative_data_index :" << relative_data_index << endl;
+    #endif
     // Expand the dataset if needed.
     if (relative_data_index > current_dataset_size) {
         auto dataset = datasets.at(dataset_name);
@@ -404,7 +437,7 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
         datasets_current_size[dataset_name] = new_dataset_size;
     }
 
-    // Max dataset size needed to shring the datasets before closing file.
+    // Max dataset size needed to shrink the datasets before closing file.
     if (relative_data_index > max_data_index) {
         max_data_index = relative_data_index;
     }

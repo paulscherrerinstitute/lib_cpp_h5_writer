@@ -200,15 +200,16 @@ void ProcessManager::write_h5()
         
 
         // When using file roll over, write the file format before switching to the next file.
-        if (!writer->is_data_for_current_file(received_data.first->frame_index)) {
+        if (!writer->is_data_for_current_file(received_data.first->frame_index-writer_manager.get_n_frames_offset())) {
             #ifdef DEBUG_OUTPUT
                 using namespace date;
                 cout << "[" << std::chrono::system_clock::now() << "]";
                 cout << "[ProcessManager::write_h5] Frame index " << received_data.first->frame_index;
                 cout << " does not belong to current file. Write format before the file will be closed." << endl;
             #endif
+            writer->set_n_received_frames(writer_manager.get_n_received_frames());
 
-            writer->write_metadata_to_file();
+            writer->write_metadata_to_file(writer_manager.get_n_received_frames());
 
             write_h5_format(writer->get_h5_file());            
         }
@@ -262,7 +263,7 @@ void ProcessManager::write_h5()
                     }
                 }
                 
-                writer->cache_metadata(name, received_data.first->frame_index, value.get(), writer_manager.get_n_frames_offset());   
+                writer->cache_metadata(name, received_data.first->frame_index-writer_manager.get_n_frames_offset(), value.get());   
             }   
         }
         #ifdef PERF_OUTPUT
@@ -308,7 +309,7 @@ void ProcessManager::write_h5()
         writer->set_n_received_frames(writer_manager.get_n_received_frames());
 
 
-        writer->write_metadata_to_file();
+        writer->write_metadata_to_file(writer_manager.get_n_received_frames());
 
         write_h5_format(writer->get_h5_file());
     }
