@@ -391,6 +391,8 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
             cout << "[H5Writer::prepare_storage_for_data] !is_data_for_current_file(data_index: " << data_index << ", frame_chunk: " << frame_chunk << ")" << endl;
         #endif
         create_file(frame_chunk);
+        // If moving to a new file, clear datasets
+        datasets.clear();
     }
 
     // Open the file if needed.

@@ -207,9 +207,7 @@ void ProcessManager::write_h5()
                 cout << "[ProcessManager::write_h5] Frame index " << received_data.first->frame_index;
                 cout << " does not belong to current file. Write format before the file will be closed." << endl;
             #endif
-            writer->set_n_received_frames(writer_manager.get_n_received_frames());
-
-            writer->write_metadata_to_file(writer_manager.get_n_received_frames());
+            writer->write_metadata_to_file(writer_manager.get_n_received_frames(), writer_manager.get_n_written_frames());
 
             write_h5_format(writer->get_h5_file());            
         }
@@ -306,10 +304,10 @@ void ProcessManager::write_h5()
         while (!writer_manager.are_all_parameters_set() && !writer_manager.is_killed()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(config::parameters_read_retry_interval));
         }
-        writer->set_n_received_frames(writer_manager.get_n_received_frames());
+        // writer->set_n_received_frames(writer_manager.get_n_received_frames());
 
 
-        writer->write_metadata_to_file(writer_manager.get_n_received_frames());
+        writer->write_metadata_to_file(writer_manager.get_n_received_frames(), writer_manager.get_n_written_frames());
 
         write_h5_format(writer->get_h5_file());
     }

@@ -14,8 +14,7 @@ class BufferedWriter : public H5Writer
         BufferedWriter(const std::string& filename, const std::string& dataset_name, size_t total_frames, std::unique_ptr<MetadataBuffer>&& metadata_buffer, 
             hsize_t frames_per_file=0, hsize_t initial_dataset_size=1000, hsize_t dataset_increase_step=1000);
         virtual void cache_metadata(std::string name, uint64_t frame_index, const char* data);
-        void set_n_received_frames(uint64_t n_rec_frames);
-        virtual void write_metadata_to_file(uint64_t n_rec_frames);
+        virtual void write_metadata_to_file(uint64_t n_rec_frames, uint64_t frame_index);
 };
 
 class DummyBufferedWriter : public BufferedWriter, public DummyH5Writer
@@ -23,7 +22,7 @@ class DummyBufferedWriter : public BufferedWriter, public DummyH5Writer
     public:
         DummyBufferedWriter() : BufferedWriter("/dev/null", 0, 0, 0, 0) {}
         void cache_metadata(std::string name, uint64_t frame_index, const char* data) override {}
-        void write_metadata_to_file(uint64_t n_rec_frames) override {}
+        void write_metadata_to_file(uint64_t n_rec_frames, uint64_t frame_index) override {}
 
         bool is_file_open() const override 
             { return DummyH5Writer::is_file_open(); }
