@@ -45,6 +45,30 @@ void ProcessManager::notify_first_pulse_id(uint64_t pulse_id)
     });
 }
 
+void ProcessManager::notify_pco_client_end() 
+{
+    std::string finished_url = "/finished";
+    string request_address("http://0.0.0.0:9901");
+    async(launch::async, [finished_url, &request_address]{
+        try {
+            stringstream request;
+            request << "curl -X POST "<< request_address << finished_url;
+
+            string request_call(request.str());
+
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
+                // cout << request.str() << endl;
+                cout << "[ProcessManager::notify_pco_client_end] Sending status finished to pco client... "<< endl;
+
+            #endif
+
+            system(request_call.c_str());
+        } catch (...){}
+    });
+}
+
 void ProcessManager::notify_last_pulse_id(uint64_t pulse_id) 
 {
     // Last pulse_id should be a sync operation - we do not want to terminate the process to quickly.
@@ -293,6 +317,8 @@ void ProcessManager::write_h5()
     while (!writer_manager.is_stats_queue_empty()){
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
+    
+
     if (writer->is_file_open() && !writer->get_dataset_name_taken()) {
         #ifdef DEBUG_OUTPUT
             using namespace date;
@@ -304,12 +330,11 @@ void ProcessManager::write_h5()
         while (!writer_manager.are_all_parameters_set() && !writer_manager.is_killed()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(config::parameters_read_retry_interval));
         }
-        // writer->set_n_received_frames(writer_manager.get_n_received_frames());
-
-
         writer->write_metadata_to_file(writer_manager.get_n_received_frames(), writer_manager.get_n_written_frames());
 
         write_h5_format(writer->get_h5_file());
+        // submits the finished status to the client (if existing)
+        notify_pco_client_end();
     }
     
     #ifdef DEBUG_OUTPUT

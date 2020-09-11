@@ -24,6 +24,7 @@ class ProcessManager
 
     void notify_first_pulse_id(uint64_t pulse_id);
     void notify_last_pulse_id(uint64_t pulse_id);
+    void notify_pco_client_end();
 
     public:
         ProcessManager(WriterManager& writer_manager, ZmqSender& sender, ZmqReceiver& receiver, 

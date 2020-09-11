@@ -10,11 +10,14 @@ import os
 # writer's executable
 tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
 # writer's rest api address:port
-endpoint = 'http://xbl-daq-32:9555'
+# endpoint = 'http://xbl-daq-32:9555'
+endpoint = 'http://localhost:9555'
 
 default_args = ['connection_address', 'output_file', 'n_frames', 'user_id', 'dataset_name', 'max_frames_per_file']
 
 app = Flask(__name__)
+
+status_finished = 'unknown'
 
 def validate_response(server_response):
     if not server_response['success']:
@@ -46,6 +49,8 @@ def start_pco_writer():
             for key in default_args:
                 tomcat_args.append(args[key])
             p = subprocess.Popen(tomcat_args,shell=False,stdin=None,stdout=None,stderr=None,close_fds=True)
+        global status_finished
+        status_finished = 'unknown'
     return response
 
 @app.route('/status', methods=['GET', 'POST'])
@@ -56,8 +61,19 @@ def get_status():
             response = requests.get(request_url).json()
             return validate_response_from_writer(response)
         except Exception as e:
-            msg = "\nWriter is not running. Please start it using the start_writer() method.\n"
+            msg = 'initialized'
             return {'success':True, 'value':msg}
+
+@app.route('/finished', methods=['GET', 'POST'])
+def set_finished():
+    global status_finished
+    if request.method == 'POST':
+        status_finished = 'finished'
+        return {'success':True}
+    else:
+        return {'success':True, 'value':status_finished}
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9901)
