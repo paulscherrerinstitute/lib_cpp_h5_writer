@@ -18,6 +18,7 @@ default_args = ['connection_address', 'output_file', 'n_frames', 'user_id', 'dat
 app = Flask(__name__)
 
 status_finished = 'unknown'
+last_run_json = None
 
 def validate_response(server_response):
     if not server_response['success']:
@@ -51,10 +52,17 @@ def start_pco_writer():
             p = subprocess.Popen(tomcat_args,shell=False,stdin=None,stdout=None,stderr=None,close_fds=True)
         global status_finished
         status_finished = 'unknown'
+        global last_run_json
+        last_run_json = None
     return response
 
 @app.route('/status', methods=['GET', 'POST'])
 def get_status():
+    global status_finished
+    # verify if previous run is finished
+    if status_finished == 'finished' and last_run_json is not None:
+        return {'success':True, 'value':status_finished, 'written_frames': last_run_json['written_frames'], 'lost_frames':last_run_json['lost_frames'], 'end_time':last_run_json['end_time'], 'start_time':last_run_json['start_time'], 'duration':last_run_json['duration']}
+    # gets new status from writer
     if request.method == 'GET':
         request_url = endpoint+'/status'
         try:
@@ -67,11 +75,16 @@ def get_status():
 @app.route('/finished', methods=['GET', 'POST'])
 def set_finished():
     global status_finished
+    global last_run_json
     if request.method == 'POST':
-        status_finished = 'finished'
+        last_run_json = request.json
+        status_finished = last_run_json['status']
         return {'success':True}
     else:
-        return {'success':True, 'value':status_finished}
+        if last_run_json is not None:
+            return {'success':True, 'value':status_finished, 'written_frames': last_run_json['written_frames'], 'lost_frames':last_run_json['lost_frames'], 'end_time':last_run_json['end_time'], 'start_time':last_run_json['start_time'], 'duration':last_run_json['duration']}
+        else:
+            return {'success':True, 'value':status_finished}
 
 
 
