@@ -96,7 +96,10 @@ class WriterManager
         uint64_t get_n_lost_frames() const;
         void set_processing_rate(float diff);
         void set_time_end();
+        std::string get_time_end() const;
         void set_time_start();
+        std::string get_time_start() const;
+        float get_duration() const;
         void set_last_statistics_timestamp();
         std::chrono::system_clock::time_point get_last_statistics_timestamp() const;
 };

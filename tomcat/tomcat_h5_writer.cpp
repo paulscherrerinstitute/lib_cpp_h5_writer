@@ -35,7 +35,11 @@ int main (int argc, char *argv[])
     int n_modules = 1;
     int rest_port = 9555;
     string statistics_monitor_address = "tcp://*:8088";
-    string bsread_rest_address = "http://localhost:9999/";
+    // For DEBUG -> http://0.0.0.0:9901
+    // string pco_client_rest_address = "http://0.0.0.0:9901";
+    // For Release -> http://xbl-daq-32:9901
+    string pco_client_rest_address = "http://xbl-daq-32:9901";
+
 
     if (user_id != -1) {
         writer_utils::set_process_id(user_id);
@@ -65,7 +69,7 @@ int main (int argc, char *argv[])
     uint16_t adjust_n_frames = 1;
 
 
-    ProcessManager process_manager(writer_manager, sender, receiver, ring_buffer, format, rest_port, bsread_rest_address, frames_per_file, adjust_n_frames);
+    ProcessManager process_manager(writer_manager, sender, receiver, ring_buffer, format, rest_port, pco_client_rest_address, frames_per_file, adjust_n_frames);
 
     process_manager.run_writer();
 

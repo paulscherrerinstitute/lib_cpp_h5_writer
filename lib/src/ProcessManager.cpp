@@ -45,23 +45,33 @@ void ProcessManager::notify_first_pulse_id(uint64_t pulse_id)
     });
 }
 
-void ProcessManager::notify_pco_client_end() 
+void ProcessManager::notify_pco_client_end(uint64_t written_frames, uint64_t lost_frames, std::string end_time, std::string start_time, float duration) 
 {
     std::string finished_url = "/finished";
-    string request_address("http://0.0.0.0:9901");
-    async(launch::async, [finished_url, &request_address]{
+    
+    string request_address(bsread_rest_address);
+    // string request_address("http://0.0.0.0:9901");
+    async(launch::async, [written_frames, lost_frames, end_time, start_time, duration, finished_url, &request_address]{
         try {
             stringstream request;
-            request << "curl -X POST "<< request_address << finished_url;
+            pt::ptree root;
+            root.put("written_frames", written_frames);
+            root.put("lost_frames", lost_frames);
+            root.put("end_time", end_time);
+            root.put("start_time", start_time);
+            root.put("duration", duration);
+            root.put("status", "finished");
+
+            std::stringstream ss;
+            boost::property_tree::json_parser::write_json(ss, root);
+            request << "curl --silent -X POST --header \"Content-Type: application/json\" -d '"<<ss.str() << "' " << request_address << finished_url << " > /dev/null";
 
             string request_call(request.str());
 
             #ifdef DEBUG_OUTPUT
                 using namespace date;
                 cout << "[" << std::chrono::system_clock::now() << "]";
-                // cout << request.str() << endl;
-                cout << "[ProcessManager::notify_pco_client_end] Sending status finished to pco client... "<< endl;
-
+                cout << "[ProcessManager::notify_pco_client_end] Sending status finished to pco client... " << endl;
             #endif
 
             system(request_call.c_str());
@@ -333,8 +343,12 @@ void ProcessManager::write_h5()
         writer->write_metadata_to_file(writer_manager.get_n_received_frames(), writer_manager.get_n_written_frames());
 
         write_h5_format(writer->get_h5_file());
-        // submits the finished status to the client (if existing)
-        notify_pco_client_end();
+        // submits the finished status to the server
+        notify_pco_client_end(writer_manager.get_n_written_frames(), 
+                              writer_manager.get_n_lost_frames(),
+                              writer_manager.get_time_end(),
+                              writer_manager.get_time_start(),
+                              writer_manager.get_duration());
     }
     
     #ifdef DEBUG_OUTPUT

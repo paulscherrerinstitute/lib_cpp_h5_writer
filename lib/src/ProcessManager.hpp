@@ -8,6 +8,9 @@
 #include "ZmqSender.hpp"
 #include <chrono>
 #include "date.h"
+#include <boost/property_tree/json_parser.hpp>
+
+#include <boost/property_tree/json_parser.hpp>
 
 class ProcessManager 
 {
@@ -24,7 +27,7 @@ class ProcessManager
 
     void notify_first_pulse_id(uint64_t pulse_id);
     void notify_last_pulse_id(uint64_t pulse_id);
-    void notify_pco_client_end();
+    void notify_pco_client_end(uint64_t written_frames, uint64_t lost_frames, std::string end_time, std::string start_time, float duration);
 
     public:
         ProcessManager(WriterManager& writer_manager, ZmqSender& sender, ZmqReceiver& receiver, 

@@ -289,6 +289,28 @@ size_t WriterManager::get_n_free_slots() const
     }
 }
 
+
+std::string WriterManager::get_time_end() const
+{
+    time_t tt;
+    tt = std::chrono::system_clock::to_time_t(time_end);
+    return ctime(&tt);
+}
+
+std::string WriterManager::get_time_start() const
+{
+    time_t tt;
+    tt = std::chrono::system_clock::to_time_t(time_start);
+    return ctime(&tt);
+}
+
+float WriterManager::get_duration() const
+{
+    auto frame_time_difference = time_end - time_start;
+    auto time_diff_ms = std::chrono::duration<float, milli>(frame_time_difference).count();
+    return time_diff_ms;
+}
+
 void WriterManager::set_time_end()
 {
     time_end = std::chrono::system_clock::now();
