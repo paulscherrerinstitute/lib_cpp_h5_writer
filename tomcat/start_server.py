@@ -10,8 +10,8 @@ import os
 # writer's executable
 tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
 # writer's rest api address:port
-# endpoint = 'http://xbl-daq-32:9555'
-endpoint = 'http://localhost:9555'
+endpoint = 'http://xbl-daq-32:9555'
+# endpoint = 'http://localhost:9555'
 
 default_args = ['connection_address', 'output_file', 'n_frames', 'user_id', 'dataset_name', 'max_frames_per_file']
 
