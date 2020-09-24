@@ -94,8 +94,7 @@ def set_finished():
     last_run_json = app.config['last_run_json']
     if app.config['last_run_json'] is not None:
         return {'success':True, 'value':status_finished, 'written_frames': last_run_json['written_frames'], 'lost_frames':last_run_json['lost_frames'], 'end_time':last_run_json['end_time'], 'start_time':last_run_json['start_time'], 'duration':last_run_json['duration']}
-    else:
-        return {'success':True, 'value':status_finished}
+    return {'success':True, 'value':status_finished}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9901, debug=False, threaded=False, processes=1)

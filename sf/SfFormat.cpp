@@ -108,5 +108,4 @@ class SfFormat : public H5Format
         const unordered_map<string, string>& get_dataset_move_mapping() const override {
             return *dataset_move_mapping;
         }
-
 };

@@ -382,7 +382,6 @@ hsize_t H5Writer::prepare_storage_for_data(const string& dataset_name, const siz
 {
     // Check if we have to create a new file.
     if (!is_data_for_current_file(data_index)) {
-        
         // Calculate to which file (1 based) the data_index belongs.
         hsize_t frame_chunk = (data_index / frames_per_file) + 1;
         #ifdef DEBUG_OUTPUT
