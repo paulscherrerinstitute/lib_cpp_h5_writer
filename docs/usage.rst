@@ -18,6 +18,16 @@ To stop/kill/status use:
     
     $ pco_rclient <stop/kill/status>
 
+TOMCAT PCO server 
+---------------------
+
+To start/stop/restart the writer server (python flask server running on xbl-daq-32):
+
+.. code-block:: bash
+    
+    $ systemctl <start/stop/restart> pco_writer_1
+
+
 TOMCAT PCO Writer log
 ---------------------
 
