@@ -13,8 +13,8 @@ import os
 # writer's executable
 tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
 # writer's rest api address:port
-endpoint = 'http://xbl-daq-32:9555'
-# endpoint = 'http://localhost:9555'
+# endpoint = 'http://xbl-daq-32:9555'
+endpoint = 'http://localhost:9555'
 
 
 app = Flask(__name__)
@@ -23,14 +23,14 @@ app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['status_finished'] = 'unknown'
 app.config['last_run_json'] = None
+app.config['statistics'] = None
 app.config['default_args'] = ['connection_address', 'output_file', 'n_frames', 'user_id', 'dataset_name', 'max_frames_per_file']
 
 Session(app)
 
 def validate_response(server_response):
     if not server_response['success']:
-        print(server_response['value'])
-        quit()
+        return False
     print("\nPCO Writer trigger successfully submitted to the server. Retrieving writer's status...\n")
     return True
 
@@ -73,7 +73,7 @@ def get_status():
     status_finished = app.config['status_finished']
     last_run_json = app.config['last_run_json']
     if status_finished == 'finished' and last_run_json is not None:
-        return {'success':True, 'value':status_finished, 'written_frames': last_run_json['written_frames'], 'lost_frames':last_run_json['lost_frames'], 'end_time':last_run_json['end_time'], 'start_time':last_run_json['start_time'], 'duration':last_run_json['duration']}
+        return {'success':True, 'value':status_finished, 'n_written_frames': last_run_json['written_frames'], 'n_lost_frames':last_run_json['n_lost_frames'], 'end_time':last_run_json['end_time'], 'start_time':last_run_json['start_time'], 'duration':last_run_json['duration']}
     # gets new status from writer
     if request.method == 'GET':
         request_url = endpoint+'/status'
@@ -81,8 +81,13 @@ def get_status():
             response = requests.get(request_url).json()
             return validate_response_from_writer(response)
         except Exception as e:
-            msg = 'initialized'
+            msg = 'unknown'
             return {'success':True, 'value':msg}
+
+@app.route('/ack', methods=['GET'])
+def return_ack():
+    if request.method == 'GET':
+        return {'success':True}
 
 @app.route('/finished', methods=['GET', 'POST'])
 def set_finished():
@@ -93,7 +98,7 @@ def set_finished():
     status_finished = app.config['status_finished']
     last_run_json = app.config['last_run_json']
     if app.config['last_run_json'] is not None:
-        return {'success':True, 'value':status_finished, 'written_frames': last_run_json['written_frames'], 'lost_frames':last_run_json['lost_frames'], 'end_time':last_run_json['end_time'], 'start_time':last_run_json['start_time'], 'duration':last_run_json['duration']}
+        return {'success':True, 'value':status_finished, 'n_written_frames': last_run_json['n_written_frames'], 'n_lost_frames':last_run_json['n_lost_frames'], 'end_time':last_run_json['end_time'], 'start_time':last_run_json['start_time'], 'duration':last_run_json['duration']}
     return {'success':True, 'value':status_finished}
 
 if __name__ == '__main__':

@@ -50,13 +50,12 @@ void ProcessManager::notify_pco_client_end(uint64_t written_frames, uint64_t los
     std::string finished_url = "/finished";
     
     string request_address(bsread_rest_address);
-    // string request_address("http://0.0.0.0:9901");
     async(launch::async, [written_frames, lost_frames, end_time, start_time, duration, finished_url, &request_address]{
         try {
             stringstream request;
             pt::ptree root;
-            root.put("written_frames", written_frames);
-            root.put("lost_frames", lost_frames);
+            root.put("n_written_frames", written_frames);
+            root.put("n_lost_frames", lost_frames);
             root.put("end_time", end_time);
             root.put("start_time", start_time);
             root.put("duration", duration);
@@ -178,6 +177,7 @@ void ProcessManager::receive_zmq()
         // checks if ring buffer is initialized, if not, it defines the
         // statistics writer to send the start statistics
         if (!ring_buffer.is_initialized()){
+            writer_manager.set_time_start();
             writer_manager.create_writer_stats_2queue("start");
         }
         // Commit the frame to the buffer.
@@ -322,6 +322,7 @@ void ProcessManager::write_h5()
     }
 
     // before killing it, sends the end statistics
+    writer_manager.set_time_end();
     writer_manager.create_writer_stats_2queue("end");
     // waits for all the statistics to be sent
     while (!writer_manager.is_stats_queue_empty()){
@@ -409,6 +410,8 @@ void ProcessManager::send_writer_stats()
             auto filter = writer_manager.get_filter();
             sender.send(filter , stats_str);
             writer_manager.set_last_statistics_timestamp();
+            // sends the run statistics to the pco writer
+
         }
 
         // sleeps for 1 seconds before verifying statistics again

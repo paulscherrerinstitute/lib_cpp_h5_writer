@@ -66,13 +66,14 @@ class WriterManager
         void lost_frame(size_t frame_index);
 
         void set_n_frames_offset(size_t new_n_frames);
-        size_t get_n_frames_offset();
+        size_t get_n_frames_offset() const;
         size_t get_n_frames() const;
 
         // statistics variables
         std::tuple<bool, std::string> mode_category;
         uint64_t first_pulse_id;
         int user_id;
+        std::chrono::system_clock::time_point get_time_start_point() const;
         std::chrono::system_clock::time_point time_start;
         std::chrono::system_clock::time_point time_end;
         std::chrono::system_clock::time_point last_statistics_timestamp;

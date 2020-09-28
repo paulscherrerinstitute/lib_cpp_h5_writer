@@ -113,10 +113,13 @@ string WriterManager::get_dataset_name() const
 
 unordered_map<string, uint64_t> WriterManager::get_statistics() const
 {
-    unordered_map<string, uint64_t> result = {{"n_received_frames", n_received_frames.load()},
-                                    {"n_written_frames", n_written_frames.load()},
-                                    {"n_lost_frames", n_lost_frames.load()},
-                                    {"total_expected_frames", n_frames}};
+    unordered_map<string, uint64_t> result = {
+                                    {"n_written_frames", get_n_written_frames()},
+                                    {"n_frames", get_n_frames()},
+                                    {"n_received_frames", get_n_received_frames()},
+                                    {"user_id", get_user_id()},
+                                    {"first_frame_id", n_frames_offset},
+                                    {"n_lost_frames", get_n_lost_frames()}};
 
     return result;
 }
@@ -226,7 +229,7 @@ void WriterManager::set_n_frames_offset(size_t new_n_frames)
     n_frames_offset = new_n_frames;
 }
 
-size_t WriterManager::get_n_frames_offset()
+size_t WriterManager::get_n_frames_offset() const
 {
     return n_frames_offset;
 }
@@ -295,6 +298,11 @@ std::string WriterManager::get_time_end() const
     time_t tt;
     tt = std::chrono::system_clock::to_time_t(time_end);
     return ctime(&tt);
+}
+
+std::chrono::system_clock::time_point WriterManager::get_time_start_point() const
+{
+    return time_start;
 }
 
 std::string WriterManager::get_time_start() const
@@ -368,35 +376,67 @@ void WriterManager::create_writer_stats_2queue(const std::string category)
         stats_json.put("n_frames", get_n_frames() );
         stats_json.put("output_file", get_output_file());
         stats_json.put("user_id", get_user_id());
+        stats_json.put("status", get_status());
         stats_json.put("start_time", ctime(&tt));
-        root.add_child("statistics_wr_start", stats_json);
+        root.add_child("statistics", stats_json);
         always_add = true;
-    } else if (category == "adv"){
+    } else if (category == "adv" || category == "end"){
         // calculates the elapsed time from beginning
         auto frame_time_difference = std::chrono::system_clock::now() - time_start;
         auto time_diff_ms = std::chrono::duration<float, milli>(frame_time_difference).count();
         // received_rate = total number of received frames / elapsed time
         auto receiving_rate = get_n_received_frames() / time_diff_ms;
-        // writting_rate = total number of written frames / elapsed time
-        auto writting_rate = get_n_written_frames()  / time_diff_ms;
+        // writing_rate = total number of written frames / elapsed time
+        auto writing_rate = get_n_written_frames()  / time_diff_ms;
+        // 
+        time_t tt;
+        tt = std::chrono::system_clock::to_time_t(time_start);
+        stats_json.put("first_frame_id", first_pulse_id);
+        stats_json.put("n_frames", get_n_frames() );
+        stats_json.put("output_file", get_output_file());
+        stats_json.put("user_id", get_user_id());
+        stats_json.put("start_time", ctime(&tt));
         stats_json.put("n_written_frames", get_n_written_frames());
+        stats_json.put("n_received_frames", get_n_received_frames());
+        stats_json.put("n_free_slots", get_n_free_slots());
+        stats_json.put("enable", "true");
+        stats_json.put("status", get_status());
+        stats_json.put("processing_rate", processing_rate);
+        stats_json.put("n_lost_frames", get_n_lost_frames());
+        stats_json.put("receiving_rate", receiving_rate);
+        stats_json.put("writing_rate", writing_rate);
+        root.add_child("statistics", stats_json);
+    } else if (category == "end") {
+        // creates the finish statistics json
+        // calculates the elapsed time from beginning
+        auto frame_time_difference = std::chrono::system_clock::now() - time_start;
+        auto time_diff_ms = std::chrono::duration<float, milli>(frame_time_difference).count();
+        // received_rate = total number of received frames / elapsed time
+        auto receiving_rate = get_n_received_frames() / time_diff_ms;
+        // writing_rate = total number of written frames / elapsed time
+        auto writing_rate = get_n_written_frames()  / time_diff_ms;
+        time_t tt;
+        tt = std::chrono::system_clock::to_time_t(time_end);
+        time_t tt_start;
+        tt_start = std::chrono::system_clock::to_time_t(time_start);
+        stats_json.put("first_frame_id", first_pulse_id);
+        stats_json.put("n_frames", get_n_frames() );
+        stats_json.put("output_file", get_output_file());
+        stats_json.put("user_id", get_user_id());
+        stats_json.put("start_time", ctime(&tt_start));
+        stats_json.put("n_written_frames", get_n_written_frames());
+        stats_json.put("status", get_status());
         stats_json.put("n_received_frames", get_n_received_frames());
         stats_json.put("n_free_slots", get_n_free_slots());
         stats_json.put("enable", "true");
         stats_json.put("processing_rate", processing_rate);
         stats_json.put("receiving_rate", receiving_rate);
-        stats_json.put("writting_rate", writting_rate);
-        stats_json.put("avg_compressed_size", "-1.0");
-        root.add_child("statistics_wr_adv", stats_json);
-    } else if (category == "end") {
-        // creates the finish statistics json
-        time_t tt;
-        tt = std::chrono::system_clock::to_time_t(time_end);
+        stats_json.put("writing_rate", writing_rate);
         stats_json.put("end_time", ctime(&tt));
         stats_json.put("enable", "true");
         stats_json.put("n_lost_frames", get_n_lost_frames());
         stats_json.put("n_total_written_frames", get_n_written_frames());
-        root.add_child("statistics_wr_finish", stats_json);
+        root.add_child("statistics", stats_json);
         always_add = true;
     } else {
         stats_json.put("problem", "unidentified_mode");
