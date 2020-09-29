@@ -5,7 +5,6 @@
 #include "config.hpp"
 #include "WriterManager.hpp"
 #include "ZmqReceiver.hpp"
-#include "ZmqSender.hpp"
 #include "ProcessManager.hpp"
 
 #include "TomcatFormat.cpp"
@@ -34,7 +33,8 @@ int main (int argc, char *argv[])
     hsize_t frames_per_file = atoi(argv[6]);
     int n_modules = 1;
     int rest_port = 9555;
-    string statistics_monitor_address = "tcp://*:8088";
+    
+    
     // For DEBUG -> http://0.0.0.0:9901
     // string pco_client_rest_address = "http://0.0.0.0:9901";
     // For Release -> http://xbl-daq-32:9901
@@ -64,12 +64,11 @@ int main (int argc, char *argv[])
 
     WriterManager writer_manager(format.get_input_value_type(), output_file, dataset_name, user_id, n_frames);
     ZmqReceiver receiver(connect_address, config::zmq_n_io_threads, config::zmq_receive_timeout, header_values);
-    ZmqSender sender(statistics_monitor_address, config::zmq_n_io_threads);
     RingBuffer ring_buffer(config::ring_buffer_n_slots);
     uint16_t adjust_n_frames = 1;
 
 
-    ProcessManager process_manager(writer_manager, sender, receiver, ring_buffer, format, rest_port, pco_client_rest_address, frames_per_file, adjust_n_frames);
+    ProcessManager process_manager(writer_manager, receiver, ring_buffer, format, rest_port, pco_client_rest_address, frames_per_file, adjust_n_frames);
 
     process_manager.run_writer();
 

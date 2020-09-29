@@ -14,9 +14,9 @@
 
 using namespace std;
 
-ProcessManager::ProcessManager(WriterManager& writer_manager, ZmqSender& sender, ZmqReceiver& receiver, RingBuffer& ring_buffer, 
+ProcessManager::ProcessManager(WriterManager& writer_manager, ZmqReceiver& receiver, RingBuffer& ring_buffer,
     const H5Format& format, uint16_t rest_port, const string& bsread_rest_address, hsize_t frames_per_file, uint16_t adjust_n_frames):
-        writer_manager(writer_manager), sender(sender), receiver(receiver), ring_buffer(ring_buffer), format(format), rest_port(rest_port), 
+        writer_manager(writer_manager), receiver(receiver), ring_buffer(ring_buffer), format(format), rest_port(rest_port),
         bsread_rest_address(bsread_rest_address), frames_per_file(frames_per_file), adjust_n_frames(adjust_n_frames)
 {
 }
@@ -45,34 +45,27 @@ void ProcessManager::notify_first_pulse_id(uint64_t pulse_id)
     });
 }
 
-void ProcessManager::notify_pco_client_end(uint64_t written_frames, uint64_t lost_frames, std::string end_time, std::string start_time, float duration) 
+void ProcessManager::notify_pco_client_end(uint64_t written_frames, uint64_t lost_frames, std::string end_time, std::string start_time, float duration, size_t n_frames, size_t n_frames_offset, std::string output_file, int user_id, std::string dataset_name) 
 {
     std::string finished_url = "/finished";
-    
-// {'end_time': 'Thu Jan  1 00:00:00 1970\n',
-//  'first_frame_id': 2290,
-//  'n_frames': 10,
-//  'n_lost_frames': 0,
-//  'n_received_frames': 3,
-//  'n_written_frames': 3,
-//  'receiving_rate': 0.0676776,
-//  'start_time': 'Tue Sep 29 10:42:44 2020\n',
-//  'status': 'finished',
-//  'success': 'True',
-//  'user_id': 0,
-//  'writing_rate': 0.0676776}
-
 
     string request_address(bsread_rest_address);
-    async(launch::async, [written_frames, lost_frames, end_time, start_time, duration, finished_url, &request_address]{
+    async(launch::async, [written_frames, lost_frames, end_time, start_time, duration, finished_url, &request_address, n_frames, n_frames_offset, output_file, user_id, dataset_name]{
         try {
             stringstream request;
             pt::ptree root;
+            root.put("n_frames", n_frames);
+            root.put("first_frame_id", n_frames_offset);
             root.put("n_written_frames", written_frames);
             root.put("n_lost_frames", lost_frames);
             root.put("end_time", end_time);
             root.put("start_time", start_time);
-            root.put("duration_sec", std::ceil(duration * 100.0) / 100.0);
+            root.put("output_file", output_file);
+            root.put("dataset_name", dataset_name);
+            auto duration_sec = std::ceil(duration * 100.0) / 100.0;
+            root.put("duration_sec", duration_sec);
+            root.put("user_id", user_id);
+            root.put("writing_rate", written_frames / duration_sec);
             root.put("status", "finished");
 
             std::stringstream ss;
@@ -127,7 +120,7 @@ void ProcessManager::run_writer()
         cout << endl;
     #endif
 
-    boost::thread sender_thread(&ProcessManager::send_writer_stats, this);
+    // boost::thread sender_thread(&ProcessManager::send_writer_stats, this);
     boost::thread receiver_thread(&ProcessManager::receive_zmq, this);
     boost::thread writer_thread(&ProcessManager::write_h5, this);
 
@@ -143,7 +136,7 @@ void ProcessManager::run_writer()
     writer_manager.stop();
     receiver_thread.join();
     writer_thread.join();
-    sender_thread.join();
+    // sender_thread.join();
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
@@ -190,9 +183,9 @@ void ProcessManager::receive_zmq()
 
         // checks if ring buffer is initialized, if not, it defines the
         // statistics writer to send the start statistics
-        if (!ring_buffer.is_initialized()){
-            writer_manager.create_writer_stats_2queue("start");
-        }
+        // if (!ring_buffer.is_initialized()){
+            // writer_manager.create_writer_stats_2queue("start");
+        // }
         // Commit the frame to the buffer.
         ring_buffer.write(frame_metadata, frame_data);
 
@@ -326,7 +319,7 @@ void ProcessManager::write_h5()
         auto frame_time_difference = std::chrono::system_clock::now() - start_processing_rate;
         auto frame_diff_ms = std::chrono::duration<float, milli>(frame_time_difference).count();
         writer_manager.set_processing_rate(frame_diff_ms);
-        writer_manager.create_writer_stats_2queue("adv");
+        // writer_manager.create_writer_stats_2queue("adv");
     }
 
     // Send the last_pulse_id only if it was set.
@@ -336,7 +329,7 @@ void ProcessManager::write_h5()
 
     // before killing it, sends the end statistics
     writer_manager.set_time_end();
-    writer_manager.create_writer_stats_2queue("end");
+    // writer_manager.create_writer_stats_2queue("end");
     
 
     if (writer->is_file_open() && !writer->get_dataset_name_taken()) {
@@ -359,11 +352,12 @@ void ProcessManager::write_h5()
                               writer_manager.get_n_lost_frames(),
                               writer_manager.get_time_end(),
                               writer_manager.get_time_start(),
-                              writer_manager.get_duration());
-    }
-    // waits for all the statistics to be sent
-    while (!writer_manager.is_stats_queue_empty()){
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                              writer_manager.get_duration(),
+                              writer_manager.get_n_frames(),
+                              writer_manager.get_n_frames_offset(),
+                              writer_manager.get_output_file(),
+                              writer_manager.get_user_id(),
+                              writer_manager.get_dataset_name());
     }
     
     #ifdef DEBUG_OUTPUT
@@ -402,55 +396,4 @@ void ProcessManager::write_h5_format(H5::H5File& file) {
         std::cout << "[" << std::chrono::system_clock::now() << "]";
         std::cout << "[ProcessManager::write_h5_format] Error while trying to write file format: "<< ex.what() << endl;
     }
-}
-
-void ProcessManager::send_writer_stats()
-{
-    if (sender.get_valid_tcp_stats_address() ){
-        sender.bind();
-
-        while (writer_manager.is_running()) 
-        {
-            if (writer_manager.is_stats_queue_empty()){
-                continue;
-            }
-            #ifdef DEBUG_OUTPUT
-                using namespace date;
-                cout << "[" << std::chrono::system_clock::now() << "]";
-                cout << "[ProcessManager::send_writer_stats] Sending item from queue. Queue size:  "<< writer_manager.get_queue_size()  << endl;
-            #endif
-            // fetches the statistic from the writer manager
-            // and sends the filter + statistics json to the sender
-            auto stats_str = writer_manager.get_stats_from_queue();
-            auto filter = writer_manager.get_filter();
-            sender.send(filter , stats_str);
-            writer_manager.set_last_statistics_timestamp();
-            // sends the run statistics to the pco writer
-
-        }
-
-        // sleeps for 1 seconds before verifying statistics again
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        // if writer is not running anymore, still needs to send out possible
-        // stuff from statistics queue
-        while (!writer_manager.is_stats_queue_empty())
-        {
-                auto stats_str = writer_manager.get_stats_from_queue();
-                auto filter = writer_manager.get_filter();
-                sender.send(filter , stats_str);
-                writer_manager.set_last_statistics_timestamp();
-        }
-    }else{
-        #ifdef DEBUG_OUTPUT
-            using namespace date;
-            cout << "[" << std::chrono::system_clock::now() << "]";
-            cout << "[ProcessManager::send_writer_stats] Sender zmq statistics thread stopping since the tcp address is not valid." << endl;
-        #endif
-    }
-
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[ProcessManager::send_writer_stats] Sender zmq statistics thread stopped." << endl;
-    #endif
 }

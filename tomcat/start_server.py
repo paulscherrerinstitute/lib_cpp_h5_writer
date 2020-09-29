@@ -1,16 +1,39 @@
-#!/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Server that controls the PCO writer and communicates with the PCO client.
+"""
+
+# Notes
+# =====
+# 1.) This module uses numpy style docstrings, as they display nicely even
+#       on the command line (for example, when using ipython's interactive
+#       shell).
+#
+#   See:
+#     http://sphinx-doc.org/latest/ext/napoleon.html
+#     https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
+#
+#   Use the napoleon Sphinx extension to render the docstrings correctly with
+#   Sphinx: 'sphinx.ext.napoleon'
+#
 
 from flask import Flask, request, jsonify, session
 from flask_session import Session
 import requests
+import copy
 import json
 import subprocess
 import sys
 import os
 
+__author__ = 'Leonardo Hax Damiani'
+__date_created__ = '2020-08-20'
+__credits__ = 'Christian M. Schlepuetz'
+__copyright__ = 'Copyright (c) 2020, Paul Scherrer Institut'
+__docformat__ = 'restructuredtext en'
 
-
-# writer's executable
+# path to writer's executable
 tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
 # writer's rest api address:port
 # endpoint = 'http://xbl-daq-32:9555'
@@ -19,87 +42,171 @@ endpoint = 'http://localhost:9555'
 
 app = Flask(__name__)
 # Configure session to use filesystem
-app.config["SESSION_PERMANENT"] = True
-app.config["SESSION_TYPE"] = "filesystem"
-app.config['status_finished'] = 'unknown'
+app.config['SESSION_PERMANENT'] = True
+app.config['SESSION_TYPE'] = 'filesystem'
 app.config['previous_statistics'] = None
 app.config['statistics'] = None
-app.config['default_args'] = ['connection_address', 'output_file', 'n_frames', 'user_id', 'dataset_name', 'max_frames_per_file']
+app.config['default_args'] = [
+    'connection_address',
+    'output_file',
+    'n_frames',
+    'user_id',
+    'dataset_name',
+    'max_frames_per_file',
+    ]
 
 Session(app)
 
 def validate_response(server_response):
+    """
+    Method to validate the response from the server.
+
+    Returns
+    -------
+    bool : bool
+        True/False.
+    """
     if not server_response['success']:
         return False
-    print("\nPCO Writer trigger successfully submitted to the server. Retrieving writer's status...\n")
+    print("\nPCO Writer trigger successfully submitted "
+            "to the server. Retrieving writer's status...\n")
     return True
 
 def validate_start_parameters(json_parameters):
+    """
+    Method to validate the start parameters from the client.
+
+    Returns
+    -------
+    response : dict
+        A dictionary with the following keys: success and value.
+    """
     data = json.loads(json_parameters)
     for argument in app.config['default_args']:
         if argument not in data:
-            value = "Argument %s missing on the configuration file. Please, check the configuration template file." % argument
-            return json.loads({'success':False, 'value':value})
+            value = ("Argument %s missing on the configuration file. "
+                "Please, check the configuration template file." % argument)
+            return {'success':False, 'status':value}
     return {'success':True, 'value':"OK"}
 
 def validate_response_from_writer(writer_response):
-    val = {'success':True, 'value':writer_response['status']}
-    return val
+    if 'status' in writer_response:
+        return {'success':True, 
+                'status':writer_response['status']}
+    return {'success':False}
 
-@app.route('/start_pco_writer', methods=['GET', 'POST'])
+@app.route('/start_pco_writer', methods=['POST'])
 def start_pco_writer():
+    """
+    Starts the PCO writer process to start an acquisition.
+
+    The method will verify if the provided arguments are
+    matching the list of default arguments defined previously.
+    The parameters that will be provided to the PCO writer process
+    come via the POST request in the form of json.
+
+    Returns
+    -------
+    response : dict
+        A dictionary with the following keys: success and value.
+
+    """
     if request.method == 'POST':
         request_json = request.data.decode()
         data = json.loads(request_json)
-        response = {'success':True, 'value':"OK"}
+        is_ok = True
         for argument in app.config['default_args']:
             if argument not in data:
-                value = "Argument %s missing on the configuration file. Please, check the configuration template file." % argument
-                response = json.loads({'success':False, 'value':value})
-        if response["value"] == "OK":
+                value = ("Argument %s missing on the configuration file. "
+                    "Please, check the configuration template file." % argument)
+                is_ok = False
+        if is_ok:
             tomcat_args = [tomcat_pco_writer]
-            args= json.loads(request_json)
             for key in app.config['default_args']:
-                tomcat_args.append(args[key])
-            p = subprocess.Popen(tomcat_args,shell=False,stdin=None,stdout=None,stderr=None,close_fds=True)
+                tomcat_args.append(data[key])
+            p = subprocess.Popen(
+                tomcat_args,
+                shell=False,
+                stdin=None,
+                stdout=None,
+                stderr=None,
+                close_fds=True,
+                )
             # clear previous variables for the new execution
-            app.config['status_finished'] = 'unknown'
             app.config['previous_statistics'] = None
-    return response
+    return {'success':True}
 
-@app.route('/status', methods=['GET', 'POST'])
+@app.route('/status', methods=['GET'])
 def get_status():
+    """
+    Gets the status from the PCO writer process or from a previous
+    execution of it.
+
+    The method will return previous run status and statistics or request
+    a new status from the writer.
+
+    Returns
+    -------
+    response : dict
+        A dictionary with the following keys: success and value.
+
+    """
     # verify if previous run is finished
-    status_finished = app.config['status_finished']
-    previous_statistics = app.config['previous_statistics']
-    if status_finished == 'finished' and previous_statistics is not None:
-        return {'success':True, 'value':status_finished, 'n_written_frames': previous_statistics['n_written_frames'], 'n_lost_frames':previous_statistics['n_lost_frames'], 'end_time':previous_statistics['end_time'], 'start_time':previous_statistics['start_time'], 'duration_sec':previous_statistics['duration_sec']}
+    try:
+        if app.config['previous_statistics']['status'] == 'finished' and app.config['previous_statistics'] is not None:
+            get_finish_statistics = copy.deepcopy(previous_statistics)
+            get_finish_statistics['success'] =  True
+            return get_finish_statistics
+    except Exception as e:
+        pass
     # gets new status from writer
-    if request.method == 'GET':
-        request_url = endpoint+'/status'
-        try:
-            response = requests.get(request_url).json()
+    request_url = endpoint+'/status'
+    try:
+        response = requests.get(request_url).json()
+        if validate_response_from_writer(response):
             return validate_response_from_writer(response)
-        except Exception as e:
-            msg = 'unknown'
-            return {'success':True, 'value':msg}
+    except Exception as e:
+        return {'success':True, 'status':'unknown'}
+    return {'success':True, 'status':'unknown'}
 
 @app.route('/ack', methods=['GET'])
 def return_ack():
+    """
+    Method to simply check if the server is running.
+
+    Returns
+    -------
+    response : dict
+        A dictionary with the following keys: success.
+
+    """
     if request.method == 'GET':
         return {'success':True}
 
 @app.route('/finished', methods=['GET', 'POST'])
-def set_finished():
+def finished():
+    """
+    Method that saves/retrieves (GET/POST) previous acquisitions
+    statistics and status.
+
+    Returns
+    -------
+    response : dict
+        A dictionary that will have values depending on the method
+        used (GET/POST) and if it was sucessful.
+
+    """
     if request.method == 'POST':
         app.config['previous_statistics'] = request.json
-        app.config['status_finished'] = request.json['status']
         return {'success':True}
-    status_finished = app.config['status_finished']
-    previous_statistics = app.config['previous_statistics']
-    if app.config['previous_statistics'] is not None:
-        return {'success':True, 'value':status_finished, 'n_written_frames': previous_statistics['n_written_frames'], 'n_lost_frames':previous_statistics['n_lost_frames'], 'end_time':previous_statistics['end_time'], 'start_time':previous_statistics['start_time'], 'duration_sec':previous_statistics['duration_sec']}
-    return {'success':False, 'value':status_finished}
+    if request.method == 'GET':
+        status_finished = app.config['previous_statistics']['status']
+        previous_statistics = app.config['previous_statistics']
+        if app.config['previous_statistics'] is not None:
+            get_finish_statistics = copy.deepcopy(previous_statistics)
+            get_finish_statistics['success'] =  True
+            return get_finish_statistics
+        return {'success':False, 'status':'unknown'}
 
 # @app.route('/log', methods=['GET'])
 # def get_log():

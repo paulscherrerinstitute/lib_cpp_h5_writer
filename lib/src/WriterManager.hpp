@@ -83,13 +83,9 @@ class WriterManager
 
 
         // statistics methods
-        bool is_stats_queue_empty();
-        int get_queue_size();
-        std::string get_stats_from_queue();
         std::tuple<bool, std::string> get_stat_flag();
         std::string get_filter() const;
         void set_stat_flag(const bool new_mode, const std::string new_category);
-        void create_writer_stats_2queue(const std::string category);
         int get_user_id() const;
         size_t get_n_written_frames() const;
         size_t get_n_received_frames() const;
@@ -101,8 +97,6 @@ class WriterManager
         void set_time_start();
         std::string get_time_start() const;
         float get_duration() const;
-        void set_last_statistics_timestamp();
-        std::chrono::system_clock::time_point get_last_statistics_timestamp() const;
 };
 
 #endif
