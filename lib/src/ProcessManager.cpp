@@ -49,6 +49,20 @@ void ProcessManager::notify_pco_client_end(uint64_t written_frames, uint64_t los
 {
     std::string finished_url = "/finished";
     
+// {'end_time': 'Thu Jan  1 00:00:00 1970\n',
+//  'first_frame_id': 2290,
+//  'n_frames': 10,
+//  'n_lost_frames': 0,
+//  'n_received_frames': 3,
+//  'n_written_frames': 3,
+//  'receiving_rate': 0.0676776,
+//  'start_time': 'Tue Sep 29 10:42:44 2020\n',
+//  'status': 'finished',
+//  'success': 'True',
+//  'user_id': 0,
+//  'writing_rate': 0.0676776}
+
+
     string request_address(bsread_rest_address);
     async(launch::async, [written_frames, lost_frames, end_time, start_time, duration, finished_url, &request_address]{
         try {
@@ -58,7 +72,7 @@ void ProcessManager::notify_pco_client_end(uint64_t written_frames, uint64_t los
             root.put("n_lost_frames", lost_frames);
             root.put("end_time", end_time);
             root.put("start_time", start_time);
-            root.put("duration", duration);
+            root.put("duration_sec", std::ceil(duration * 100.0) / 100.0);
             root.put("status", "finished");
 
             std::stringstream ss;
@@ -141,7 +155,7 @@ void ProcessManager::run_writer()
 void ProcessManager::receive_zmq()
 {   
     receiver.connect();
-
+    writer_manager.set_time_start();
     while (writer_manager.is_running()) {
         auto frame = receiver.receive();
 
@@ -177,7 +191,6 @@ void ProcessManager::receive_zmq()
         // checks if ring buffer is initialized, if not, it defines the
         // statistics writer to send the start statistics
         if (!ring_buffer.is_initialized()){
-            writer_manager.set_time_start();
             writer_manager.create_writer_stats_2queue("start");
         }
         // Commit the frame to the buffer.
@@ -324,10 +337,6 @@ void ProcessManager::write_h5()
     // before killing it, sends the end statistics
     writer_manager.set_time_end();
     writer_manager.create_writer_stats_2queue("end");
-    // waits for all the statistics to be sent
-    while (!writer_manager.is_stats_queue_empty()){
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    }
     
 
     if (writer->is_file_open() && !writer->get_dataset_name_taken()) {
@@ -344,6 +353,7 @@ void ProcessManager::write_h5()
         writer->write_metadata_to_file(writer_manager.get_n_received_frames(), writer_manager.get_n_written_frames());
 
         write_h5_format(writer->get_h5_file());
+
         // submits the finished status to the server
         notify_pco_client_end(writer_manager.get_n_written_frames(), 
                               writer_manager.get_n_lost_frames(),
@@ -351,11 +361,16 @@ void ProcessManager::write_h5()
                               writer_manager.get_time_start(),
                               writer_manager.get_duration());
     }
+    // waits for all the statistics to be sent
+    while (!writer_manager.is_stats_queue_empty()){
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
     
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << "[" << std::chrono::system_clock::now() << "]";
         cout << "[ProcessManager::write] Closing file " << writer_manager.get_output_file() << endl;
+        // cout << writer_manager.get_n_written_frames() << writer_manager.get_n_lost_frames() << writer_manager.get_time_end() << writer_manager.get_time_start() <<  writer_manager.get_duration() << endl;
     #endif
 
     writer->close_file();

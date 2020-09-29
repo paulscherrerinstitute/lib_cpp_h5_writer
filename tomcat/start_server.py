@@ -22,7 +22,7 @@ app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['status_finished'] = 'unknown'
-app.config['last_run_json'] = None
+app.config['previous_statistics'] = None
 app.config['statistics'] = None
 app.config['default_args'] = ['connection_address', 'output_file', 'n_frames', 'user_id', 'dataset_name', 'max_frames_per_file']
 
@@ -64,16 +64,16 @@ def start_pco_writer():
             p = subprocess.Popen(tomcat_args,shell=False,stdin=None,stdout=None,stderr=None,close_fds=True)
             # clear previous variables for the new execution
             app.config['status_finished'] = 'unknown'
-            app.config['last_run_json'] = None
+            app.config['previous_statistics'] = None
     return response
 
 @app.route('/status', methods=['GET', 'POST'])
 def get_status():
     # verify if previous run is finished
     status_finished = app.config['status_finished']
-    last_run_json = app.config['last_run_json']
-    if status_finished == 'finished' and last_run_json is not None:
-        return {'success':True, 'value':status_finished, 'n_written_frames': last_run_json['written_frames'], 'n_lost_frames':last_run_json['n_lost_frames'], 'end_time':last_run_json['end_time'], 'start_time':last_run_json['start_time'], 'duration':last_run_json['duration']}
+    previous_statistics = app.config['previous_statistics']
+    if status_finished == 'finished' and previous_statistics is not None:
+        return {'success':True, 'value':status_finished, 'n_written_frames': previous_statistics['n_written_frames'], 'n_lost_frames':previous_statistics['n_lost_frames'], 'end_time':previous_statistics['end_time'], 'start_time':previous_statistics['start_time'], 'duration_sec':previous_statistics['duration_sec']}
     # gets new status from writer
     if request.method == 'GET':
         request_url = endpoint+'/status'
@@ -92,14 +92,30 @@ def return_ack():
 @app.route('/finished', methods=['GET', 'POST'])
 def set_finished():
     if request.method == 'POST':
-        app.config['last_run_json'] = request.json
+        app.config['previous_statistics'] = request.json
         app.config['status_finished'] = request.json['status']
         return {'success':True}
     status_finished = app.config['status_finished']
-    last_run_json = app.config['last_run_json']
-    if app.config['last_run_json'] is not None:
-        return {'success':True, 'value':status_finished, 'n_written_frames': last_run_json['n_written_frames'], 'n_lost_frames':last_run_json['n_lost_frames'], 'end_time':last_run_json['end_time'], 'start_time':last_run_json['start_time'], 'duration':last_run_json['duration']}
-    return {'success':True, 'value':status_finished}
+    previous_statistics = app.config['previous_statistics']
+    if app.config['previous_statistics'] is not None:
+        return {'success':True, 'value':status_finished, 'n_written_frames': previous_statistics['n_written_frames'], 'n_lost_frames':previous_statistics['n_lost_frames'], 'end_time':previous_statistics['end_time'], 'start_time':previous_statistics['start_time'], 'duration_sec':previous_statistics['duration_sec']}
+    return {'success':False, 'value':status_finished}
+
+# @app.route('/log', methods=['GET'])
+# def get_log():
+#     if request.method == 'GET':
+#         # systemctl status pco_writer_1 | tail -10
+#         result = subprocess.run(['systemctl', 'status', 'pco_writer_1', '|', 'tail', '-10'], stdout=subprocess.PIPE)
+#         log_str = result.stdout.decode('utf-8')
+#         return {'success':True, 'log':log_str}
+
+# @app.route('/uptime', methods=['GET'])
+# def get_uptime():
+#     if request.method == 'GET':
+#         # systemctl status pco_writer_1 | grep Active | awk '{ print $9 }'
+#         result = subprocess.run(['systemctl', 'status', 'pco_writer_1'], stdout=subprocess.PIPE)
+#         uptime = result.stdout.decode('utf-8')
+#         return {'success':True, 'uptime': uptime}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9901, debug=False, threaded=False, processes=1)

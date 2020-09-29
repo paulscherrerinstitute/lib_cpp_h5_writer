@@ -315,7 +315,7 @@ std::string WriterManager::get_time_start() const
 float WriterManager::get_duration() const
 {
     auto frame_time_difference = time_end - time_start;
-    auto time_diff_ms = std::chrono::duration<float, milli>(frame_time_difference).count();
+    auto time_diff_ms = std::chrono::duration<float, milli>(frame_time_difference).count() * 0.001;
     return time_diff_ms;
 }
 

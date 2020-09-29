@@ -61,14 +61,13 @@ void RestApi::start_rest_api(WriterManager& writer_manager, uint16_t port)
         result["status"] = writer_manager.get_status();
 
         auto frame_time_difference = std::chrono::system_clock::now() - writer_manager.get_time_start_point();
-        auto time_diff_ms = std::chrono::duration<float, milli>(frame_time_difference).count();
+        auto time_diff_s = std::chrono::duration<float, milli>(frame_time_difference).count();
         // received_rate = total number of received frames / elapsed time
-        auto receiving_rate = float(writer_manager.get_n_received_frames()) / time_diff_ms;
+        auto receiving_rate = float(writer_manager.get_n_received_frames()) / time_diff_s;
         // writing_rate = total number of written frames / elapsed time
-        auto writing_rate = float(writer_manager.get_n_written_frames()) / time_diff_ms;
+        auto writing_rate = float(writer_manager.get_n_written_frames()) / time_diff_s;
         result["receiving_rate"] = receiving_rate;
         result["writing_rate"] = writing_rate;
-        // result["processing_rate"] = processing_rate;
 
         result["success"] = "True";
         return result;
