@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#!/bin/env python
 """
 Server that controls the PCO writer and communicates with the PCO client.
 """
