@@ -36,8 +36,12 @@ __docformat__ = 'restructuredtext en'
 # path to writer's executable
 tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
 # writer's rest api address:port
-# endpoint = 'http://xbl-daq-32:9555'
-endpoint = 'http://localhost:9555'
+endpoint = 'http://xbl-daq-32:9555'
+debug = False
+# if not running on xbl-daq-32 -> DEBUG
+if os.uname()[1] != 'xbl-daq-32.psi.ch':
+    endpoint = 'http://localhost:9555'
+    debug = True
 
 
 app = Flask(__name__)
@@ -208,21 +212,28 @@ def finished():
             return get_finish_statistics
         return {'success':False, 'status':'unknown'}
 
-# @app.route('/log', methods=['GET'])
-# def get_log():
-#     if request.method == 'GET':
-#         # systemctl status pco_writer_1 | tail -10
-#         result = subprocess.run(['systemctl', 'status', 'pco_writer_1', '|', 'tail', '-10'], stdout=subprocess.PIPE)
-#         log_str = result.stdout.decode('utf-8')
-#         return {'success':True, 'log':log_str}
+@app.route('/server_status', methods=['GET'])
+def get_log():
+    if request.method == 'GET':
+        # Test with ssh service since pco_writer_1 is not running on debug machine
+        if debug:
+            outcome = '● pco_writer_1.service - pco_writer pco_writer_1\n   Loaded: loaded (/etc/systemd/system/pco_writer_1.service; static; vendor preset: disabled)\n   Active: active (running) since Fri 2020-09-25 16:04:06 CEST; 4 days ago\n Main PID: 33374 (bash)\n   CGroup: /system.slice/pco_writer_1.service\n           ├─33374 /bin/bash ./home/dbe/service_scripts/pco_writer_1_start.sh\n           └─33984 python /home/dbe/git/lib_cpp_h5_writer/tomcat/start_server.py\n\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:18 xbl-daq-32.psi.ch bash[33374]: 129.129.95.54 - - [25/Sep/2020 16:27:18] "POST /finished HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\n'
+            log = outcome.split("\n\n")[1]
+        else:
+            log = subprocess.run(['systemctl', 'status', 'pco_writer_1'], stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n\n')[1]
+        return {'success':True, 'log': log}
 
-# @app.route('/uptime', methods=['GET'])
-# def get_uptime():
-#     if request.method == 'GET':
-#         # systemctl status pco_writer_1 | grep Active | awk '{ print $9 }'
-#         result = subprocess.run(['systemctl', 'status', 'pco_writer_1'], stdout=subprocess.PIPE)
-#         uptime = result.stdout.decode('utf-8')
-#         return {'success':True, 'uptime': uptime}
+@app.route('/server_status', methods=['GET'])
+def get_uptime():
+    if request.method == 'GET':
+        # systemctl status pco_writer_1 | grep Active | awk '{ print $9 }'
+        # Test with ssh service since pco_writer_1 is not running on debug machine
+        if debug:
+            outcome = '● pco_writer_1.service - pco_writer pco_writer_1\n   Loaded: loaded (/etc/systemd/system/pco_writer_1.service; static; vendor preset: disabled)\n   Active: active (running) since Fri 2020-09-25 16:04:06 CEST; 4 days ago\n Main PID: 33374 (bash)\n   CGroup: /system.slice/pco_writer_1.service\n           ├─33374 /bin/bash ./home/dbe/service_scripts/pco_writer_1_start.sh\n           └─33984 python /home/dbe/git/lib_cpp_h5_writer/tomcat/start_server.py\n\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:18 xbl-daq-32.psi.ch bash[33374]: 129.129.95.54 - - [25/Sep/2020 16:27:18] "POST /finished HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\n'
+            uptime = outcome.split("Active: ")[1].split(";")[0]
+        else:
+            uptime = subprocess.run(['systemctl', 'status', 'pco_writer_1'], stdout=subprocess.PIPE).stdout.decode('utf-8').split("Active: ")[1].split(";")[0]
+        return {'success':True, 'uptime': uptime}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9901, debug=False, threaded=False, processes=1)
