@@ -212,8 +212,8 @@ def finished():
             return get_finish_statistics
         return {'success':False, 'status':'unknown'}
 
-@app.route('/server_status', methods=['GET'])
-def get_log():
+@app.route('/server_log', methods=['GET'])
+def get_server_log():
     if request.method == 'GET':
         # Test with ssh service since pco_writer_1 is not running on debug machine
         if debug:
@@ -223,8 +223,8 @@ def get_log():
             log = subprocess.run(['systemctl', 'status', 'pco_writer_1'], stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n\n')[1]
         return {'success':True, 'log': log}
 
-@app.route('/server_status', methods=['GET'])
-def get_uptime():
+@app.route('/server_uptime', methods=['GET'])
+def get_server_uptime():
     if request.method == 'GET':
         # systemctl status pco_writer_1 | grep Active | awk '{ print $9 }'
         # Test with ssh service since pco_writer_1 is not running on debug machine
