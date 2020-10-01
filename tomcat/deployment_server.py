@@ -1,4 +1,5 @@
 #!/bin/env python
 from waitress import serve
 import start_server
-serve(start_server.app, host='0.0.0.0', port=9901)
+from paste.translogger import TransLogger
+serve(TransLogger(start_server.app, setup_console_handler=False), port=9901)
