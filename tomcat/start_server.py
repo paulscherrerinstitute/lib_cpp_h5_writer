@@ -204,13 +204,15 @@ def finished():
         app.config['previous_statistics'] = request.json
         return {'success':True}
     if request.method == 'GET':
-        status_finished = app.config['previous_statistics']['status']
-        previous_statistics = app.config['previous_statistics']
-        if app.config['previous_statistics'] is not None:
-            get_finish_statistics = copy.deepcopy(previous_statistics)
-            get_finish_statistics['success'] =  True
-            return get_finish_statistics
-        return {'success':False, 'status':'unknown'}
+        try: 
+            status_finished = app.config['previous_statistics']['status']
+            previous_statistics = app.config['previous_statistics']
+            if app.config['previous_statistics'] is not None:
+                get_finish_statistics = copy.deepcopy(previous_statistics)
+                get_finish_statistics['success'] =  True
+                return get_finish_statistics
+        except Exception as e:
+            return {'success':False, 'status':'unknown'}
 
 @app.route('/server_log', methods=['GET'])
 def get_server_log():
