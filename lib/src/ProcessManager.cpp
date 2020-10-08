@@ -85,6 +85,38 @@ void ProcessManager::notify_pco_client_end(uint64_t written_frames, uint64_t los
     });
 }
 
+void ProcessManager::notify_pco_client_error(std::string error_msg) 
+{
+    std::string error_url = "/error";
+    time_t tt;
+    tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    auto error_time = ctime(&tt);
+    string request_address(bsread_rest_address);
+    async(launch::async, [error_msg, error_time, error_url, &request_address]{
+        try {
+            stringstream request;
+            pt::ptree root;
+            root.put("error", error_msg);
+            root.put("error_time", error_time);
+            root.put("status", "error");
+
+            std::stringstream ss;
+            boost::property_tree::json_parser::write_json(ss, root);
+            request << "curl --silent -X POST --header \"Content-Type: application/json\" -d '"<<ss.str() << "' " << request_address << error_url << " > /dev/null";
+
+            string request_call(request.str());
+
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << "[" << std::chrono::system_clock::now() << "]";
+                cout << "[ProcessManager::notify_pco_client_error] Sending error to pco client... " << endl;
+            #endif
+
+            system(request_call.c_str());
+        } catch (...){}
+    });
+}
+
 void ProcessManager::notify_last_pulse_id(uint64_t pulse_id) 
 {
     // Last pulse_id should be a sync operation - we do not want to terminate the process to quickly.
@@ -179,13 +211,6 @@ void ProcessManager::receive_zmq()
                 writer_manager.set_n_frames_offset(frame_metadata->frame_index);
             }
         }
-
-
-        // checks if ring buffer is initialized, if not, it defines the
-        // statistics writer to send the start statistics
-        // if (!ring_buffer.is_initialized()){
-            // writer_manager.create_writer_stats_2queue("start");
-        // }
         // Commit the frame to the buffer.
         ring_buffer.write(frame_metadata, frame_data);
 
@@ -215,6 +240,7 @@ void ProcessManager::write_h5()
             cout << "[" << std::chrono::system_clock::now() << "]";
             cout << "[ProcessManager::write_h5] Dataset name is taken, halting execution." << endl;
         #endif
+        notify_pco_client_error("Dataset name is taken. Please, reconfigure using a unique dataset name.");
         writer_manager.stop();
     }
 
@@ -395,5 +421,6 @@ void ProcessManager::write_h5_format(H5::H5File& file) {
         using namespace date;
         std::cout << "[" << std::chrono::system_clock::now() << "]";
         std::cout << "[ProcessManager::write_h5_format] Error while trying to write file format: "<< ex.what() << endl;
+        notify_pco_client_error("Error while trying to write file format.");
     }
 }

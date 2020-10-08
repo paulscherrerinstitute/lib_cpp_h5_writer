@@ -50,6 +50,7 @@ app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['previous_statistics'] = None
 app.config['statistics'] = None
+app.config['error'] = None
 app.config['default_args'] = [
     'connection_address',
     'output_file',
@@ -158,7 +159,7 @@ def get_status():
     # verify if previous run is finished
     try:
         if app.config['previous_statistics']['status'] == 'finished' and app.config['previous_statistics'] is not None:
-            get_finish_statistics = copy.deepcopy(previous_statistics)
+            get_finish_statistics = copy.deepcopy(app.config['previous_statistics'])
             get_finish_statistics['success'] =  True
             return get_finish_statistics
     except Exception as e:
@@ -170,7 +171,14 @@ def get_status():
         if validate_response_from_writer(response):
             return validate_response_from_writer(response)
     except Exception as e:
-        return {'success':True, 'status':'unknown'}
+        # if exception found -> check again for previous before returning unknown
+        try:
+            if app.config['previous_statistics']['status'] == 'finished' and app.config['previous_statistics'] is not None:
+                get_finish_statistics = copy.deepcopy(app.config['previous_statistics'])
+                get_finish_statistics['success'] =  True
+                return get_finish_statistics
+        except Exception as e:
+            return {'success':True, 'status':'unknown'}
     return {'success':True, 'status':'unknown'}
 
 @app.route('/ack', methods=['GET'])
@@ -213,6 +221,32 @@ def finished():
                 return get_finish_statistics
         except Exception as e:
             return {'success':False, 'status':'unknown'}
+
+@app.route('/error', methods=['GET', 'POST'])
+def error():
+    """
+    Method that saves/retrieves (GET/POST) writer's errors
+
+    Returns
+    -------
+    response : dict
+        A dictionary that will have values depending on the method
+        used (GET/POST) and if it was sucessful.
+
+    """
+    if request.method == 'POST':
+        app.config['error'] = request.json
+        return {'success':True}
+    if request.method == 'GET':
+        try:
+            error_content = app.config['error']
+            if app.config['error'] is not None:
+                get_error = copy.deepcopy(error_content)
+                get_error['success'] =  True
+                return get_error
+        except Exception as e:
+            return {'success':False, 'error':'unknown'}
+
 
 @app.route('/server_log', methods=['GET'])
 def get_server_log():

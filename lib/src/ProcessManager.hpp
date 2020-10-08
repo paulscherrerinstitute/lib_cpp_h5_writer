@@ -35,6 +35,7 @@ class ProcessManager
                                std::string output_file,
                                int user_id,
                                std::string dataset_name);
+    void notify_pco_client_error(std::string error_msg);
 
     public:
         ProcessManager(WriterManager& writer_manager, ZmqReceiver& receiver,

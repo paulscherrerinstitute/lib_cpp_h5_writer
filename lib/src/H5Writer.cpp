@@ -355,7 +355,6 @@ inline size_t H5Writer::get_relative_data_index(const size_t data_index)
 inline bool H5Writer::is_data_for_current_file(const size_t data_index)
 {
     if (frames_per_file) {
-
         hsize_t frame_chunk = (data_index / frames_per_file) + 1;
 
         // This frames does not go into this file.
