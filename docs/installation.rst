@@ -20,8 +20,8 @@ Tomcat's pco writer controller is hosted on the psi conda channel and is install
     $ conda install -c paulscherrerinstitute pco_rclient
 
 For more information/details about the pco_rclient, please check:
-    * pco_rclient `repository`_
-    * pco_rclient `conda package`_
+    * pco_rclient code `repository`_
+    * pco_rclient conda package `conda package`_
 
 .. note::
    pco_rclient needs to have access to xbl-daq-32 (where the flask server and the writer run).
@@ -41,13 +41,25 @@ For more information/details about the pco_rclient, please check:
 Deployment information
 ----------------------
 
-It is run using a systemd service (/etc/systemd/system/pco_writer_1.service).
+As sudo user on XBL-DAQ-32, one can run using a systemd service (```/etc/systemd/system/pco_writer_1.service```).
 
-The services invokes the startup file, located in /home/dbe/service_scripts/.
+The services invokes the startup file, located in ```/home/dbe/service_scripts/```.
 
 The service can be controlled with the following commands (using sudo or root):
 
-    * systemctl start pco_writer_1 (start the flask server)
-    * systemctl stop pco_writer_1 (stop the flask server)
-    * journalctl -u pco_writer_1 -f (check the flask logs)
-    * systemctl is-active --quiet pco_writer_1  && echo PCO flask server is running || echo Pco flask server is not running (check if flask server is runnign)
+    * ```systemctl start pco_writer_1```: start the flask serve;
+    * ```systemctl stop pco_writer_1```: stop the flask server;
+    * ```journalctl -u pco_writer_1 -f``` : check the flask logs;
+    * ```systemctl is-active --quiet pco_writer_1  && echo PCO flask server is running || echo Pco flask server is not running``` : check if flask server is runnign;
+
+Ansible Deployment
+------------------
+
+Useful:
+    * Template `pco_writer_setup`_ 
+    * Template `pco_writer_start`_ 
+    * Conda environment `pco_writer`_
+
+.. `pco_writer_setup`_ : https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/pco_writer_setup.sh
+.. `pco_writer_start`_ : https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/pco_writer_start.sh
+.. `pco_writer`_ : https://git.psi.ch/hpdi_configs/sls/blob/master/hosts/xbl-daq-32/conda_env.yml

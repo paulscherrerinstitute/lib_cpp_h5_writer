@@ -2,4 +2,11 @@
 Contact
 #######
 
-For questions, suggestions or contributions contact leonardo.hax@psi.ch or andrej.babic@psi.ch.
+Contributors
+------------
+
+* Andrej Babic
+* Christian Schlepuetz
+* Federica Marone
+* Leonardo Hax Damiani
+* Leonardo Sala
