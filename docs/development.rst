@@ -17,6 +17,5 @@ For the PCO_RCLIENT project:
 
     $ git clone https://github.com/paulscherrerinstitute/pco_rclient.git
     $ git fetch 
-    $ git checkout tomcat
     $ git pull
     $ git checkout -b <new_branch>

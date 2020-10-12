@@ -37,7 +37,6 @@ For more information/details about the pco_rclient, please check:
 .. _repository : https://github.com/paulscherrerinstitute/pco_rclient
 .. _conda package : https://anaconda.org/paulscherrerinstitute/pco_rclient
 
-
 Deployment information
 ----------------------
 
