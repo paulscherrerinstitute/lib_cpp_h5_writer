@@ -59,6 +59,6 @@ Useful:
     * Template `pco_writer_start`_ 
     * Conda environment `pco_writer`_
 
-.. `pco_writer_setup`_ : https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/pco_writer_setup.sh
-.. `pco_writer_start`_ : https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/pco_writer_start.sh
-.. `pco_writer`_ : https://git.psi.ch/hpdi_configs/sls/blob/master/hosts/xbl-daq-32/conda_env.yml
+.. _pco_writer_setup : https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/pco_writer_setup.sh
+.. _pco_writer_start : https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/pco_writer_start.sh
+.. _pco_writer : https://git.psi.ch/hpdi_configs/sls/blob/master/hosts/xbl-daq-32/conda_env.yml
