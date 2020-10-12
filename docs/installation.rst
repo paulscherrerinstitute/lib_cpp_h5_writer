@@ -51,14 +51,3 @@ The service can be controlled with the following commands (using sudo or root):
     * ```journalctl -u pco_writer_1 -f``` : check the flask logs;
     * ```systemctl is-active --quiet pco_writer_1  && echo PCO flask server is running || echo Pco flask server is not running``` : check if flask server is runnign;
 
-Ansible Deployment
-------------------
-
-Useful:
-    * Template `pco_writer_setup`_ 
-    * Template `pco_writer_start`_ 
-    * Conda environment `pco_writer`_
-
-.. _pco_writer_setup : https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/pco_writer_setup.sh
-.. _pco_writer_start : https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/pco_writer_start.sh
-.. _pco_writer : https://git.psi.ch/hpdi_configs/sls/blob/master/hosts/xbl-daq-32/conda_env.yml
