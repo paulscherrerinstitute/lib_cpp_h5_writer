@@ -179,7 +179,7 @@ remain in the temporary datasets and the user will need to fix the file manually
 <a id="process_manager"></a>
 ## ProcessManager
 
-Not yet here :(
+Process Manager 
 
 <a id="zmq_receiver"></a>
 ## ZmqReceiver
@@ -241,15 +241,6 @@ The H5Format is the base class you need to extend to implement your file format.
 - dataset\_move\_mapping (Move datasets to another place in the file if needed)
 - file_format (The hierarchical structure of your H5 format)
 
-We will discuss each one in details in this chapter.
-
-### input\_value\_type
-
-Not yet here :(
-
-### default\_values
-
-Not yet here :(
 
 ### dataset\_move\_mapping
 
@@ -266,22 +257,6 @@ endianess : "measurement/acquisition/"+dataset_name+"/endianess"
 
 ⋅⋅⋅ This is defined on TomcatFormat.cpp.⋅⋅
 
-
-### file\_format
-
-Not yet here :(
-
-<a id="writer_manager"></a>
-## WriterManager
-
-Not yet here :(
-
-<a id="RingBuffer"></a>
-## RingBuffer
-
-Not yet here :(
-
-<a id="rest_interface"></a>
 # REST interface
 
 The REST interface will start and be available while the writer is running on the port given as parameter when initializing the writer. The table below shows the currently available endpoints:
@@ -333,26 +308,6 @@ pco_controller.wait_writer()
 pco_controller.stop_writer(VERBOSE)
 ```
 
-### PCO_RCLIENT
-
-```
-    usage: pco_rclient [-h] {start,stop,kill,status} ...
-
-    Rest api pco writer
-
-    optional arguments:
-      -h, --help            show this help message and exit
-
-    command:
-      valid commands
-
-      {start,stop,kill,status}
-                            commands
-        start               start the writer
-        stop                stop the writer
-        kill                kill the writer
-        status              Retrieve the status of the writer
-```
 
 <a id="examples"></a>
 # Examples
