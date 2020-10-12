@@ -38,15 +38,17 @@ Useful links / badges
 
 H5 Writer:
 |codefactor| |docker_build| |release| |release_date| |languages|
-- `lib_cpp_h5_writer repo <https://github.com/paulscherrerinstitute/lib_cpp_h5_writer/tree/tomcat>`_
-- `Ansible playbook <https://git.psi.ch/HPDI/daq_server_deployment/tree/master/ansible>`_
-- `Code factor lib_cpp_h5_writer <https://www.codefactor.io/repository/github/paulscherrerinstitute/lib_cpp_h5_writer>`_
-- `Docker hub image <https://hub.docker.com/repository/docker/lhdamiani/tomcat_writer>`_
+|
+|- `lib_cpp_h5_writer repo <https://github.com/paulscherrerinstitute/lib_cpp_h5_writer/tree/tomcat>`_
+|- `Ansible playbook <https://git.psi.ch/HPDI/daq_server_deployment/tree/master/ansible>`_
+|- `Code factor lib_cpp_h5_writer <https://www.codefactor.io/repository/github/paulscherrerinstitute/lib_cpp_h5_writer>`_
+|- `Docker hub image <https://hub.docker.com/repository/docker/lhdamiani/tomcat_writer>`_
 
 H5 Writer Client:
+|
 |codefactor_client| |release_client| |release_date_client| |languages_client|
-- `pco_rclient repo <https://anaconda.org/paulscherrerinstitute/pco_rclient>`_
-- `Conda pco_rclient package <https://anaconda.org/paulscherrerinstitute/pco_rclient>`_
+|- `pco_rclient repo <https://anaconda.org/paulscherrerinstitute/pco_rclient>`_
+|- `Conda pco_rclient package <https://anaconda.org/paulscherrerinstitute/pco_rclient>`_
 
 
 

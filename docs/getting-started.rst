@@ -24,15 +24,6 @@ Basic example:
     pco_controller.get_status()
 
 
-
-.. note::
-    If the output file exists, data will be appended to it:
-        * Make sure to change the **dataset_name** variable. If a dataset with the same name already exists on the output file, the writer will exit. 
-        * Append to files at your own risk, if by any reason the second acquisition fails, the output file will be corrupted and the previously existing data will not be accessible any more.
-    If the **n_frames** is 0, the writer will not stop until the client command is issued.
-    If you don't know what the parameters means, we recommend to not change it.
-
-
 TOMCAT PCO writer Rest API
 ------------------------------------
 
