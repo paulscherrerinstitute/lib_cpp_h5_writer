@@ -2,6 +2,162 @@
 Usage
 #####
 
+
+Basic walkthrough an acquisition script. Start by importing what you'll need:
+
+.. code-block:: python
+   :linenos:
+
+    #!/bin/env python
+    # -*- coding: UTF-8 -*-
+
+    """
+    POC Camera writer test script template 
+
+    Description:
+    Instantiates a PcoWriter object, configures, and receives 20 frames.
+
+    """
+    from epics import caput, caget
+    import sys
+    import time
+    import getpass
+    from datetime import datetime
+    import os
+    import inspect
+    from pco_rclient import PcoWriter
+
+    def get_datetime_now():
+        return datetime.now().strftime("%H%M%S")
+
+
+Define some camera manipulation routines:
+
+.. code-block:: python
+   :linenos:
+
+   ##########################################
+    #### CAMERA CONFIGURATION AND METHODS ####
+    ##########################################
+
+    # IOC COMMANDS
+    COMMANDS = {
+        "CAMERA":       ":CAMERA",
+        "FILEFORMAT":   ":FILEFORMAT",
+        "RECMODE":      ":RECMODE",
+        "STOREMODE":    ":STOREMODE",
+        "CLEARMEM":     ":CLEARMEM",
+        "SET_PARAM":    ":SET_PARAM",
+        "SAVESTOP":     ":SAVESTOP",
+        "FTRANSFER":    ":FTRANSFER"
+    }
+    # combines the IOCNAME:CMD for a epics command (caput/caget)
+    def get_caput_cmd(ioc_name, command):
+        return str(ioc_name+command)
+    # starts the camera transfer
+    def start_cam_transfer(n_frames):
+        caput(get_caput_cmd(ioc_name, COMMANDS["SAVESTOP"]), n_frames) # Sets the number of frames to transfer
+        caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 1) # Starts the camera
+        time.sleep(1)
+        caput(get_caput_cmd(ioc_name, COMMANDS["FTRANSFER"]), 1) # Starts the transfer
+    # stops the camera transfer
+    def stop_cam_transfer():
+        caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 0) # Stops the camera
+    # configures the camera
+    def config_cam_transfer():
+        caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 0)
+        caput(get_caput_cmd(ioc_name, COMMANDS["FILEFORMAT"]), 2)
+        caput(get_caput_cmd(ioc_name, COMMANDS["RECMODE"]), 0)
+        caput(get_caput_cmd(ioc_name, COMMANDS["STOREMODE"]), 1)
+        caput(get_caput_cmd(ioc_name, COMMANDS["CLEARMEM"]), 1)
+        caput(get_caput_cmd(ioc_name, COMMANDS["SET_PARAM"]), 1)
+
+
+Define user's variables as nframes, user_id, ioc_name, output path and prepare camera (using ``config_cam_transfer`` method):
+
+.. code-block:: python
+   :linenos:
+
+    ###############################
+    #### SCRIPT USER VARIABLES ####
+    ###############################
+    # number of frames
+    nframes = 20
+    # defines the current time for the uniqueness of the output file
+    output_str = get_datetime_now()
+
+    # user id
+    user_id = int(getpass.getuser()[1:])
+
+    # IOC's name
+    ioc_name = 'X02DA-CCDCAM2'
+    #ioc_name = 'X02DA-CCDCAM3'
+
+    # Output file path
+    outpath = "/sls/X02DA/data/e{}/Data10/pco_test/".format(user_id)
+
+    if not os.path.isdir(outpath):
+        os.makedirs(outpath)
+
+    # configure the camera
+    config_cam_transfer()
+
+
+Define the PcoWriter object, called ``pco_controller``:
+
+.. code-block:: python
+   :linenos:
+
+    ###########################
+    #### PCO CLIENT OBJECT ####
+    ###########################
+    pco_controller = PcoWriter(connection_address="tcp://129.129.99.104:8080", 
+                            user_id=user_id)
+    # if there's something running, it will stop 
+    if pco_controller.is_running():
+        pco_controller.stop()
+
+Configures the writer:
+
+.. code-block:: python
+   :linenos:
+
+    conf_dict = pco_controller.configure(output_file=os.path.join(
+        outpath, 'test'+output_str+'.h5'),user_id=user_id,
+        dataset_name="data", n_frames=nframes)
+
+
+Starts the acquisition:
+
+.. code-block:: python
+   :linenos:
+
+    # start
+    pco_controller.start()
+
+
+Starts the stream from the camera and waits for the frames:
+
+.. code-block:: python
+   :linenos:
+
+    # start nframes transfer via EPICS IOC CAPUT
+    start_cam_transfer(nframes)
+    # wait for nframes
+    print('pco_controller.wait...')
+    pco_controller.wait()
+    # Stop the camera transfer via EPICS IOC CAPUT
+    stop_cam_transfer()
+
+Shows the statistics from the acquisition:
+
+.. code-block:: python
+   :linenos:
+
+    print(pco_controller.get_statistics_last_run())
+
+Below you find an enhanced version with the full script that performs an acquisition using the PCO camera at TOMCAT. 
+
 TOMCAT PCO Writer client usage
 ------------------------------
 

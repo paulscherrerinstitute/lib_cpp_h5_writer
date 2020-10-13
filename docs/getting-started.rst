@@ -21,30 +21,30 @@ Basic example:
     pco_controller = PcoWriter(connection_address=<CAMERA_ADDRESS>, user_id=<USER_ID>)
     pco_controller.get_status()
 
-.. list-table:: Writer parameters
-   :widths: 25 25
-   :header-rows: 1
 
-   * - Name
-     - Description
-   * - output_file
-     - Output file name.
-   * - dataset_name  
-     - Dataset name (data, data_black, data_white)
-   * - n_frames
-     - Total number of frames expected.
-   * - connection_address
-     - Address of the camera server, where the incoming ZMQ stream is generated (tcp://129.129.99.104:8080)
-   * - flask_api_address
-     - Address of the flask server (http://xbl-daq-32:9901)
-   * - writer_api_address
-     - Address of the writer (http://xbl-daq-32:9555)
-   * - user_id
-     - User id
-   * - max_frames_per_file
-     - Defines the max frames on each file (h5 output with multiple chunked files)
-   * - debug
-     - Runs the client with the pre-defined local debug configuration.
+
++---------------------------+-----------------------------------------------------+
+| Writer parameter          | Description                                         |
++===========================+=====================================================+
+| output_file               | Output file name                                    |
++---------------------------+-----------------------------------------------------+
+| dataset_name              | Dataset name (data, data_black, data_white)         |
++---------------------------+-----------------------------------------------------+
+| n_frames                  | Total number of frames expected                     |
++---------------------------+-----------------------------------------------------+
+| connection_address        | Camera server address (incoming ZMQ stream)         |
++---------------------------+-----------------------------------------------------+
+| flask_api_address         | Flask server's address (http://xbl-daq-32:9901)     |
++---------------------------+-----------------------------------------------------+
+| writer_api_address        | Writer REST api address (http://xbl-daq-32:9555)    |
++---------------------------+-----------------------------------------------------+
+| user_id                   | User id                                             |
++---------------------------+-----------------------------------------------------+
+| max_frames_per_file       | Defines the max frames on each h5 file              |
++---------------------------+-----------------------------------------------------+
+| debug                     | Runs the client in debug mode                       |
++---------------------------+-----------------------------------------------------+
+
 
 TOMCAT PCO Cameras servers / IOC's name
 ---------------------------------------
