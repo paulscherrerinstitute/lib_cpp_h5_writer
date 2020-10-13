@@ -50,3 +50,16 @@ The service can be controlled with the following commands (using sudo or root):
         * Flask server status: ``systemctl status pco_writer_1``
     * Flask log: ``journalctl -u pco_writer_1 -f``
 
+
+.. note::
+    Accessing statuses of the python flask service can be also acquired via its REST api interface:
+
+    .. code-block:: bash
+        
+        $ curl -X GET http://xbl-daq-32:9901/<endpoint>
+
+    
+.. note::
+   journalctl allows  the usage of, for example: **--since "1 hour ago"** to apply filters on the output file. For more instructions check `journalct guide`_.
+
+.. _journalct guide:  https://www.loggly.com/ultimate-guide/using-journalctl/

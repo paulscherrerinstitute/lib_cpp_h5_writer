@@ -21,20 +21,19 @@ Basic example:
     pco_controller = PcoWriter(connection_address=<CAMERA_ADDRESS>, user_id=<USER_ID>)
     pco_controller.get_status()
 
+Writer parameters:
 
-TOMCAT PCO writer Rest API
-------------------------------------
-
-The direct calls to the REST Api will be shown with cURL.
-
-.. code-block:: python
-
-    # Get writer status
-    curl -X GET http://xbl-daq-32:9555/status
-
-    # Get server status
-    curl -X GET http://xbl-daq-32:9901/status
-
+| Name  |  Description  |
+|---|---|
+| output_file  | Output file name.  |
+| dataset_name  | Dataset name (data, data_black, data_white)  |
+| n_frames  | Total number of frames expected.  |
+| connection_address  | Address of the camera server, where the incoming ZMQ stream is generated (tcp://129.129.99.104:8080)   |
+| flask_api_address  | Address of the flask server (http://xbl-daq-32:9901)  |
+| writer_api_address  | Address of the writer (http://xbl-daq-32:9555)  |
+| user_id  | User id  |
+| max_frames_per_file  | Defines the max frames on each file (h5 output with multiple chunked files)  |
+| debug  | Runs the client with the pre-defined local debug configuration.  |
 
 TOMCAT PCO Cameras servers / IOC's name
 ---------------------------------------
@@ -42,7 +41,7 @@ TOMCAT PCO Cameras servers / IOC's name
 There are currently two servers installed with PCO cameras: PCO-3 and PCO-4.
 
     * ``tcp://129.129.99.104:8080`` : the 1G copper link on x02da-pco-4 (last updated: 2020-09-31)
-    * DEBUG: ``tcp://pc9808:9999`` : Debug pco camera.
+    * ``tcp://pc9808:9999`` : Debug pco camera.
 
 IOC's name:
     * X02DA-CCDCAM2

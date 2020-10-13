@@ -17,10 +17,11 @@ Useful info
 | tcp://pc9808:9999 | DEBUG PCO Camera |
 +------------+------------+
 
-
 Contribute and create a merge request
 -------------------------------------
-You can create a new branch to implemenet new features for the tomcat pco writer by doing ::
+You can create a new branch to implemenet new features for the tomcat pco writer by doing
+
+.. code-block:: bash
 
     $ git clone https://github.com/paulscherrerinstitute/lib_cpp_h5_writer.git
     $ git fetch 
@@ -29,6 +30,8 @@ You can create a new branch to implemenet new features for the tomcat pco writer
     $ git checkout -b <new_branch>
 
 For the PCO_RCLIENT project: 
+
+.. code-block:: bash
 
     $ git clone https://github.com/paulscherrerinstitute/pco_rclient.git
     $ git fetch 
