@@ -101,5 +101,7 @@ Contents:
     installation
     getting-started
     usage
+    modules
+    pco_rclient
     development
     contact
