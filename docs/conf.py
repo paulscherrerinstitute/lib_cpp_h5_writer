@@ -3,8 +3,9 @@
 import sys, os
 
 sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../../pco_rclient/pco_rclient/'))
 
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo',
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo', 'sphinx.ext.napoleon',
               'sphinx.ext.coverage', 'sphinx.ext.ifconfig']
 
 todo_include_todos = True
