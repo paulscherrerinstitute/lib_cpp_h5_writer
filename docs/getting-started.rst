@@ -17,10 +17,8 @@ The pco writer client was developed with the intention to allow a fluid manipula
 Basic example:
 
 .. code-block:: python
-   :linenos:
 
-    pco_controller = PcoWriter(connection_address="tcp://129.129.99.104:8080", 
-                            user_id=user_id)
+    pco_controller = PcoWriter(connection_address=<CAMERA_ADDRESS>, user_id=<USER_ID>)
     pco_controller.get_status()
 
 
@@ -43,9 +41,8 @@ TOMCAT PCO Cameras servers / IOC's name
 
 There are currently two servers installed with PCO cameras: PCO-3 and PCO-4.
 
-    * ```tcp://129.129.99.104:8080``` : the 1G copper link on x02da-pco-4 (last updated: 2020-09-31)
-    * //TODO PUT the complete/official tcp addresses here
-    * DEBUG: ```tcp://pc9808:9999``` : Debug pco camera.
+    * ``tcp://129.129.99.104:8080`` : the 1G copper link on x02da-pco-4 (last updated: 2020-09-31)
+    * DEBUG: ``tcp://pc9808:9999`` : Debug pco camera.
 
 IOC's name:
     * X02DA-CCDCAM2
