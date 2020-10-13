@@ -56,13 +56,16 @@ Define some camera manipulation routines:
         return str(ioc_name+command)
     # starts the camera transfer
     def start_cam_transfer(n_frames):
-        caput(get_caput_cmd(ioc_name, COMMANDS["SAVESTOP"]), n_frames) # Sets the number of frames to transfer
-        caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 1) # Starts the camera
+        # Sets the number of frames to transfer
+        caput(get_caput_cmd(ioc_name, COMMANDS["SAVESTOP"]), n_frames) 
+        # Starts the camera
+        caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 1) 
         time.sleep(1)
-        caput(get_caput_cmd(ioc_name, COMMANDS["FTRANSFER"]), 1) # Starts the transfer
+        # Starts the transfer
+        caput(get_caput_cmd(ioc_name, COMMANDS["FTRANSFER"]), 1) 
     # stops the camera transfer
     def stop_cam_transfer():
-        caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 0) # Stops the camera
+        caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 0) 
     # configures the camera
     def config_cam_transfer():
         caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 0)
@@ -208,12 +211,14 @@ TOMCAT PCO Writer client usage
     def start_cam_transfer(n_frames):
         # Sets the number of frames to transfer
         caput(get_caput_cmd(ioc_name, COMMANDS["SAVESTOP"]), n_frames) 
-        caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 1) # Starts the camera
+        # Starts the camera
+        caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 1)
         time.sleep(1)
-        caput(get_caput_cmd(ioc_name, COMMANDS["FTRANSFER"]), 1) # Starts the transfer
+        # Starts the transfer
+        caput(get_caput_cmd(ioc_name, COMMANDS["FTRANSFER"]), 1) 
     # stops the camera transfer
     def stop_cam_transfer():
-        caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 0) # Stops the camera
+        caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 0) 
     # configures the camera
     def config_cam_transfer():
         caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 0)
