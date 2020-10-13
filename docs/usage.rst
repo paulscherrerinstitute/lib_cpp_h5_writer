@@ -206,7 +206,8 @@ TOMCAT PCO Writer client usage
         return str(ioc_name+command)
     # starts the camera transfer
     def start_cam_transfer(n_frames):
-        caput(get_caput_cmd(ioc_name, COMMANDS["SAVESTOP"]), n_frames) # Sets the number of frames to transfer
+        # Sets the number of frames to transfer
+        caput(get_caput_cmd(ioc_name, COMMANDS["SAVESTOP"]), n_frames) 
         caput(get_caput_cmd(ioc_name, COMMANDS["CAMERA"]), 1) # Starts the camera
         time.sleep(1)
         caput(get_caput_cmd(ioc_name, COMMANDS["FTRANSFER"]), 1) # Starts the transfer
@@ -330,7 +331,12 @@ TOMCAT PCO Writer client usage
 
     print("pco_controller.get_statistics_last_run()... (after start/stop)", end="")
     statistics_dict = pco_controller.get_statistics_last_run()
-    statistics_ref = {'first_frame_id': '2466', 'user_id': '0', 'n_written_frames': '20', 'n_lost_frames': '0', 'end_time': 'Fri Oct  2 16:38:09 2020\n', 'start_time': 'Fri Oct  2 16:34:51 2020\n', 'n_frames': '20', 'dataset_name': 'data', 'duration_sec': '198.19', 'writing_rate': '0.10091326504869065', 'output_file': '/home/hax_l/software/lib_cpp_h5_writer/tomcat/output/test163451.h5', 'status': 'finished', 'success': True}
+    statistics_ref = {'first_frame_id': '2466', 'user_id': '0', 'n_written_frames': '20', 
+        'n_lost_frames': '0', 'end_time': 'Fri Oct  2 16:38:09 2020\n', 
+        'start_time': 'Fri Oct  2 16:34:51 2020\n', 'n_frames': '20', 
+        'dataset_name': 'data', 'duration_sec': '198.19', 'writing_rate': '0.10091326504869065',
+         'output_file': '/home/hax_l/software/lib_cpp_h5_writer/tomcat/output/test163451.h5', 
+         'status': 'finished', 'success': True}
     if statistics_dict['success'] == False and statistics_dict['status'] is 'unknown':
         problems += 1
         ok_flag=False
