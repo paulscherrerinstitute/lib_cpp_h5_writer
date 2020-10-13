@@ -14,7 +14,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 exclude_patterns = []
 add_function_parentheses = True
-#add_module_names = True
+add_module_names = True
+pygments_style = 'sphinx'
+
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
