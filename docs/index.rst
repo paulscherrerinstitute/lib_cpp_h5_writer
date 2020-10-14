@@ -32,6 +32,11 @@ It is developed using c++ on an open-source project (`github repository`_) and d
 .. _github repository : https://github.com/paulscherrerinstitute/lib_cpp_h5_writer/tree/tomcat/
 .. _conda_client : https://anaconda.org/paulscherrerinstitute/pco_rclient
 
+Architecture Diagram
+--------------------
+.. image:: https://github.com/paulscherrerinstitute/lib_cpp_h5_writer/raw/tomcat/docs/pco_diagram.jpg
+  :width: 500
+  :alt: Architecture Diagram
 
 Useful links / badges
 ---------------------
