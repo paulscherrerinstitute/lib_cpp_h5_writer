@@ -35,7 +35,7 @@ It is developed using c++ on an open-source project (`github repository`_) and d
 Architecture Diagram
 --------------------
 .. image:: https://github.com/paulscherrerinstitute/lib_cpp_h5_writer/raw/tomcat/docs/pco_diagram.jpg
-  :width: 500
+  :width: 100%
   :alt: Architecture Diagram
 
 Useful links / badges
