@@ -14,6 +14,7 @@ Key features:
 
 # Table of content
 1. [Quick start using the library](#quick_start)
+1.1. [Diagram](#diagram)
 2. [Build](#build)
     1. [Conda build](#conda_build)
     2. [Local build](#local_build)
@@ -49,6 +50,10 @@ The minimum you need to implement your own writer is:
 - Build file (example: csaxs/Makefile)
 
 For extra documentation, template, usage: [read the docs documentation](https://lib-cpp-h5-writer.readthedocs.io/en/tomcat/index.html)
+<a id="diagram"></a>
+## Architecture diagram
+
+![architecture](https://github.com/paulscherrerinstitute/lib_cpp_h5_writer/raw/tomcat/docs/pco_diagram.jpg)
 
 ## Writer runner
 Example: **csaxs/csaxs\_h5\_writer.cpp**
