@@ -98,5 +98,6 @@ Contents:
     getting-started
     usage
     pco_rclient-api
+    server-api
     development
     contact
