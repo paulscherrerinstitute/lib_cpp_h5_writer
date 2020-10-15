@@ -97,6 +97,6 @@ Contents:
     installation
     getting-started
     usage
-    client-api
+    pco_rclient-api
     development
     contact
