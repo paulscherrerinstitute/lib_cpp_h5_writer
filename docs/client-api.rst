@@ -1,11 +1,15 @@
+
+
+PCO_RCLIENT REST API
+======================================
+
 .. automodule:: pco_rclient.pco_rclient.pco_client
     :members:
     :undoc-members:
     :show-inheritance:
 
 
-Example NumPy Style Python Docstrings
-======================================
-
-.. literalinclude:: pco_rclient.pco_rclient.pco_client.py
-   :language: python
+.. autoclass:: pco_rclient.pco_rclient.pco_rclient.PcoWriter
+    :members:
+    :undoc-members:
+    :show-inheritance:
