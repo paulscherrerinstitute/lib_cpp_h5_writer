@@ -62,84 +62,82 @@ app.config['default_args'] = [
 
 Session(app)
 
-def validate_response(server_response):
-    """
-    Method to validate the response from the server.
 
-    Returns
-    -------
-    bool : bool
-        True/False.
-    """
-    if not server_response['success']:
-        return False
-    print("\nPCO Writer trigger successfully submitted "
-            "to the server. Retrieving writer's status...\n")
-    return True
 
-def validate_start_parameters(json_parameters):
+@app.route('/error', methods=['GET', 'POST'])
+def error():
     """
-    Method to validate the start parameters from the client.
+    Method that saves/retrieves (GET/POST) writer's errors
 
     Returns
     -------
     response : dict
-        A dictionary with the following keys: success and value.
-    """
-    data = json.loads(json_parameters)
-    for argument in app.config['default_args']:
-        if argument not in data:
-            value = ("Argument %s missing on the configuration file. "
-                "Please, check the configuration template file." % argument)
-            return {'success':False, 'status':value}
-    return {'success':True, 'value':"OK"}
-
-def validate_response_from_writer(writer_response):
-    if 'status' in writer_response:
-        return {'success':True, 
-                'status':writer_response['status']}
-    return {'success':False}
-
-@app.route('/start_pco_writer', methods=['POST'])
-def start_pco_writer():
-    """
-    Starts the PCO writer process to start an acquisition.
-
-    The method will verify if the provided arguments are
-    matching the list of default arguments defined previously.
-    The parameters that will be provided to the PCO writer process
-    come via the POST request in the form of json.
-
-    Returns
-    -------
-    response : dict
-        A dictionary with the following keys: success and value.
+        An ack dict in case of POST and a dict with the error in case of GET.
 
     """
     if request.method == 'POST':
-        request_json = request.data.decode()
-        data = json.loads(request_json)
-        is_ok = True
-        for argument in app.config['default_args']:
-            if argument not in data:
-                value = ("Argument %s missing on the configuration file. "
-                    "Please, check the configuration template file." % argument)
-                is_ok = False
-        if is_ok:
-            tomcat_args = [tomcat_pco_writer]
-            for key in app.config['default_args']:
-                tomcat_args.append(data[key])
-            p = subprocess.Popen(
-                tomcat_args,
-                shell=False,
-                stdin=None,
-                stdout=None,
-                stderr=None,
-                close_fds=True,
-                )
-            # clear previous variables for the new execution
-            app.config['previous_statistics'] = None
-    return {'success':True}
+        app.config['error'] = request.json
+        return {'success':True}
+    if request.method == 'GET':
+        try:
+            error_content = app.config['error']
+            if app.config['error'] is not None:
+                get_error = copy.deepcopy(error_content)
+                get_error['success'] =  True
+                return get_error
+        except Exception as e:
+            return {'success':False, 'error':'unknown'}
+
+
+@app.route('/finished', methods=['GET', 'POST'])
+def finished():
+    """
+    Method that saves/retrieves (GET/POST) previous acquisitions
+    statistics and status.
+
+    Returns
+    -------
+    response : dict
+        A dictionary that will have values depending on the method
+        used (GET/POST) and if it was sucessful.
+
+    """
+    if request.method == 'POST':
+        app.config['previous_statistics'] = request.json
+        return {'success':True}
+    if request.method == 'GET':
+        try: 
+            status_finished = app.config['previous_statistics']['status']
+            previous_statistics = app.config['previous_statistics']
+            if app.config['previous_statistics'] is not None:
+                get_finish_statistics = copy.deepcopy(previous_statistics)
+                get_finish_statistics['success'] =  True
+                return get_finish_statistics
+        except Exception as e:
+            return {'success':False, 'status':'unknown'}
+
+@app.route('/server_log', methods=['GET'])
+def get_server_log():
+    if request.method == 'GET':
+        # Test with ssh service since pco_writer_1 is not running on debug machine
+        if debug:
+            outcome = '● pco_writer_1.service - pco_writer pco_writer_1\n   Loaded: loaded (/etc/systemd/system/pco_writer_1.service; static; vendor preset: disabled)\n   Active: active (running) since Fri 2020-09-25 16:04:06 CEST; 4 days ago\n Main PID: 33374 (bash)\n   CGroup: /system.slice/pco_writer_1.service\n           ├─33374 /bin/bash ./home/dbe/service_scripts/pco_writer_1_start.sh\n           └─33984 python /home/dbe/git/lib_cpp_h5_writer/tomcat/start_server.py\n\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:18 xbl-daq-32.psi.ch bash[33374]: 129.129.95.54 - - [25/Sep/2020 16:27:18] "POST /finished HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\n'
+            log = outcome.split("\n\n")[1]
+        else:
+            log = subprocess.run(['systemctl', 'status', 'pco_writer_1'], stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n\n')[1]
+        return {'success':True, 'log': log}
+
+@app.route('/server_uptime', methods=['GET'])
+def get_server_uptime():
+    if request.method == 'GET':
+        # systemctl status pco_writer_1 | grep Active | awk '{ print $9 }'
+        # Test with ssh service since pco_writer_1 is not running on debug machine
+        if debug:
+            outcome = '● pco_writer_1.service - pco_writer pco_writer_1\n   Loaded: loaded (/etc/systemd/system/pco_writer_1.service; static; vendor preset: disabled)\n   Active: active (running) since Fri 2020-09-25 16:04:06 CEST; 4 days ago\n Main PID: 33374 (bash)\n   CGroup: /system.slice/pco_writer_1.service\n           ├─33374 /bin/bash ./home/dbe/service_scripts/pco_writer_1_start.sh\n           └─33984 python /home/dbe/git/lib_cpp_h5_writer/tomcat/start_server.py\n\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:18 xbl-daq-32.psi.ch bash[33374]: 129.129.95.54 - - [25/Sep/2020 16:27:18] "POST /finished HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\n'
+            uptime = outcome.split("Active: ")[1].split(";")[0]
+        else:
+            uptime = subprocess.run(['systemctl', 'status', 'pco_writer_1'], stdout=subprocess.PIPE).stdout.decode('utf-8').split("Active: ")[1].split(";")[0]
+        return {'success':True, 'uptime': uptime}
 
 @app.route('/status', methods=['GET'])
 def get_status():
@@ -195,81 +193,85 @@ def return_ack():
     if request.method == 'GET':
         return {'success':True}
 
-@app.route('/finished', methods=['GET', 'POST'])
-def finished():
+
+@app.route('/start_pco_writer', methods=['POST'])
+def start_pco_writer():
     """
-    Method that saves/retrieves (GET/POST) previous acquisitions
-    statistics and status.
+    Starts the PCO writer process to start an acquisition.
+
+    The method will verify if the provided arguments are
+    matching the list of default arguments defined previously.
+    The parameters that will be provided to the PCO writer process
+    come via the POST request in the form of json.
 
     Returns
     -------
     response : dict
-        A dictionary that will have values depending on the method
-        used (GET/POST) and if it was sucessful.
+        A dictionary with the following keys: success and value.
 
     """
     if request.method == 'POST':
-        app.config['previous_statistics'] = request.json
-        return {'success':True}
-    if request.method == 'GET':
-        try: 
-            status_finished = app.config['previous_statistics']['status']
-            previous_statistics = app.config['previous_statistics']
-            if app.config['previous_statistics'] is not None:
-                get_finish_statistics = copy.deepcopy(previous_statistics)
-                get_finish_statistics['success'] =  True
-                return get_finish_statistics
-        except Exception as e:
-            return {'success':False, 'status':'unknown'}
+        request_json = request.data.decode()
+        data = json.loads(request_json)
+        is_ok = True
+        for argument in app.config['default_args']:
+            if argument not in data:
+                value = ("Argument %s missing on the configuration file. "
+                    "Please, check the configuration template file." % argument)
+                is_ok = False
+        if is_ok:
+            tomcat_args = [tomcat_pco_writer]
+            for key in app.config['default_args']:
+                tomcat_args.append(data[key])
+            p = subprocess.Popen(
+                tomcat_args,
+                shell=False,
+                stdin=None,
+                stdout=None,
+                stderr=None,
+                close_fds=True,
+                )
+            # clear previous variables for the new execution
+            app.config['previous_statistics'] = None
+    return {'success':True}
 
-@app.route('/error', methods=['GET', 'POST'])
-def error():
+def validate_response(server_response):
     """
-    Method that saves/retrieves (GET/POST) writer's errors
+    Method to validate the response from the server.
+
+    Returns
+    -------
+    bool : bool
+        True/False.
+    """
+    if not server_response['success']:
+        return False
+    print("\nPCO Writer trigger successfully submitted "
+            "to the server. Retrieving writer's status...\n")
+    return True
+
+def validate_start_parameters(json_parameters):
+    """
+    Method to validate the start parameters from the client.
 
     Returns
     -------
     response : dict
-        A dictionary that will have values depending on the method
-        used (GET/POST) and if it was sucessful.
-
+        A dictionary with the following keys: success and value.
     """
-    if request.method == 'POST':
-        app.config['error'] = request.json
-        return {'success':True}
-    if request.method == 'GET':
-        try:
-            error_content = app.config['error']
-            if app.config['error'] is not None:
-                get_error = copy.deepcopy(error_content)
-                get_error['success'] =  True
-                return get_error
-        except Exception as e:
-            return {'success':False, 'error':'unknown'}
+    data = json.loads(json_parameters)
+    for argument in app.config['default_args']:
+        if argument not in data:
+            value = ("Argument %s missing on the configuration file. "
+                "Please, check the configuration template file." % argument)
+            return {'success':False, 'status':value}
+    return {'success':True, 'value':"OK"}
 
-
-@app.route('/server_log', methods=['GET'])
-def get_server_log():
-    if request.method == 'GET':
-        # Test with ssh service since pco_writer_1 is not running on debug machine
-        if debug:
-            outcome = '● pco_writer_1.service - pco_writer pco_writer_1\n   Loaded: loaded (/etc/systemd/system/pco_writer_1.service; static; vendor preset: disabled)\n   Active: active (running) since Fri 2020-09-25 16:04:06 CEST; 4 days ago\n Main PID: 33374 (bash)\n   CGroup: /system.slice/pco_writer_1.service\n           ├─33374 /bin/bash ./home/dbe/service_scripts/pco_writer_1_start.sh\n           └─33984 python /home/dbe/git/lib_cpp_h5_writer/tomcat/start_server.py\n\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:18 xbl-daq-32.psi.ch bash[33374]: 129.129.95.54 - - [25/Sep/2020 16:27:18] "POST /finished HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\n'
-            log = outcome.split("\n\n")[1]
-        else:
-            log = subprocess.run(['systemctl', 'status', 'pco_writer_1'], stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n\n')[1]
-        return {'success':True, 'log': log}
-
-@app.route('/server_uptime', methods=['GET'])
-def get_server_uptime():
-    if request.method == 'GET':
-        # systemctl status pco_writer_1 | grep Active | awk '{ print $9 }'
-        # Test with ssh service since pco_writer_1 is not running on debug machine
-        if debug:
-            outcome = '● pco_writer_1.service - pco_writer pco_writer_1\n   Loaded: loaded (/etc/systemd/system/pco_writer_1.service; static; vendor preset: disabled)\n   Active: active (running) since Fri 2020-09-25 16:04:06 CEST; 4 days ago\n Main PID: 33374 (bash)\n   CGroup: /system.slice/pco_writer_1.service\n           ├─33374 /bin/bash ./home/dbe/service_scripts/pco_writer_1_start.sh\n           └─33984 python /home/dbe/git/lib_cpp_h5_writer/tomcat/start_server.py\n\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:26:49 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:26:49] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:18 xbl-daq-32.psi.ch bash[33374]: 129.129.95.54 - - [25/Sep/2020 16:27:18] "POST /finished HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:31 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:31] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\nSep 25 16:27:35 xbl-daq-32.psi.ch bash[33374]: 129.129.99.81 - - [25/Sep/2020 16:27:35] "GET /status HTTP/1.1" 200 -\n'
-            uptime = outcome.split("Active: ")[1].split(";")[0]
-        else:
-            uptime = subprocess.run(['systemctl', 'status', 'pco_writer_1'], stdout=subprocess.PIPE).stdout.decode('utf-8').split("Active: ")[1].split(";")[0]
-        return {'success':True, 'uptime': uptime}
+def validate_response_from_writer(writer_response):
+    if 'status' in writer_response:
+        return {'success':True, 
+                'status':writer_response['status']}
+    return {'success':False}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9901, debug=False, threaded=False, processes=1)
