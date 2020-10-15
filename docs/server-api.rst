@@ -1,7 +1,7 @@
 Server api
 ==========
 
-.. automodule:: tomcat.start_server
+.. automodule:: start_server
     :members:
     :undoc-members:
 

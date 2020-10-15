@@ -1,2 +1,3 @@
 pyzmq==18.1.0
 flask==1.1.2
+flask_session==0.3.2
