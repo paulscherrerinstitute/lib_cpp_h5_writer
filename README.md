@@ -282,35 +282,31 @@ curl -X GET http://<address:port>/<endpoint>
 ### PCO_CONTROLLER
 
 ## pco_controller via python script
-The pco_controller is meant for flexible usage and control of the pco writer from within python scripts. 
+The pco_controller is meant for flexible usage and control of the pco writer from within python scripts. Basic example of usage:
 ```python
-# Import the client.
-from pco_controller import PcoWriter
+###########################
+#### PCO CLIENT OBJECT ####
+###########################
+pco_controller = PcoWriter(connection_address="tcp://129.129.99.104:8080",
+                         user_id=user_id)
+# if there's something running, it will stop
+if pco_controller.is_running():
+     pco_controller.stop()
+pco_controller.configure(output_file=os.path.join(
+     outpath, 'test'+output_str+'.h5'),user_id=user_id,
+     dataset_name="data", n_frames=nframes)
+# start
+pco_controller.start()
+# start nframes transfer via EPICS IOC CAPUT
+start_cam_transfer(nframes)
+# wait for nframes
+print('pco_controller.wait...')
+pco_controller.wait()
+# Stop the camera transfer via EPICS IOC CAPUT
+stop_cam_transfer()
+# statistics
+print(pco_controller.get_statistics())
 
-# Connects to the PcoWriter controller
-pco_controller = PcoWriter(output_file='/tmp/output.h5', 
-    dataset_name='data', 
-    connection_address="https://129.129.95.47:8080", 
-    n_frames=5, 
-    user_id=503)
-# gets status
-pco_controller.get_status()
-# updates configuration
-pco_controller.set_configuration(output_file='/tmp/output_new.h5', 
-    dataset_name='data_black', 
-    connection_address="https://129.129.95.47:8080", 
-    n_frames=10,
-    user_id=503)
-# gets the configuration
-pco_controller.get_configuration()
-# starts the writer
-pco_controller.start_writer()
-# gets statistics
-pco_controller.get_statistics()
-# wait the writer
-pco_controller.wait_writer()
-# stop the writer
-pco_controller.stop_writer(VERBOSE)
 ```
 
 
