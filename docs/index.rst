@@ -1,5 +1,5 @@
 Welcome to TOMCAT PCO writer documentation
-=======================================
+==========================================
 
 .. meta::
    :description lang=en: This library is used for creating C++ based stream writer for H5 files. It focuses on the functionality and performance needed for high performance detectors integrations and pco.edge cameras.
@@ -59,53 +59,44 @@ H5 Writer Client:
 
 .. |languages| image:: https://img.shields.io/github/languages/top/paulscherrerinstitute/lib_cpp_h5_writer
     :alt: Top languages lib_cpp_h5_writer
-    :scale: 100%
 
 .. |languages_client| image:: https://img.shields.io/github/languages/top/paulscherrerinstitute/pco_rclient
     :alt: Top languages pco_rclient
-    :scale: 100%
 
 .. |release_date| image:: https://img.shields.io/github/release-date/paulscherrerinstitute/lib_cpp_h5_writer
     :alt: Release date lib_cpp_h5_writer
-    :scale: 100%
 
 .. |release_date_client| image:: https://img.shields.io/github/release-date/paulscherrerinstitute/pco_rclient
     :alt: Release date pco_rclient
-    :scale: 100%
 
 .. |release| image:: https://img.shields.io/github/v/release/paulscherrerinstitute/lib_cpp_h5_writer
     :alt: Release date lib_cpp_h5_writer
-    :scale: 100%
 
 .. |release_client| image:: https://img.shields.io/github/v/release/paulscherrerinstitute/pco_rclient
     :alt: Release date pco_rclient
-    :scale: 100%
 
 
 .. |docker_build| image:: https://img.shields.io/docker/cloud/build/lhdamiani/tomcat_writer.svg
     :alt: Docker build
-    :scale: 100%
     :target: https://hub.docker.com/repository/docker/lhdamiani/tomcat_writer
 
 .. |codefactor| image:: https://www.codefactor.io/repository/github/paulscherrerinstitute/lib_cpp_h5_writer/badge
     :alt: CodeFactor lib_cpp_h5_writer
-    :scale: 100%
     :target: https://www.codefactor.io/repository/github/paulscherrerinstitute/lib_cpp_h5_writer
 
 .. |codefactor_client| image:: https://www.codefactor.io/repository/github/paulscherrerinstitute/pco_rclient/badge
     :alt: CodeFactor lib_cpp_h5_writer
-    :scale: 100%
     :target: https://www.codefactor.io/repository/github/paulscherrerinstitute/pco_rclient
 
 Contents:
 
 .. toctree::
     :glob:
-    :maxdepth: 3
+    :maxdepth: 2
 
     installation
     getting-started
     usage
-    development
     client-api
+    development
     contact
