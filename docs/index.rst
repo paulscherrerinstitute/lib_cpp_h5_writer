@@ -107,4 +107,5 @@ Contents:
     getting-started
     usage
     development
+    client-api
     contact
