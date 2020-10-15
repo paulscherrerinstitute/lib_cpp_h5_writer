@@ -1,6 +1,6 @@
 PCO_RCLIENT REST API
 ======================================
 
-.. automodule:: pco_client
+.. autoclass:: pco_client.PcoWriter
     :members:
     :undoc-members:
