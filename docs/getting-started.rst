@@ -12,16 +12,8 @@ To verify if the pco_rclient is installed and working on your python virtual env
 
 TOMCAT PCO writer client
 ------------------------
-The pco writer client was developed with the intention to allow a fluid manipulation of the camera commands in a trustful and robust way. It communicates via a REST API with a python flask server that runs on xbl-daq-32 and controls the instantiation of the writer library (lib_cpp_h5_writer) as an external process.
- 
-Basic example:
-
-.. code-block:: python
-
-    pco_controller = PcoWriter(connection_address=<CAMERA_ADDRESS>, user_id=<USER_ID>)
-    pco_controller.get_status()
-
-
+The pco writer client was developed with the intention to allow a fluid manipulation of the camera commands in a trustful and robust way. It communicates via a REST API with a python flask server that runs on xbl-daq-32 and controls the instantiation of the writer library (lib_cpp_h5_writer) as an external process. 
+The list of parameters are displayed in the table below:
 
 +---------------------------+-----------------------------------------------------+
 | Writer parameter          | Description                                         |
@@ -44,16 +36,3 @@ Basic example:
 +---------------------------+-----------------------------------------------------+
 | debug                     | Runs the client in debug mode                       |
 +---------------------------+-----------------------------------------------------+
-
-
-TOMCAT PCO Cameras servers / IOC's name
----------------------------------------
-
-There are currently two servers installed with PCO cameras: PCO-3 and PCO-4.
-
-    * ``tcp://129.129.99.104:8080`` : the 1G copper link on x02da-pco-4 (last updated: 2020-09-31)
-    * ``tcp://pc9808:9999`` : Debug pco camera.
-
-IOC's name:
-    * X02DA-CCDCAM2
-    * X02DA-CCDCAM3

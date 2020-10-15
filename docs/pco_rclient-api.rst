@@ -1,5 +1,5 @@
-PCO_RCLIENT REST API
-======================================
+PCO client api
+==============
 
 .. autoclass:: pco_client.PcoWriter
     :members:
