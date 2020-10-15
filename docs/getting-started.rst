@@ -1,6 +1,6 @@
-######################################
-Getting started with TOMCAT pco writer
-######################################
+###############
+Getting started
+###############
 
 PCO client controller (pco_rclient)
 -----------------------------------
