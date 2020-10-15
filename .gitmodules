@@ -1,0 +1,3 @@
+[submodule "pco_rclient"]
+	path = pco_rclient
+	url = https://github.com/paulscherrerinstitute/pco_rclient.git
