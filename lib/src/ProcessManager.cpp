@@ -273,9 +273,11 @@ void ProcessManager::write_h5()
                 cout << "[ProcessManager::write_h5] Frame index " << received_data.first->frame_index;
                 cout << " does not belong to current file. Write format before the file will be closed." << endl;
             #endif
-            writer->write_metadata_to_file(writer_manager.get_n_received_frames(), writer_manager.get_n_written_frames());
+            if (writer_manager.get_n_received_frames() > 0){
+                writer->write_metadata_to_file(writer_manager.get_n_received_frames(), writer_manager.get_n_written_frames());
 
-            write_h5_format(writer->get_h5_file());            
+                write_h5_format(writer->get_h5_file());          
+            }  
         }
         #ifdef PERF_OUTPUT
             using namespace date;
@@ -369,21 +371,24 @@ void ProcessManager::write_h5()
         while (!writer_manager.are_all_parameters_set() && !writer_manager.is_killed()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(config::parameters_read_retry_interval));
         }
-        writer->write_metadata_to_file(writer_manager.get_n_received_frames(), writer_manager.get_n_written_frames());
 
-        write_h5_format(writer->get_h5_file());
+        if (writer_manager.get_n_received_frames() > 0){
+            writer->write_metadata_to_file(writer_manager.get_n_received_frames(), writer_manager.get_n_written_frames());
 
-        // submits the finished status to the server
-        notify_pco_client_end(writer_manager.get_n_written_frames(), 
-                              writer_manager.get_n_lost_frames(),
-                              writer_manager.get_time_end(),
-                              writer_manager.get_time_start(),
-                              writer_manager.get_duration(),
-                              writer_manager.get_n_frames(),
-                              writer_manager.get_n_frames_offset(),
-                              writer_manager.get_output_file(),
-                              writer_manager.get_user_id(),
-                              writer_manager.get_dataset_name());
+            write_h5_format(writer->get_h5_file());
+
+            // submits the finished status to the server
+            notify_pco_client_end(writer_manager.get_n_written_frames(), 
+                                writer_manager.get_n_lost_frames(),
+                                writer_manager.get_time_end(),
+                                writer_manager.get_time_start(),
+                                writer_manager.get_duration(),
+                                writer_manager.get_n_frames(),
+                                writer_manager.get_n_frames_offset(),
+                                writer_manager.get_output_file(),
+                                writer_manager.get_user_id(),
+                                writer_manager.get_dataset_name());
+        }
     }
     
     #ifdef DEBUG_OUTPUT
