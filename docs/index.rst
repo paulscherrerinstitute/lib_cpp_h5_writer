@@ -94,6 +94,7 @@ Contents:
     :glob:
     :maxdepth: 2
 
+    index
     installation
     getting-started
     usage
