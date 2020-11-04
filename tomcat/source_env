@@ -1,0 +1,11 @@
+#!/bin/sh
+
+export PATH=/home/dbe/miniconda3/bin:$PATH
+
+# Source the environment you need.
+source deactivate
+source activate pco_writer
+
+# Add conda installed libraries to LD_LIBRARY_PATH.
+export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib
+
