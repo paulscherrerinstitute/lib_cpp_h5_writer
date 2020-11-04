@@ -3,8 +3,13 @@
 import sys, os
 
 sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('../tomcat/'))
+sys.path.insert(0, os.path.abspath('../pco_rclient/pco_rclient/'))
 
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo',
+
+
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo', 'sphinx.ext.napoleon',
               'sphinx.ext.coverage', 'sphinx.ext.ifconfig']
 
 todo_include_todos = True
@@ -13,7 +18,27 @@ source_suffix = '.rst'
 master_doc = 'index'
 exclude_patterns = []
 add_function_parentheses = True
-#add_module_names = True
+add_module_names = True
+pygments_style = 'sphinx'
+
+# Napoleon settings
+napoleon_google_docstring = True
+napoleon_numpy_docstring = True
+napoleon_google_docstring = True
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = False
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = False
+napoleon_use_param = True
+napoleon_use_rtype = True
+napoleon_use_keyword = True
+napoleon_custom_sections = None
+
+
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 

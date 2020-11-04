@@ -14,6 +14,7 @@ Key features:
 
 # Table of content
 1. [Quick start using the library](#quick_start)
+1.1. [Diagram](#diagram)
 2. [Build](#build)
     1. [Conda build](#conda_build)
     2. [Local build](#local_build)
@@ -49,6 +50,10 @@ The minimum you need to implement your own writer is:
 - Build file (example: csaxs/Makefile)
 
 For extra documentation, template, usage: [read the docs documentation](https://lib-cpp-h5-writer.readthedocs.io/en/tomcat/index.html)
+<a id="diagram"></a>
+## Architecture diagram
+
+![architecture](https://github.com/paulscherrerinstitute/lib_cpp_h5_writer/raw/tomcat/docs/pco_diagram.jpg)
 
 ## Writer runner
 Example: **csaxs/csaxs\_h5\_writer.cpp**
@@ -179,7 +184,7 @@ remain in the temporary datasets and the user will need to fix the file manually
 <a id="process_manager"></a>
 ## ProcessManager
 
-Not yet here :(
+Process Manager 
 
 <a id="zmq_receiver"></a>
 ## ZmqReceiver
@@ -241,15 +246,6 @@ The H5Format is the base class you need to extend to implement your file format.
 - dataset\_move\_mapping (Move datasets to another place in the file if needed)
 - file_format (The hierarchical structure of your H5 format)
 
-We will discuss each one in details in this chapter.
-
-### input\_value\_type
-
-Not yet here :(
-
-### default\_values
-
-Not yet here :(
 
 ### dataset\_move\_mapping
 
@@ -266,22 +262,6 @@ endianess : "measurement/acquisition/"+dataset_name+"/endianess"
 
 ⋅⋅⋅ This is defined on TomcatFormat.cpp.⋅⋅
 
-
-### file\_format
-
-Not yet here :(
-
-<a id="writer_manager"></a>
-## WriterManager
-
-Not yet here :(
-
-<a id="RingBuffer"></a>
-## RingBuffer
-
-Not yet here :(
-
-<a id="rest_interface"></a>
 # REST interface
 
 The REST interface will start and be available while the writer is running on the port given as parameter when initializing the writer. The table below shows the currently available endpoints:
@@ -302,57 +282,33 @@ curl -X GET http://<address:port>/<endpoint>
 ### PCO_CONTROLLER
 
 ## pco_controller via python script
-The pco_controller is meant for flexible usage and control of the pco writer from within python scripts. 
+The pco_controller is meant for flexible usage and control of the pco writer from within python scripts. Basic example of usage:
 ```python
-# Import the client.
-from pco_controller import PcoWriter
-
-# Connects to the PcoWriter controller
-pco_controller = PcoWriter(output_file='/tmp/output.h5', 
-    dataset_name='data', 
-    connection_address="https://129.129.95.47:8080", 
-    n_frames=5, 
-    user_id=503)
-# gets status
-pco_controller.get_status()
-# updates configuration
-pco_controller.set_configuration(output_file='/tmp/output_new.h5', 
-    dataset_name='data_black', 
-    connection_address="https://129.129.95.47:8080", 
-    n_frames=10,
-    user_id=503)
-# gets the configuration
-pco_controller.get_configuration()
-# starts the writer
-pco_controller.start_writer()
-# gets statistics
-pco_controller.get_statistics()
-# wait the writer
-pco_controller.wait_writer()
-# stop the writer
-pco_controller.stop_writer(VERBOSE)
-```
-
-### PCO_RCLIENT
+###########################
+#### PCO CLIENT OBJECT ####
+###########################
+pco_controller = PcoWriter(connection_address="tcp://129.129.99.104:8080",
+                         user_id=user_id)
+# if there's something running, it will stop
+if pco_controller.is_running():
+     pco_controller.stop()
+pco_controller.configure(output_file=os.path.join(
+     outpath, 'test'+output_str+'.h5'),user_id=user_id,
+     dataset_name="data", n_frames=nframes)
+# start
+pco_controller.start()
+# start nframes transfer via EPICS IOC CAPUT
+start_cam_transfer(nframes)
+# wait for nframes
+print('pco_controller.wait...')
+pco_controller.wait()
+# Stop the camera transfer via EPICS IOC CAPUT
+stop_cam_transfer()
+# statistics
+print(pco_controller.get_statistics())
 
 ```
-    usage: pco_rclient [-h] {start,stop,kill,status} ...
 
-    Rest api pco writer
-
-    optional arguments:
-      -h, --help            show this help message and exit
-
-    command:
-      valid commands
-
-      {start,stop,kill,status}
-                            commands
-        start               start the writer
-        stop                stop the writer
-        kill                kill the writer
-        status              Retrieve the status of the writer
-```
 
 <a id="examples"></a>
 # Examples

@@ -4,7 +4,7 @@ Installation
 
 
 Tomcat pco writer
------------------
+^^^^^^^^^^^^^^^^^
 Tomcat pco writer is deployed and installed on xbl-daq-32 using `ansible`_. The `ansible configuration`_ shows the remote connection to the server and allows to easily deploy new versions of the writer library.
 
     * `pco setup script`_ is used to install the TOMCAT pco writer. It will create the home folder for the specified user on the specified machine, create the conda environment based on `conda exported file`_, clone the repository (for the branch named tomcat) and compile the core library and the tomcat's format and configuration writer.
@@ -12,7 +12,7 @@ Tomcat pco writer is deployed and installed on xbl-daq-32 using `ansible`_. The 
     * `pco start script`_ activates the environment and starts the service that starts a `python flask server`_. The flask server is listening to commands issued using the pco_rclient.
 
 Tomcat pco writer client
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 Tomcat's pco writer controller is hosted on the psi conda channel and is installed using:
 
 .. code-block:: bash
@@ -37,29 +37,42 @@ For more information/details about the pco_rclient, please check:
 .. _repository : https://github.com/paulscherrerinstitute/pco_rclient
 .. _conda package : https://anaconda.org/paulscherrerinstitute/pco_rclient
 
+TOMCAT PCO Cameras servers / IOC's name
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There are currently two servers installed with PCO cameras: PCO-3 and PCO-4.
+
+    * ``tcp://129.129.99.104:8080`` : the 1G copper link on x02da-pco-4 (last updated: 2020-09-31)
+    * ``tcp://pc9808:9999`` : Debug pco camera.
+
+IOC's name:
+    * X02DA-CCDCAM2
+    * X02DA-CCDCAM3
+
 
 Deployment information
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
-As sudo user on XBL-DAQ-32, one can run using a systemd service (```/etc/systemd/system/pco_writer_1.service```).
+As sudo user on XBL-DAQ-32, one can run using a systemd service (``/etc/systemd/system/pco_writer_1.service``).
 
-The services invokes the startup file, located in ```/home/dbe/service_scripts/```.
+The services invokes the startup file, located in ``/home/dbe/service_scripts/``.
 
 The service can be controlled with the following commands (using sudo or root):
 
-    * ```systemctl start pco_writer_1```: start the flask serve;
-    * ```systemctl stop pco_writer_1```: stop the flask server;
-    * ```journalctl -u pco_writer_1 -f``` : check the flask logs;
-    * ```systemctl is-active --quiet pco_writer_1  && echo PCO flask server is running || echo Pco flask server is not running``` : check if flask server is runnign;
+    * Flask server commands start / stop / restart: ``systemctl <cmd> pco_writer_1``
+        * Flask server status: ``systemctl status pco_writer_1``
+    * Flask log: ``journalctl -u pco_writer_1 -f``
 
-Ansible Deployment
-------------------
 
-Useful:
-    * Template `pco_writer_setup`_ 
-    * Template `pco_writer_start`_ 
-    * Conda environment `pco_writer`_
+.. note::
+    Accessing statuses of the python flask service can be also acquired via its REST api interface:
 
-.. `pco_writer_setup`_ : https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/pco_writer_setup.sh
-.. `pco_writer_start`_ : https://git.psi.ch/HPDI/daq_server_deployment/blob/master/ansible/roles/generic_service/templates/pco_writer_start.sh
-.. `pco_writer`_ : https://git.psi.ch/hpdi_configs/sls/blob/master/hosts/xbl-daq-32/conda_env.yml
+    .. code-block:: bash
+        
+        $ curl -X GET http://xbl-daq-32:9901/<endpoint>
+
+    
+.. note::
+   journalctl allows  the usage of, for example: **--since "1 hour ago"** to apply filters on the output file. For more instructions check `journalct guide`_.
+
+.. _journalct guide:  https://www.loggly.com/ultimate-guide/using-journalctl/

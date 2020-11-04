@@ -44,3 +44,7 @@ obj/
 
 # mflow dump stream
 *.raw
+
+# flask session
+tomcat/__pycache__/
+tomcat/flask_session/
