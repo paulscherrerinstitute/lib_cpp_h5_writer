@@ -88,6 +88,31 @@ H5 Writer Client:
     :alt: CodeFactor lib_cpp_h5_writer
     :target: https://www.codefactor.io/repository/github/paulscherrerinstitute/pco_rclient
 
+
+Useful info
+^^^^^^^^^^^
+
+(sudo required) To control the server from xbl-daq-32: 
+* ``systemctl start pco_writer_1``
+* ``systemctl stop pco_writer_1``
+* ``systemctl status pco_writer_1``
+
+.. note::
+    Accessing statuses of the python flask service can be also acquired via its REST api interface without sudo rights:
+
+    .. code-block:: bash
+        
+        $ curl -X GET http://xbl-daq-32:9901/get_server_log
+    
+(sudo required) To check the server's log from xbl-daq-32:
+* ``journalctl -u pco_writer_1 -f``    
+
+.. note::
+   journalctl allows the usage of, for example: **--since "1 hour ago"** to apply filters on the output file. For more instructions check `journalct guide`_.
+
+.. _journalct guide: https://www.loggly.com/ultimate-guide/using-journalctl/
+
+
 Contents:
 
 .. toctree::
