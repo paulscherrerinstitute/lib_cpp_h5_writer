@@ -281,9 +281,9 @@ curl -X GET http://<address:port>/<endpoint>
 
 ### PCO_RCLIENT
 
-[pco_rclient](https://github.com/paulscherrerinstitute/pco_rclient).
-[pco_rclient package](https://anaconda.org/paulscherrerinstitute/pco_rclient)
-[pco_rclient api documentation](https://lib-cpp-h5-writer.readthedocs.io/en/tomcat/pco_rclient-api.html)
+* [pco_rclient](https://github.com/paulscherrerinstitute/pco_rclient).
+* [pco_rclient package](https://anaconda.org/paulscherrerinstitute/pco_rclient)
+* [pco_rclient api documentation](https://lib-cpp-h5-writer.readthedocs.io/en/tomcat/pco_rclient-api.html)
 
 
 
