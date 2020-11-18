@@ -93,9 +93,9 @@ Useful info
 ^^^^^^^^^^^
 
 (sudo required) To control the server from xbl-daq-32: 
-* ``systemctl start pco_writer_1``
-* ``systemctl stop pco_writer_1``
-* ``systemctl status pco_writer_1``
+   * ``systemctl start pco_writer_1``
+   * ``systemctl stop pco_writer_1``
+   * ``systemctl status pco_writer_1``
 
 .. note::
     Accessing statuses of the python flask service can be also acquired via its REST api interface without sudo rights:
@@ -105,8 +105,7 @@ Useful info
         $ curl -X GET http://xbl-daq-32:9901/get_server_log
     
 (sudo required) To check the server's log from xbl-daq-32:
-* ``journalctl -u pco_writer_1 -f``    
-
+    * ``journalctl -u pco_writer_1 -f``    
 .. note::
    journalctl allows the usage of, for example: **--since "1 hour ago"** to apply filters on the output file. For more instructions check `journalct guide`_.
 
