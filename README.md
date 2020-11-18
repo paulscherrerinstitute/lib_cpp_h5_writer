@@ -274,40 +274,17 @@ The REST interface will start and be available while the writer is running on th
 | `statistics` | Gets the statistics from the writer manager.  |
 | `parameters` | [GET/POST] Allows to get and post parameters from the writer manager. |
 
-The rest interface can be used directly using cURL command or with the client developed specifically to control it [pco_rclient](https://github.com/paulscherrerinstitute/pco_rclient).
+The rest interface can be used directly using cURL command or with the client developed specifically to control it (PCO_RCLIENT). 
 
 ### Get writer status using curl command:
 curl -X GET http://<address:port>/<endpoint>
 
-### PCO_CONTROLLER
+### PCO_RCLIENT
 
-## pco_controller via python script
-The pco_controller is meant for flexible usage and control of the pco writer from within python scripts. Basic example of usage:
-```python
-###########################
-#### PCO CLIENT OBJECT ####
-###########################
-pco_controller = PcoWriter(connection_address="tcp://129.129.99.104:8080",
-                         user_id=user_id)
-# if there's something running, it will stop
-if pco_controller.is_running():
-     pco_controller.stop()
-pco_controller.configure(output_file=os.path.join(
-     outpath, 'test'+output_str+'.h5'),user_id=user_id,
-     dataset_name="data", n_frames=nframes)
-# start
-pco_controller.start()
-# start nframes transfer via EPICS IOC CAPUT
-start_cam_transfer(nframes)
-# wait for nframes
-print('pco_controller.wait...')
-pco_controller.wait()
-# Stop the camera transfer via EPICS IOC CAPUT
-stop_cam_transfer()
-# statistics
-print(pco_controller.get_statistics())
+[pco_rclient](https://github.com/paulscherrerinstitute/pco_rclient).
+[pco_rclient package](https://anaconda.org/paulscherrerinstitute/pco_rclient)
+[pco_rclient api documentation](https://lib-cpp-h5-writer.readthedocs.io/en/tomcat/pco_rclient-api.html)
 
-```
 
 
 <a id="examples"></a>
