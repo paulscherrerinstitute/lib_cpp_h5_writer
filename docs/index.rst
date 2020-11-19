@@ -98,11 +98,18 @@ Useful info
    * ``systemctl status pco_writer_1``
 
 .. note::
-    Accessing statuses of the python flask service can be also acquired via its REST api interface without sudo rights:
-
-    .. code-block:: bash
+    Accessing the status of the pco_writer_1 service can be also acquired via its REST api interface without sudo rights:
+      * Using the pco_rclient:
+         .. code-block:: bash
         
-        $ curl -X GET http://xbl-daq-32:9901/get_server_log
+            $ pco_controller = PcoWriter(connection_address=<CAM_ADDRESS>, user_id=<USER_ID>)
+            $ pco_controller.get_server_log()
+          
+      
+      * Using curl:
+         .. code-block:: bash
+        
+            $ curl -X GET http://xbl-daq-32:9901/get_server_log
     
 (sudo required) To check the server's log from xbl-daq-32:
     * ``journalctl -u pco_writer_1 -f``    
