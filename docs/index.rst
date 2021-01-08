@@ -109,7 +109,7 @@ Useful info
       * Using curl:
          .. code-block:: bash
         
-            $ curl -X GET http://xbl-daq-32:9901/get_server_log
+            $ curl -X GET http://xbl-daq-32:9901/server_log
     
 (sudo required) To check the server's log from xbl-daq-32:
     * ``journalctl -u pco_writer_1 -f``    
