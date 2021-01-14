@@ -273,5 +273,3 @@ def validate_response_from_writer(writer_response):
                 'status':writer_response['status']}
     return {'success':False}
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9901, debug=False, threaded=False, processes=1)

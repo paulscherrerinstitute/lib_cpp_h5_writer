@@ -1,0 +1,16 @@
+{
+	"cameras": [ 
+		{
+			"name": "pco1",
+			"connection_address": "tcp://10.10.1.26:8080",
+            "flask_api_address": "http://xbl-daq-32:9901",
+            "writer_api_address": "http://xbl-daq-32:9555"
+		},
+		{
+            "name": "pco2",
+			"connection_address": "tcp://10.10.1.202:8080",
+            "flask_api_address": "http://xbl-daq-32:9901",
+            "writer_api_address": "http://xbl-daq-32:9555"
+		}
+	]
+}
