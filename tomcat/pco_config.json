@@ -9,8 +9,8 @@
 		{
             "name": "pco2",
 			"connection_address": "tcp://10.10.1.202:8080",
-            "flask_api_address": "http://xbl-daq-32:9901",
-            "writer_api_address": "http://xbl-daq-32:9555"
+            "flask_api_address": "http://xbl-daq-32:9902",
+            "writer_api_address": "http://xbl-daq-32:9556"
 		}
 	]
 }
