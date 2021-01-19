@@ -226,7 +226,7 @@ def start_pco_writer():
             tomcat_args = [tomcat_pco_writer]
             for key in app.config['default_args']:
                 tomcat_args.append(data[key])
-            app.config['endpoint'] = "http://xbl-daq-34"+data['writer_rest_port']
+            app.config['endpoint'] = "http://xbl-daq-34:"+data['writer_rest_port']
             p = subprocess.Popen(
                 tomcat_args,
                 shell=False,
