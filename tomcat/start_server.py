@@ -36,7 +36,7 @@ __docformat__ = 'restructuredtext en'
 # path to writer's executable
 tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
 # writer's rest api address:port
-endpoint = 'http://xbl-daq-34:9555'
+
 debug = False
 # if not running on xbl-daq-32 -> DEBUG
 # if os.uname()[1] != 'xbl-daq-34.psi.ch':
@@ -51,6 +51,7 @@ app.config['SESSION_TYPE'] = 'filesystem'
 app.config['previous_statistics'] = None
 app.config['statistics'] = None
 app.config['error'] = None
+app.config['endpoint'] = 'http://xbl-daq-34:9555'
 app.config['default_args'] = [
     'connection_address',
     'output_file',
@@ -165,7 +166,7 @@ def get_status():
     except Exception as e:
         pass
     # gets new status from writer
-    request_url = endpoint+'/status'
+    request_url = app.config['endpoint']+'/status'
     try:
         response = requests.get(request_url).json()
         if validate_response_from_writer(response):
@@ -225,6 +226,7 @@ def start_pco_writer():
             tomcat_args = [tomcat_pco_writer]
             for key in app.config['default_args']:
                 tomcat_args.append(data[key])
+            app.config['endpoint'] = "http://xbl-daq-34"+data['writer_rest_port']
             p = subprocess.Popen(
                 tomcat_args,
                 shell=False,
