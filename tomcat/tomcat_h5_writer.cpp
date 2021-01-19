@@ -14,7 +14,7 @@ int main (int argc, char *argv[])
     if (argc != 9) {
         cout << endl;
         cout << "Usage: tomcat_h5_writer [connection_address] [output_file] [n_frames] [user_id]" << endl;
-        cout << " [dataset_name] [max_frames_per_file] [writer_rest_address] [pco_server_address]" << endl;
+        cout << " [dataset_name] [max_frames_per_file] [writer_rest_port] [pco_server_address]" << endl;
         cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\toutput_file: Name of the output file." << endl;
         cout << "\tn_frames: Number of images to acquire. 0 for infinity (until /stop is called)." << endl;
