@@ -142,8 +142,8 @@ def get_server_uptime():
             uptime = subprocess.run(['systemctl', 'status', 'pco_writer_1'], stdout=subprocess.PIPE).stdout.decode('utf-8').split("Active: ")[1].split(";")[0]
         return {'success':True, 'uptime': uptime}
 
-@app.route('/status', methods=['GET'])
-def get_status():
+@app.route('/status/<endpoint>', methods=['GET'])
+def get_status(endpoint):
     """
     Gets the status from the PCO writer process or from a previous
     execution of it.
@@ -166,7 +166,7 @@ def get_status():
     except Exception as e:
         pass
     # gets new status from writer
-    request_url = app.config['endpoint']+'/status'
+    request_url = "http://xbl-daq-34:"+endpoint+'/status'
     try:
         response = requests.get(request_url).json()
         if validate_response_from_writer(response):
