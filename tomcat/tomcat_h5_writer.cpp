@@ -11,16 +11,18 @@
 
 int main (int argc, char *argv[])
 {
-    if (argc != 7) {
+    if (argc != 9) {
         cout << endl;
         cout << "Usage: tomcat_h5_writer [connection_address] [output_file] [n_frames] [user_id]" << endl;
-        cout << " [dataset_name] [max_frames_per_file]" << endl;
+        cout << " [dataset_name] [max_frames_per_file] [writer_rest_address] [pco_server_address]" << endl;
         cout << "\tconnection_address: Address to connect to the stream (PULL). Example: tcp://127.0.0.1:40000" << endl;
         cout << "\toutput_file: Name of the output file." << endl;
         cout << "\tn_frames: Number of images to acquire. 0 for infinity (until /stop is called)." << endl;
         cout << "\tuser_id: uid under which to run the writer. -1 to leave it as it is." << endl;
         cout << "\tdataset_name: Definition of the dataset name." << endl;
         cout << "\tframes_per_file: Maximum number of frames for each h5 file." << endl;
+        cout << "\twriter_rest_port: Writer's rest port." << endl;
+        cout << "\tflask_api_address: Flask's address:port." << endl;
         cout << endl;
         exit(-1);
     }
@@ -32,13 +34,14 @@ int main (int argc, char *argv[])
     string dataset_name = string(argv[5]);
     hsize_t frames_per_file = atoi(argv[6]);
     int n_modules = 1;
-    int rest_port = 9555;
+    int rest_port = atoi(argv[7]);
     
     
     // For DEBUG -> http://0.0.0.0:9901
     // string pco_client_rest_address = "http://0.0.0.0:9901";
-    // For Release -> http://xbl-daq-32:9901
-    string pco_client_rest_address = "http://xbl-daq-32:9901";
+    // For Release -> // "http://xbl-daq-34:9901";
+    string pco_client_rest_address = string(argv[8]);
+    
 
 
     if (user_id != -1) {

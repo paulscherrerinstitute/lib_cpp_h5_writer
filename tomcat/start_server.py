@@ -36,12 +36,12 @@ __docformat__ = 'restructuredtext en'
 # path to writer's executable
 tomcat_pco_writer = '/home/dbe/git/lib_cpp_h5_writer/tomcat/bin/tomcat_h5_writer'
 # writer's rest api address:port
-endpoint = 'http://xbl-daq-32:9555'
+endpoint = 'http://xbl-daq-34:9555'
 debug = False
 # if not running on xbl-daq-32 -> DEBUG
-if os.uname()[1] != 'xbl-daq-32.psi.ch':
-    endpoint = 'http://localhost:9555'
-    debug = True
+# if os.uname()[1] != 'xbl-daq-34.psi.ch':
+#     endpoint = 'http://localhost:9555'
+#     debug = True
 
 
 app = Flask(__name__)
@@ -58,6 +58,8 @@ app.config['default_args'] = [
     'user_id',
     'dataset_name',
     'max_frames_per_file',
+    'writer_rest_port',
+    'flask_api_address',
     ]
 
 Session(app)
