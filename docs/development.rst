@@ -2,8 +2,8 @@
 Development
 ###########
 
-Cameras/server addresses
-------------------------
+Cameras/server addresses PCO1
+-----------------------------
 
 +---------------------------+-----------------------------------------------------+
 | Address:Port              | Description                                         |
@@ -12,23 +12,43 @@ Cameras/server addresses
 +---------------------------+-----------------------------------------------------+
 | tcp://10.10.1.26:8080     | PCO camera (10G fiber-optic link X02DA-PCO-1.psi.ch)|
 +---------------------------+-----------------------------------------------------+
+| X02DA-CCDCAM1             | PCO camera 1 ioc                                    |
++---------------------------+-----------------------------------------------------+
+| pco_writer-pco1.          | Service name for pco 1                              |
++---------------------------+-----------------------------------------------------+
+| http://xbl-daq-34:9901    | Flask python server for pco 1                       |
++---------------------------+-----------------------------------------------------+
+| http://xbl-daq-34:9555    | Writer API address (only valid during acquisitions)*|
++---------------------------+-----------------------------------------------------+
+
+Cameras/server addresses PCO2
+-----------------------------
+
++---------------------------+-----------------------------------------------------+
+| Address:Port              | Description                                         |
++===========================+=====================================================+
 | tcp://129.129.99.107:8080 | PCO camera (1G copper link X02DA-PCO-2.psi.ch)      |
 +---------------------------+-----------------------------------------------------+
 | tcp://10.10.1.202:8080    | PCO camera (10G fiber-optic link X02DA-PCO-2.psi.ch)|
 +---------------------------+-----------------------------------------------------+
-| http://xbl-daq-32:9901    | Flask python server                                 |
+| X02DA-CCDCAM2             | PCO camera 2 ioc                                    |
 +---------------------------+-----------------------------------------------------+
-| http://xbl-daq-32:9555    | Writer API address (only valid during acquisitions)*|
+| pco_writer-pco2.          | Service name for pco 2                              |
 +---------------------------+-----------------------------------------------------+
-| tcp://pc9808:9999         | DEBUG PCO Camera                                    |
+| http://xbl-daq-34:9902    | Flask python server for pco 2                       |
++---------------------------+-----------------------------------------------------+
+| http://xbl-daq-34:9556    | Writer API address (only valid during acquisitions)*|
 +---------------------------+-----------------------------------------------------+
 
 .. note::
    * *Writer API address is a parameter used when configuring and, therefore, can be changed.
+   
+.. note::
+   * *DEBUG PCO Camera: tcp://pc9808:9999
 
 Contribute and create a merge request
 -------------------------------------
-You can create a new branch to implemenet new features for the tomcat pco writer by doing
+You can create a new branch to implement new features for the tomcat pco writer by doing
 
 .. code-block:: bash
 

@@ -17,7 +17,7 @@ Key features of the library:
 
 In addition, the TOMCAT pco writer:
       * Offers a remote client for controlling and spawning the writer - `pco_rclient`_
-      * Runs on xbl-daq-32 and is controlled remotely using the `pco_rclient`_ (inside tomcat's gateway - x06sa-gw).
+      * Runs on xbl-daq-34 and is controlled remotely using the `pco_rclient`_ (inside tomcat's gateway - x06sa-gw).
       * The `pco_rclient`_ allows to fully control automated acquisitions and the usage of scripting 
       * Is deployed/installed using ansible playbooks in a conda environment. Check `ansible configuration`_ and `conda env`_. 
       * It's distributed via Anaconda and easily installed using the `conda_client`_
@@ -92,33 +92,30 @@ H5 Writer Client:
 Useful info
 ^^^^^^^^^^^
 
-(sudo required) To control the server from xbl-daq-32: 
-   * ``systemctl start pco_writer_1``
-   * ``systemctl stop pco_writer_1``
-   * ``systemctl status pco_writer_1``
-
-.. note::
-    Accessing the status of the pco_writer_1 service can be also acquired via its REST api interface without sudo rights:
-      * Using the pco_rclient:
-         .. code-block:: bash
-        
-            $ pco_controller = PcoWriter(connection_address=<CAM_ADDRESS>, user_id=<USER_ID>)
-            $ pco_controller.get_server_log()
-          
-      
-      * Using curl:
-         .. code-block:: bash
-        
-            $ curl -X GET http://xbl-daq-32:9901/server_log
+(sudo required) To control the server from xbl-daq-34: 
+   * ``systemctl start pco_writer-pco{1-2}``
+   * ``systemctl stop pco_writer-pco{1-2}``
+   * ``systemctl status pco_writer-pco{1-2}``
+            
     
-(sudo required) To check the server's log from xbl-daq-32:
-    * ``journalctl -u pco_writer_1 -f``    
+(sudo required) To check the server's log from xbl-daq-34:
+    * ``journalctl -u pco_writer-pco{1-2} -f``
+
 .. note::
    journalctl allows the usage of, for example: **--since "1 hour ago"** to apply filters on the output file. For more instructions check `journalct guide`_.
 
 .. _journalct guide: https://www.loggly.com/ultimate-guide/using-journalctl/
 
 
+The ```pco_writer-pco{1-2}``` logs are shipped to PSI `kibana`_ infrastructure using `journalbeat`_. After logging in, locate the dashboard: ```[xbl-daq-34] Tomcat PCO Writer``` or use the `direct`_ link. 
+
+.. note::
+   The search bar inside the dashboard uses the Kibana Query Language `(KQL)`_. It offers a simplified query syntax and support for scripted fields.
+ 
+.. _kibana : http://kibana.psi.ch/
+.. _journalbeat : https://www.elastic.co/guide/en/beats/journalbeat/current/index.html
+.. _direct : https://kibana.psi.ch/s/gfa/app/dashboards#/view/68e8b3d0-5b0f-11eb-a4fd-4fdac4bb5369?_g=(filters%3A!()%2CrefreshInterval%3A(pause%3A!t%2Cvalue%3A0)%2Ctime%3A(from%3Anow-15m%2Cto%3Anow))
+.. _(KQL) : https://www.elastic.co/guide/en/kibana/7.9/kuery-query.html
 Contents:
 
 .. toctree::
