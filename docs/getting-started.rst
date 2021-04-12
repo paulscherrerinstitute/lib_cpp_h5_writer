@@ -26,9 +26,9 @@ The list of parameters are displayed in the table below:
 +---------------------------+-----------------------------------------------------+
 | connection_address        | Camera server address (incoming ZMQ stream)         |
 +---------------------------+-----------------------------------------------------+
-| flask_api_address         | Flask server's address (http://xbl-daq-32:9901)     |
+| flask_api_address         | Flask server's address (http://xbl-daq-34:9901)     |
 +---------------------------+-----------------------------------------------------+
-| writer_api_address        | Writer REST api address (http://xbl-daq-32:9555)    |
+| writer_api_address        | Writer REST api address (http://xbl-daq-34:9555)    |
 +---------------------------+-----------------------------------------------------+
 | user_id                   | User id                                             |
 +---------------------------+-----------------------------------------------------+
