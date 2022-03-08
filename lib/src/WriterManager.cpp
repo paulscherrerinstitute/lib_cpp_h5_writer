@@ -18,7 +18,6 @@ void writer_utils::set_process_id(int user_id)
         using namespace date;
         error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[writer_utils::set_process_id] Cannot set group_id to " << user_id << endl;
-
         throw runtime_error(error_message.str());
     }
 
@@ -27,7 +26,6 @@ void writer_utils::set_process_id(int user_id)
         using namespace date;
         error_message << "[" << std::chrono::system_clock::now() << "]";
         error_message << "[writer_utils::set_process_id] Cannot set user_id to " << user_id << endl;
-
         throw runtime_error(error_message.str());
     }
 }
@@ -38,12 +36,13 @@ void writer_utils::create_destination_folder(const string& output_file)
 
     if (file_separator_index != string::npos) {
         string output_folder(output_file.substr(0, file_separator_index));
-        using namespace date;
-        cout << "[" << std::chrono::system_clock::now() << "]";
-        cout << "[writer_utils::create_destination_folder] Creating folder " << output_folder << endl;
-
         string create_folder_command("mkdir -p " + output_folder);
-        cout << create_folder_command.c_str() << endl;
+        string create_folder_command("mkdir -p " + output_folder);
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << "[" << std::chrono::system_clock::now() << "]";
+            cout << "[writer_utils::create_destination_folder] Creating folder " << output_folder << endl;
+        #endif
         system(create_folder_command.c_str());
     }
 }
