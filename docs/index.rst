@@ -17,7 +17,7 @@ Key features of the library:
 
 In addition, the TOMCAT pco writer:
       * Offers a remote client for controlling and spawning the writer - `pco_rclient`_
-      * Runs on xbl-daq-34 and is controlled remotely using the `pco_rclient`_ (inside tomcat's gateway - x06sa-gw).
+      * Runs on xbl-daq-34 and is controlled remotely using the `pco_rclient`_ (inside tomcat's gateway - x02da-gw).
       * The `pco_rclient`_ allows to fully control automated acquisitions and the usage of scripting 
       * Is deployed/installed using ansible playbooks in a conda environment. Check `ansible configuration`_ and `conda env`_. 
       * It's distributed via Anaconda and easily installed using the `conda_client`_
