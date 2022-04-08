@@ -37,7 +37,6 @@ void writer_utils::create_destination_folder(const string& output_file)
     if (file_separator_index != string::npos) {
         string output_folder(output_file.substr(0, file_separator_index));
         string create_folder_command("mkdir -p " + output_folder);
-        string create_folder_command("mkdir -p " + output_folder);
         #ifdef DEBUG_OUTPUT
             using namespace date;
             cout << "[" << std::chrono::system_clock::now() << "]";
